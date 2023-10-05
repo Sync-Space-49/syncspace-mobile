@@ -1,6 +1,6 @@
-![SyncSpace Logo](public/icons/SyncSpace-mint.png)
+[![SyncSpace Logo](https://drive.google.com/file/d/1auIDnZmAkM2jXgv00sM1FaKmTjTauI_z/view?usp=drive_link)](https://drive.google.com)
 
-### Welcome to SyncSpace Mobile :rocket:
+### Welcome to SyncSpace Mobile 🚀
 
 ## Intro
 SyncSpace Mobile is the mobile counterpart to SyncSpace (who would've thought). Built using Ionic with React, we can build iOS and Android apps simultaneously with just one codebase. 
