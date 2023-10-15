@@ -1,0 +1,15 @@
+.list-title {
+    font-size: 18px; 
+    font-weight: bold; 
+    margin-top: 20px; 
+    margin-bottom: 10px; 
+    padding-left: 15px; 
+}
+
+.sub-list-title {
+    font-size: 16px;
+    font-weight: 300;
+    margin-top: 20px; 
+    margin-bottom: 5px; 
+    padding-left: 15px; 
+}
