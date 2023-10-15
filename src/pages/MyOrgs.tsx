@@ -1,6 +1,15 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
-import './MyOrgs.css';
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonSearchbar,
+  IonButton,
+} from "@ionic/react";
+// import ExploreContainer from '../components/ExploreContainer';
+import "./MyOrgs.css";
+import CustomList from "../components/CustomList";
 
 const MyOrgs: React.FC = () => {
   return (
@@ -16,7 +25,29 @@ const MyOrgs: React.FC = () => {
             <IonTitle size="large">My Organizations</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="My Organizations" />
+        <IonSearchbar></IonSearchbar>
+
+        <CustomList
+          title="SyncSpace's Boards"
+          imgSrc="/icons/SyncSpace-mint.png"
+          items={["Frontend", "Mobile", "Backend"]}
+        />
+
+        <CustomList
+          title="My Boards"
+          imgSrc="/icons/SyncSpace-mint.png"
+          items={["Laundry Room remodel", "Garden"]}
+        />
+
+        <CustomList
+          title="ACM-W's Boards"
+          imgSrc="/icons/SyncSpace-mint.png"
+          items={["Axe-Hacks", "Fall '23"]}
+        />
+        <div className="button">
+          {/* Does having this make sense? Don't we already have a '+' button at the very top? */}
+          <IonButton shape="round">+ Add Organization</IonButton>
+        </div>
       </IonContent>
     </IonPage>
   );
