@@ -1,5 +1,4 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
 import './MyBoards.css';
 
 const Tab2: React.FC = () => {
@@ -7,7 +6,7 @@ const Tab2: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Tab 2</IonTitle>
+          <IonTitle>My Boards</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -16,7 +15,6 @@ const Tab2: React.FC = () => {
             <IonTitle size="large">My Boards</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="My Boards" />
       </IonContent>
     </IonPage>
   );
