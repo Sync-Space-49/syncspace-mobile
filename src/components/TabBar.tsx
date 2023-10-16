@@ -10,43 +10,37 @@ import Profile from "../pages/Profile";
 const TabBar: React.FC = () => {
     return (
         <IonReactRouter>
-        <IonTabs>
-            <IonRouterOutlet>
-            <Route exact path="/home">
-                <Home />
-            </Route>
-            <Route exact path="/myboards">
-                <MyBoards />
-            </Route>
-            <Route exact path="/myorgs">
-                <MyOrgs />
-            </Route>
-            <Route exact path="/profile">
-                <Profile />
-            </Route>
-            <Route exact path="/">
-                <Redirect to="/home" />
-            </Route>
-            </IonRouterOutlet>
-            <IonTabBar slot="bottom">
-            <IonTabButton tab="Home" href="/home">
-                <IonIcon aria-hidden="true" icon={home} />
-                <IonLabel>Home</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="My Boards" href="/myboards">
-                <IonIcon aria-hidden="true" icon={browsersOutline} />
-                <IonLabel>My Boards</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="My Organizations" href="/myorgs">
-                <IonIcon aria-hidden="true" icon={layersOutline} />
-                <IonLabel>My Orgs</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="Profile" href="/profile">
-                <IonIcon aria-hidden="true" icon={personCircleOutline} />  
-                <IonLabel>Profile</IonLabel>
-            </IonTabButton>
-            </IonTabBar>
-        </IonTabs>
+            <IonTabs>
+                <IonRouterOutlet>
+                <Route exact path="/app/home">
+                    <Home />
+                </Route>
+                <Route exact path="/app/myboards">
+                    <MyBoards />
+                </Route>
+                <Route exact path="/app/myorgs">
+                    <MyOrgs />
+                </Route>
+                <Route exact path="/app/profile">
+                    <Profile />
+                </Route>
+                </IonRouterOutlet>
+
+                <IonTabBar slot="bottom">
+                    <IonTabButton tab="Home" href="/app/home">
+                        <IonIcon aria-hidden="true" icon={home} />
+                        <IonLabel>Home</IonLabel>
+                    </IonTabButton>
+                    <IonTabButton tab="My Organizations" href="/app/myorgs">
+                        <IonIcon aria-hidden="true" icon={layersOutline} />
+                        <IonLabel>My Orgs</IonLabel>
+                    </IonTabButton>
+                    <IonTabButton tab="Profile" href="/app/profile">
+                        <IonIcon aria-hidden="true" icon={personCircleOutline} />  
+                        <IonLabel>Profile</IonLabel>
+                    </IonTabButton>
+                </IonTabBar>
+            </IonTabs>
         </IonReactRouter>
     );
 };
