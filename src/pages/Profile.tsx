@@ -19,7 +19,7 @@ const Profile: React.FC = () => {
           <IonTitle>Profile</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen color="light">
+      <IonContent>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Profile</IonTitle>
