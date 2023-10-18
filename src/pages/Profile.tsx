@@ -8,7 +8,6 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-// import ExploreContainer from '../components/ExploreContainer';
 import "./Profile.css";
 
 const Profile: React.FC = () => {

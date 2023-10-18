@@ -9,7 +9,6 @@ import {
   IonToolbar,
   IonSearchbar,
 } from "@ionic/react";
-// import ExploreContainer from '../components/ExploreContainer';
 import CustomList from "../components/CustomList";
 import "./Home.css";
 
@@ -32,41 +31,49 @@ const Home: React.FC = () => {
 
         <CustomList
           title="Quick Access"
-          items={["Mobile", "Axe-Hacks", "Fall'23"]}
+          items={[
+            { text: "Mobile", listImg: "/icons/SyncSpace-mint.png" },
+            { text: "Axe-Hacks", listImg: "/icons/SyncSpace-mint.png" },
+            { text: "Fall'23", listImg: "/icons/SyncSpace-mint.png" },
+          ]}
         />
 
         <CustomList
           title="Recent Activity"
           subTitle="Today"
           items={[
-            "Dylan created a new ticket: “Modify AI Models”",
-            "Sumi marked “Create flyers for Axe-Hacks” as completed",
-            "Tyler deleted “[SPIKE] Research AI”",
+            {
+              text: "Dylan created a new ticket: “Modify AI Models”",
+              listImg: "/icons/SyncSpace-mint.png",
+            },
+            {
+              text: "Sumi marked “Create flyers for Axe-Hacks” as completed",
+              listImg: "/icons/SyncSpace-mint.png",
+            },
+            {
+              text: "Tyler deleted “[SPIKE] Research AI”",
+              listImg: "/icons/SyncSpace-mint.png",
+            },
           ]}
         />
 
         <CustomList
           subTitle="Yesterday"
           items={[
-            "Nathan edited “Add Account Functionality”",
-            "Kaitlyn commented “Should we use React?”",
-            "MJ marked “Update Github README” as in-progress",
+            {
+              text: "Nathan edited “Add Account Functionality”",
+              listImg: "/icons/SyncSpace-mint.png",
+            },
+            {
+              text: "Kaitlyn commented “Should we use React?”",
+              listImg: "/icons/SyncSpace-mint.png",
+            },
+            {
+              text: "MJ marked “Update Github README” as in-progress",
+              listImg: "/icons/SyncSpace-mint.png",
+            },
           ]}
         />
-
-        {/* An example of old list implementation in case we need to go back (but look at how much neater components are <3) */}
-        {/* <div className="list-title">Quick Access</div>
-        <IonList inset={true}>
-          <IonItem>
-            <IonLabel>Mobile</IonLabel>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Axe-Hacks</IonLabel>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Fall '23</IonLabel>
-          </IonItem>
-        </IonList> */}
       </IonContent>
     </IonPage>
   );

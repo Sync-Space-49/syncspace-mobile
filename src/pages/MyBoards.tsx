@@ -1,6 +1,11 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
-import './MyBoards.css';
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
+import "./MyBoards.css";
 
 const Tab2: React.FC = () => {
   return (
@@ -16,7 +21,6 @@ const Tab2: React.FC = () => {
             <IonTitle size="large">My Boards</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="My Boards" />
       </IonContent>
     </IonPage>
   );
