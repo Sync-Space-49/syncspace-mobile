@@ -5,24 +5,23 @@ import App from './App';
 
 const domain = process.env.REACT_APP_AUTH0_DOMAIN;
 const clientId = process.env.REACT_APP_AUTH0_FRONTEND_CLIENT_ID;
-
-console.log(domain);
-console.log(clientId);
-console.log(process.env)
+const authorizationParams = process.env.REACT_APP_AUTHORIZATION_PARAMS
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
 
 root.render(
-  // <Auth0Provider
-  //   domain={domain}
-  //   clientId={clientId}
-  //   authorizationParams={{
-  //     redirect_uri: window.location.origin
-  //   }}
-  // >
+  <Auth0Provider
+    // domain="{domain}"
+    // clientId="{clientId}"
+    domain={domain}
+    clientId={clientId}
+    useRefreshTokens={true}
+    useRefreshTokensFallback={false}
+    authorizationParams={authorizationParams}
+  >
     <React.StrictMode>
       <App />
     </React.StrictMode>
-  // </Auth0Provider>
-);
+   </Auth0Provider>
+)

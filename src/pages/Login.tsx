@@ -4,6 +4,8 @@ import SyncSpaceLogoSmall from '/svgs/SyncSpace-logo-100w.svg';
 import './LandingPage.css';
 import TabBar from '../components/TabBar';
 
+
+
 const LandingPage: React.FC = () => {
   return (
     <IonPage>
@@ -22,7 +24,7 @@ const LandingPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol className='ion-text-center'>
-              <IonButton routerLink="/app/home" routerDirection='root'>
+              <IonButton routerLink="/app" routerDirection='root'>
                 Ready to Launch?
               </IonButton>
             </IonCol>
