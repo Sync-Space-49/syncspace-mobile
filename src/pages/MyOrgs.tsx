@@ -7,7 +7,6 @@ import {
   IonSearchbar,
   IonButton,
 } from "@ionic/react";
-// import ExploreContainer from '../components/ExploreContainer';
 import "./MyOrgs.css";
 import CustomList from "../components/CustomList";
 
@@ -29,20 +28,24 @@ const MyOrgs: React.FC = () => {
 
         <CustomList
           title="SyncSpace's Boards"
-          imgSrc="/icons/SyncSpace-mint.png"
-          items={["Frontend", "Mobile", "Backend"]}
+          titleImg="/icons/SyncSpace-mint.png"
+          items={[
+            { text: "Frontend" },
+            { text: "Mobile" },
+            { text: "Backend" },
+          ]}
         />
 
         <CustomList
           title="My Boards"
-          imgSrc="/icons/SyncSpace-mint.png"
-          items={["Laundry Room remodel", "Garden"]}
+          titleImg="/icons/SyncSpace-mint.png"
+          items={[{ text: "Laundry Room remodel" }, { text: "Garden" }]}
         />
 
         <CustomList
           title="ACM-W's Boards"
-          imgSrc="/icons/SyncSpace-mint.png"
-          items={["Axe-Hacks", "Fall '23"]}
+          titleImg="/icons/SyncSpace-mint.png"
+          items={[{ text: "Axe-Hacks" }, { text: "Fall '23" }]}
         />
         <div className="button">
           {/* Does having this make sense? Don't we already have a '+' button at the very top? */}
