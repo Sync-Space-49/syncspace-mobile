@@ -1,9 +1,16 @@
-// import { Redirect, Route } from 'react-router-dom';
-import { IonApp, setupIonicReact } from "@ionic/react";
-import Tab1 from "./pages/Home";
-import Tab2 from "./pages/MyBoards";
-import Tab3 from "./pages/Profile";
-import TabBar from "./components/TabBar";
+import { IonReactRouter } from '@ionic/react-router';
+import { Redirect, Route } from 'react-router-dom';
+import {
+  IonApp,
+  IonRouterOutlet,
+  setupIonicReact
+} from '@ionic/react';
+
+import TabBar from './components/TabBar'
+import { App as CapApp } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
+import { useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -26,10 +33,32 @@ import "./theme/variables.css";
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <TabBar></TabBar>
-  </IonApp>
-);
+const App: React.FC = () => {
+  // Get the callback handler from the Auth0 React hook
+  const { handleRedirectCallback } = useAuth0();
 
+  useEffect(() => {
+    // Handle the 'appUrlOpen' event and call `handleRedirectCallback`
+    CapApp.addListener('appUrlOpen', async ({ url }) => {
+      if (url.includes('state') && (url.includes('code') || url.includes('error'))) {
+        await handleRedirectCallback(url);
+      }
+      // No-op on Android
+      await Browser.close();
+    });
+  }, [handleRedirectCallback]);
+
+  return (
+    <IonApp>
+      <IonReactRouter> 
+        <IonRouterOutlet>
+          <Route exact path="/" component={LandingPage} /> 
+          <Route path="/app" component={TabBar} />
+          <Route path="/app/home" component={Home} />
+        </IonRouterOutlet>
+      </IonReactRouter>
+        
+    </IonApp>
+  );
+};
 export default App;
