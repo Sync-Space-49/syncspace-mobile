@@ -28,7 +28,8 @@ const Profile: React.FC = () => {
         {/* User Profile Pic */}
         <div className="profile-image-container">
           <img
-            src="/icons/SyncSpace-mint.png"
+            // src="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png" -this was the original pic you had but i'm changing it to our fave johnny 
+            src="https://s3.us-east-1.wasabisys.com/sync-space/pfp/johnny-appleseed.png"
             alt="user pfp"
             className="profile-image"
           />
