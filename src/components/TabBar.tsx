@@ -12,20 +12,17 @@ const TabBar: React.FC = () => {
         <IonReactRouter>
             <IonTabs>
                 <IonRouterOutlet>
-                <Route exact path="/app/home">
-                    <Home />
-                </Route>
-                <Route exact path="/app/myboards">
-                    <MyBoards />
-                </Route>
-                <Route exact path="/app/myorgs">
-                    <MyOrgs />
-                </Route>
-                <Route exact path="/app/profile">
-                    <Profile />
-                </Route>
+                    <Redirect exact path="/app" to="/app/home" />
+                    <Route exact path="/app/home">
+                        <Home />
+                    </Route>
+                    <Route exact path="/app/myorgs">
+                        <MyOrgs />
+                    </Route>
+                    <Route exact path="/app/profile">
+                        <Profile />
+                    </Route>
                 </IonRouterOutlet>
-
                 <IonTabBar slot="bottom">
                     <IonTabButton tab="Home" href="/app/home">
                         <IonIcon aria-hidden="true" icon={home} />
