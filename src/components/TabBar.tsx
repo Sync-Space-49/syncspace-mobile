@@ -1,9 +1,8 @@
 import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router";
-import { browsersOutline, home, layersOutline, personCircleOutline } from "ionicons/icons";
+import { home, layersOutline, personCircleOutline } from "ionicons/icons";
 import Home from "../pages/Home";
-import MyBoards from "../pages/MyBoards";
 import MyOrgs from "../pages/MyOrgs";
 import Profile from "../pages/Profile";
 

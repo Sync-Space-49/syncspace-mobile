@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { IonContent, IonPage, IonButton, IonIcon, IonGrid, IonCol, IonRow, IonModal } from '@ionic/react';
-// import { App as CapApp } from '@capacitor/app';
-// import { Browser } from '@capacitor/browser';
-// import { useAuth0 } from '@auth0/auth0-react';
-
-import SyncSpaceLogoSmall from '/svgs/SyncSpace-logo-100w.svg'
-import './LandingPage.css';
 import LoginButton from '../components/Login';
+
+import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
 
@@ -26,7 +22,7 @@ const LandingPage: React.FC = () => {
         <IonGrid>
           <IonRow>
             <IonCol className='ion-text-center'>
-              <IonIcon icon={SyncSpaceLogoSmall} /> 
+              <IonIcon icon="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-logo-100w.svg" /> 
             </IonCol>
           </IonRow>
           <IonRow>
@@ -36,9 +32,6 @@ const LandingPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol className='ion-text-center'>
-              {/* <IonButton id="open-modal" expand="block"> 
-                Ready to Launch?
-              </IonButton> */}
               <LoginButton />
             </IonCol>
           </IonRow>

@@ -28,7 +28,7 @@ const MyOrgs: React.FC = () => {
 
         <CustomList
           title="SyncSpace's Boards"
-          titleImg="/icons/SyncSpace-mint.png"
+          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={[
             { text: "Frontend" },
             { text: "Mobile" },
@@ -38,13 +38,13 @@ const MyOrgs: React.FC = () => {
 
         <CustomList
           title="My Boards"
-          titleImg="/icons/SyncSpace-mint.png"
+          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={[{ text: "Laundry Room remodel" }, { text: "Garden" }]}
         />
 
         <CustomList
           title="ACM-W's Boards"
-          titleImg="/icons/SyncSpace-mint.png"
+          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={[{ text: "Axe-Hacks" }, { text: "Fall '23" }]}
         />
         <div className="button">
