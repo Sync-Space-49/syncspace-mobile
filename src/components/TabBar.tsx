@@ -6,6 +6,8 @@ import Home from "../pages/Home";
 import MyOrgs from "../pages/MyOrgs";
 import Profile from "../pages/Profile";
 
+import Board from '../pages/Board';
+
 const TabBar: React.FC = () => {
     return (
         <IonReactRouter>
@@ -21,6 +23,7 @@ const TabBar: React.FC = () => {
                     <Route exact path="/app/profile">
                         <Profile />
                     </Route>
+                    <Route path="/app/board" component={Board} />
                 </IonRouterOutlet>
                 <IonTabBar slot="bottom">
                     <IonTabButton tab="Home" href="/app/home">

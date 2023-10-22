@@ -35,14 +35,14 @@ const CustomList: React.FC<CustomListProps> = ({
       {/* display each item in items array as IonItem*/}
       <IonList inset={true}>
         {items.map((item, index) => (
-          <IonItem key={index}>
+          <IonItem key={index} href="/app/board">
             {item.listImg && (
               <img
                 src={item.listImg}
                 alt="list item icon"
                 className="item-icon"
               />
-            )}
+            )}         
             <IonLabel>{item.text}</IonLabel>
           </IonItem>
         ))}

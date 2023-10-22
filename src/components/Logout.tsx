@@ -4,7 +4,6 @@ import { IonButton } from '@ionic/react';
 
 // This should reflect the URL added earlier to your "Allowed Logout URLs" setting
 // in the Auth0 dashboard.
-// const logoutUri = 'YOUR_PACKAGE_ID://{yourDomain}/capacitor/YOUR_PACKAGE_ID/callback'; //default
 
 const logoutUri = '/'; //hopefully links to landingpage
 
