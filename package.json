@@ -26,12 +26,14 @@
     "@ionic/react-router": "^7.0.0",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
+    "degenerator": "^3.0.4",
     "dotenv": "^16.3.1",
     "ionicons": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^5.3.4",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^5.3.4",
+    "swiper": "^10.3.1"
   },
   "devDependencies": {
     "@capacitor/cli": "5.4.1",
