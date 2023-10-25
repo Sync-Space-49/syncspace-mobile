@@ -12,6 +12,7 @@ import {
 } from "@ionic/react";
 import "./Profile.css";
 import { useAuth0 } from "@auth0/auth0-react";
+import LogoutButton from "../components/Logout";
 
 const Profile: React.FC = () => {
   const { user, isLoading } = useAuth0();
@@ -76,7 +77,7 @@ const Profile: React.FC = () => {
             <IonLabel>Change Password</IonLabel>
           </IonItem>
           <IonItem>
-            <IonLabel>Log Out</IonLabel>
+            <LogoutButton />
           </IonItem>
           <IonItem>
             <IonLabel>Delete Account</IonLabel>
