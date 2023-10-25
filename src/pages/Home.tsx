@@ -8,11 +8,20 @@ import {
   IonTitle,
   IonToolbar,
   IonSearchbar,
+  IonToast,
 } from "@ionic/react";
 import CustomList from "../components/CustomList";
 import "./Home.css";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Home: React.FC = () => {
+
+  const { isLoading, isAuthenticated } = useAuth0();
+
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -28,7 +37,10 @@ const Home: React.FC = () => {
         </IonHeader>
 
         <IonSearchbar></IonSearchbar>
-
+        
+        <div className="container">
+          {isAuthenticated ? <IonToast message="You were successfully signed in!" /> : <IonToast message="You are not signed in." />}
+        </div>
         <CustomList
           title="Quick Access"
           items={[

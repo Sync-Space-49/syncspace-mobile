@@ -11,6 +11,7 @@ import { App as CapApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { callbackUri } from "./auth.config";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -34,7 +35,7 @@ import "./theme/variables.css";
 /* Pages */
 import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
-import Error from './pages/Error';
+// import Error from './pages/Error';
 
 setupIonicReact();
 
@@ -45,11 +46,15 @@ const App: React.FC = () => {
   useEffect(() => {
     // Handle the 'appUrlOpen' event and call `handleRedirectCallback`
     CapApp.addListener('appUrlOpen', async ({ url }) => {
-      if (url.includes('state') && (url.includes('code') || url.includes('error'))) {
-        await handleRedirectCallback(url);
-      }
+      if (url.startsWith(callbackUri)) {
+        if (url.includes('state') && 
+          (url.includes('code') || url.includes('error'))
+        ) {
+          await handleRedirectCallback(url);
+        }
       // No-op on Android
       await Browser.close();
+      }
     });
   }, [handleRedirectCallback]);
 
@@ -60,7 +65,7 @@ const App: React.FC = () => {
           <Route exact path="/" component={LandingPage} />
           <Route path="/app" component={TabBar} />
           <Route path="/app/home" component={Home} />
-          <Route exact path="/error" component={Error} />
+          {/* <Route exact path="/error" component={Error} /> */}
         </IonRouterOutlet>
       </IonReactRouter>
         
