@@ -1,5 +1,5 @@
 {
-  "name": "SyncSpace",
+  "name": "syncspace",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -14,9 +14,10 @@
   "dependencies": {
     "-": "^0.0.1",
     "@auth0/auth0-react": "^2.2.1",
+    "@capacitor/android": "5.4.1",
     "@capacitor/app": "5.0.6",
     "@capacitor/browser": "^5.1.0",
-    "@capacitor/core": "5.4.1",
+    "@capacitor/core": "^5.4.1",
     "@capacitor/haptics": "5.0.6",
     "@capacitor/ios": "5.4.1",
     "@capacitor/keyboard": "5.0.6",
@@ -36,7 +37,7 @@
     "swiper": "^10.3.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "5.4.1",
+    "@capacitor/cli": "^5.4.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
