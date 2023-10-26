@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { IonContent, IonPage, IonIcon, IonGrid, IonCol, IonRow, IonButtons } from '@ionic/react';
+import { IonContent, IonPage, IonIcon, IonGrid, IonCol, IonRow, IonButtons, IonImg } from '@ionic/react';
 import LoginButton from '../components/Login';
 
 import './LandingPage.css';
@@ -18,6 +18,9 @@ const LandingPage: React.FC = () => {
   return (
     <IonPage>
       <IonContent className="ion-padding" scroll-y="false">
+        <div className='background-img'>
+        <IonImg src="https://s3.us-east-1.wasabisys.com/sync-space/rocket-tail.png" />
+        </div>
         <IonGrid>
           <IonRow>
             <IonCol className='ion-text-center ion-padding'>

@@ -3,9 +3,11 @@ ion-icon {
     
 }
 
-/* ion-button {
-    padding-top: 23rem;
-} */
+.background-img {
+    --background: url(https://s3.us-east-1.wasabisys.com/sync-space/rocket-tail.png);
+    padding-top: 20rem;
+    position: absolute;
+}
 
 .landing-page-button {
     padding-top: 23rem;

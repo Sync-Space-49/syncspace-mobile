@@ -1,6 +1,3 @@
-ion-buttons {
-    --padding-top: 0px;
-}
-ion-button {
-    --padding-top: 0px;
+.ai-toggle {
+    background-color: 80e08b;
 }

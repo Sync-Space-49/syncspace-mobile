@@ -15,6 +15,9 @@ import {
   IonAvatar,
   IonButton,
   IonImg,
+  IonGrid,
+  IonRow,
+  IonToggle,
 } from "@ionic/react";
 import { ellipsisHorizontal } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
@@ -61,36 +64,37 @@ const Board: React.FC = () => {
             <IonButton id="open-modal" >
               <IonIcon slot="icon-only" icon={ellipsisHorizontal} />
             </IonButton>
-            {/* this is callback for dismissing: onClick={() => dismiss()} */}
           </IonButtons>
           <IonModal ref={modal} trigger="open-modal" presentingElement={presentingElement!}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Modal</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => dismiss()}>Close</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonList>
-              <IonItem>
-                <IonAvatar slot="start">
-                  <IonImg src="https://i.pravatar.cc/300?u=b" />
-                </IonAvatar>
-                <IonLabel>
-                  <h2>Connor Smith</h2>
-                  <p>Sales Rep</p>
-                </IonLabel>
-              </IonItem>
-              </IonList>
-              </IonContent>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Board Settings</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => dismiss()}>Close</IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            {/* modal content */}
+            <IonContent className="ion-padding">
+              <IonGrid>
+                <IonRow className="ion-justify-content-center">
+                    <IonToggle>Enable AI</IonToggle>  
+                </IonRow>
+                <IonRow>
+                  
+                </IonRow>
+              </IonGrid>
+            </IonContent>
           </IonModal>
         </IonToolbar>
+
         <IonToolbar>
           <IonSearchbar />
         </IonToolbar>
       </IonHeader>
+
+        {/* end of modal and headers, beginning of Board page content */}
+
       <IonContent fullscreen>
         <Swiper
           modules={[Pagination]}
