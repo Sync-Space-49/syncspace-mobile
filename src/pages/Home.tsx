@@ -18,6 +18,7 @@ const Home: React.FC = () => {
 
   const { isLoading, isAuthenticated } = useAuth0();
 
+
   if (isLoading) {
     return null;
   }
@@ -39,7 +40,7 @@ const Home: React.FC = () => {
         <IonSearchbar></IonSearchbar>
         
         <div className="container">
-          {isAuthenticated ? <IonToast message="You were successfully signed in!" /> : <IonToast message="You are not signed in." />}
+          {isAuthenticated ? <IonToast message="You were successfully signed in!" duration={3000}/> : <IonToast message="You are not signed in." />}
         </div>
         <CustomList
           title="Quick Access"

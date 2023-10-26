@@ -76,9 +76,7 @@ const Profile: React.FC = () => {
           <IonItem>
             <IonLabel>Change Password</IonLabel>
           </IonItem>
-          <IonItem>
             <LogoutButton />
-          </IonItem>
           <IonItem>
             <IonLabel>Delete Account</IonLabel>
           </IonItem>
