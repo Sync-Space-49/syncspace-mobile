@@ -31,7 +31,9 @@ const LandingPage: React.FC = () => {
           </IonRow>
           <IonRow>
             <IonCol className='ion-text-center'>
+              <div className='landing-page-button'>
                 <LoginButton /> 
+                </div>
             </IonCol>
           </IonRow>
         </IonGrid>

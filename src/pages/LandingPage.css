@@ -3,7 +3,11 @@ ion-icon {
     
 }
 
-ion-button {
+/* ion-button {
+    padding-top: 23rem;
+} */
+
+.landing-page-button {
     padding-top: 23rem;
 }
 
