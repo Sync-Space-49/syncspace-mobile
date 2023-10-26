@@ -1,16 +1,12 @@
-import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route } from 'react-router-dom';
-import {
-  IonApp,
-  IonRouterOutlet,
-  setupIonicReact
-} from '@ionic/react';
+import { IonReactRouter } from "@ionic/react-router";
+import { Redirect, Route } from "react-router-dom";
+import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 
-import TabBar from './components/TabBar'
-import { App as CapApp } from '@capacitor/app';
-import { Browser } from '@capacitor/browser';
-import { useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import TabBar from "./components/TabBar";
+import { App as CapApp } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
+import { useEffect } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import { callbackUri } from "./auth.config";
 
 /* Core CSS required for Ionic components to work properly */
@@ -33,8 +29,9 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 
 /* Pages */
-import LandingPage from './pages/LandingPage';
-import Home from './pages/Home';
+import LandingPage from "./pages/LandingPage";
+import Home from "./pages/Home";
+import Organization from "./pages/Organization";
 // import Error from './pages/Error';
 
 setupIonicReact();
@@ -45,30 +42,31 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Handle the 'appUrlOpen' event and call `handleRedirectCallback`
-    CapApp.addListener('appUrlOpen', async ({ url }) => {
+    CapApp.addListener("appUrlOpen", async ({ url }) => {
       if (url.startsWith(callbackUri)) {
-        if (url.includes('state') && 
-          (url.includes('code') || url.includes('error'))
+        if (
+          url.includes("state") &&
+          (url.includes("code") || url.includes("error"))
         ) {
           await handleRedirectCallback(url);
         }
-      // No-op on Android
-      await Browser.close();
+        // No-op on Android
+        await Browser.close();
       }
     });
   }, [handleRedirectCallback]);
-
+  // console.log("app is rendering");
   return (
     <IonApp>
-      <IonReactRouter> 
+      <IonReactRouter>
         <IonRouterOutlet>
           <Route exact path="/" component={LandingPage} />
           <Route path="/app" component={TabBar} />
-          <Route path="/app/home" component={Home} />
+          <Route exact path="/app/home" component={Home} />
+          <Route exact path="/app/organization" component={Organization} />
           {/* <Route exact path="/error" component={Error} /> */}
         </IonRouterOutlet>
       </IonReactRouter>
-        
     </IonApp>
   );
 };
