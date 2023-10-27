@@ -28,21 +28,6 @@ const LogoutButton: React.FC = () => {
   // return <IonButton onClick={doLogout}>Log out</IonButton>;
   return (
     <>
-    <IonAlert
-            trigger="present-alert"
-            header="Are you sure you want to delete your account?"
-            buttons={[
-              {
-                text: 'No',
-                cssClass: 'primary'
-              },
-              {
-                text: 'Yes',
-                cssClass: 'danger'
-              }
-            ]}
-            >
-        </IonAlert>
       <IonItem onClick={doLogout}>Log out</IonItem>
       <IonToast message="You were successfully signed out." duration={3000} />
     </>
