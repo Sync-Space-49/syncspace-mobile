@@ -43,10 +43,11 @@ const DeleteButton: React.FC = () => {
                 cssClass: 'danger'
               }
             ]}
+            onDidDismiss={doLogout}
             >
         </IonAlert>
         <IonButton fill="clear" id="present-alert" >
-            <IonItem onClick={doLogout} color="danger">Delete Account</IonItem>
+            <IonItem color="danger">Delete Account</IonItem>
         </IonButton>
     </>
   );

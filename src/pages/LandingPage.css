@@ -5,7 +5,7 @@
 
 .background-img {
     --background: url(https://s3.us-east-1.wasabisys.com/sync-space/rocket-tail.png);
-    padding-top: 20rem;
+    padding-top: 16rem;
     position: absolute;
 }
 
