@@ -18,8 +18,12 @@ import {
   IonGrid,
   IonRow,
   IonToggle,
+  IonInput,
+  IonTextarea,
+  IonCol,
+
 } from "@ionic/react";
-import { ellipsisHorizontal } from "ionicons/icons";
+import { addOutline, ellipsisHorizontal } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -56,10 +60,10 @@ const Board: React.FC = () => {
       <IonHeader collapse="fade">
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app" className="ion-margin-vertical"/>
+            <IonBackButton defaultHref="/app" className="ion-margin-vertical" />
           </IonButtons>
           {/* <IonTitle className="ion-padding">SyncSpace Mobile</IonTitle> */}
-            <IonTitle>SyncSpace Mobile</IonTitle>
+          <IonTitle>SyncSpace Mobile</IonTitle>
           <IonButtons slot="end">
             <IonButton id="open-modal" >
               <IonIcon slot="icon-only" icon={ellipsisHorizontal} />
@@ -78,10 +82,32 @@ const Board: React.FC = () => {
             <IonContent className="ion-padding">
               <IonGrid>
                 <IonRow className="ion-justify-content-center">
-                    <IonToggle>Enable AI</IonToggle>  
+                  <IonToggle>Enable AI</IonToggle>
                 </IonRow>
                 <IonRow>
-                  
+                  <IonLabel className="ion-padding-vertical"><strong>Actions</strong></IonLabel>
+                  <form>
+                    <IonList inset={true}>
+                      <IonItem>
+                        <IonInput label="Title:" placeholder="Backend" />
+                      </IonItem>
+                      <IonItem>
+                        <IonTextarea rows={3} autoGrow={true} label="Description:" placeholder="A board dedicated to the backend team" />
+                      </IonItem>
+                    </IonList>
+                  </form>
+                </IonRow>
+                <IonRow>
+                  <IonCol >
+                    <IonLabel className="ion-padding-vertical"><strong>Board Members</strong></IonLabel>
+                  </IonCol>
+                  {/* <IonCol > */}
+                    {/* <div className="ion-button"> */}
+                      {/* <IonButton> */}
+                        <IonIcon slot="icon-only" icon={addOutline} />
+                      {/* </IonButton> *z/}
+                    {/* </div> */}
+                  {/* </IonCol> */}
                 </IonRow>
               </IonGrid>
             </IonContent>
@@ -93,7 +119,7 @@ const Board: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-        {/* end of modal and headers, beginning of Board page content */}
+      {/* end of modal and headers, beginning of Board page content */}
 
       <IonContent fullscreen>
         <Swiper
