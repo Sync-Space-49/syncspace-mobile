@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Browser } from '@capacitor/browser';
-import { IonButton } from '@ionic/react';
+import { IonAlert, IonButton, IonItem, IonToast } from '@ionic/react';
 
 // This should reflect the URL added earlier to your "Allowed Logout URLs" setting
 // in the Auth0 dashboard.
@@ -24,8 +24,14 @@ const LogoutButton: React.FC = () => {
       }
     });
   };
-
-  return <IonButton onClick={doLogout}>Log out</IonButton>;
+  
+  // return <IonButton onClick={doLogout}>Log out</IonButton>;
+  return (
+    <>
+      <IonItem onClick={doLogout}>Log out</IonItem>
+      <IonToast message="You were successfully signed out." duration={3000} />
+    </>
+  );
 };
 
 export default LogoutButton;

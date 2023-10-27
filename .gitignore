@@ -32,3 +32,9 @@ yarn-error.log*
 .eslintcache
 
 resources/ios/**/*
+resources/android/**/*
+
+
+# ignore
+src/pages/Error.tsx
+src/pages/Error.css

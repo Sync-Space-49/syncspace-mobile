@@ -9,10 +9,13 @@ import {
   IonToolbar,
   IonLoading,
   IonAvatar,
+  IonAlert,
+  IonButton,
 } from "@ionic/react";
 import "./Profile.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "../components/Logout";
+import DeleteButton from "../components/DeleteAccount";
 
 const Profile: React.FC = () => {
   const { user, isLoading } = useAuth0();
@@ -76,12 +79,11 @@ const Profile: React.FC = () => {
           <IonItem>
             <IonLabel>Change Password</IonLabel>
           </IonItem>
-          <IonItem>
             <LogoutButton />
-          </IonItem>
-          <IonItem>
-            <IonLabel>Delete Account</IonLabel>
-          </IonItem>
+          {/* <IonItem> */}
+                {/* <IonLabel>Delete Account</IonLabel> */}
+              <DeleteButton />
+          {/* </IonItem> */}
         </IonList>
       </IonContent>
     </IonPage>

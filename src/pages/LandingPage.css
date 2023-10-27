@@ -1,11 +1,17 @@
-ion-icon {
+/* ion-icon {
     font-size: 128px;
     
+} */
+
+.background-img {
+    --background: url(https://s3.us-east-1.wasabisys.com/sync-space/rocket-tail.png);
+    padding-top: 16rem;
+    position: absolute;
 }
 
-/* ion-button {
+.landing-page-button {
     padding-top: 23rem;
-} */
+} 
 
 h1 {
     font-size: 48px;
