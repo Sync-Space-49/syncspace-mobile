@@ -12,16 +12,13 @@ import {
   IonButtons,
   IonIcon,
   IonModal,
-  IonAvatar,
   IonButton,
-  IonImg,
   IonGrid,
   IonRow,
   IonToggle,
   IonInput,
   IonTextarea,
   IonCol,
-
 } from "@ionic/react";
 import { addOutline, ellipsisHorizontal } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
@@ -32,7 +29,9 @@ import "swiper/css";
 import 'swiper/css/pagination';
 
 import BoardStack from "../components/BoardStack";
+import MemberList from "../components/MemberList";
 import "./Board.css";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Board: React.FC = () => {
 
@@ -50,19 +49,15 @@ const Board: React.FC = () => {
     modal.current?.dismiss();
   }
 
+  const { user } = useAuth0();
+
   return (
     <IonPage ref={page}>
-      {/* <IonHeader>
-          <IonToolbar>
-            <IonTitle>SyncSpace Mobile</IonTitle>
-          </IonToolbar>
-        </IonHeader> */}
       <IonHeader collapse="fade">
         <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app" className="ion-margin-vertical" />
           </IonButtons>
-          {/* <IonTitle className="ion-padding">SyncSpace Mobile</IonTitle> */}
           <IonTitle>SyncSpace Mobile</IonTitle>
           <IonButtons slot="end">
             <IonButton id="open-modal" >
@@ -101,13 +96,29 @@ const Board: React.FC = () => {
                   <IonCol >
                     <IonLabel className="ion-padding-vertical"><strong>Board Members</strong></IonLabel>
                   </IonCol>
-                  {/* <IonCol > */}
-                    {/* <div className="ion-button"> */}
-                      {/* <IonButton> */}
-                        <IonIcon slot="icon-only" icon={addOutline} />
-                      {/* </IonButton> *z/}
-                    {/* </div> */}
-                  {/* </IonCol> */}
+                  <div className="add-member-button">
+                    <IonButton size="small">
+                      <IonIcon slot="icon-only" icon={addOutline} />
+                    </IonButton>
+                  </div>
+                </IonRow>
+                <IonList inset={true}>
+                  <MemberList />
+                  <MemberList />
+                  <MemberList />
+                </IonList>
+                <IonRow className="edit-buttons">
+                  <IonCol>
+                    <IonButton color="danger">
+                      Delete
+                    </IonButton>
+                  </IonCol>
+                  <IonCol />
+                  <IonCol>
+                    <IonButton color="tertiary" >
+                      Save
+                    </IonButton>
+                  </IonCol>
                 </IonRow>
               </IonGrid>
             </IonContent>
@@ -132,8 +143,6 @@ const Board: React.FC = () => {
             "--swiper-pagination-color": "#80e08b",
             "--swiper-pagination-bullet-inactive-color": "#92949c"
           }}
-        // onSwiper={(swiper) => console.log(swiper)}
-        // onSlideChange={() => console.log('slide change')}
         >
           <IonContent className="ion-padding-end">
             <SwiperSlide>

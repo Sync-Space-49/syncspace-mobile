@@ -24,7 +24,7 @@ const LandingPage: React.FC = () => {
         <IonGrid>
           <IonRow>
             <IonCol className='ion-text-center ion-padding'>
-              <img src="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-logo-100w.svg" /> 
+              <img className="ion-padding-top" src="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-logo-100w.svg" /> 
             </IonCol>
           </IonRow>
           <IonRow>
