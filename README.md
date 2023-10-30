@@ -14,7 +14,7 @@ SyncSpace Mobile is the mobile counterpart to SyncSpace (who would've thought). 
 1. (coming soon)
 
 ### How to run with Android emulator
-1. (may never come)
+1. (coming soon)
 
 ### How to run natively
 1. (coming soon)

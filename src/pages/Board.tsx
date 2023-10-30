@@ -21,9 +21,13 @@ import {
   IonInput,
   IonTextarea,
   IonCol,
+  IonNote,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
 
 } from "@ionic/react";
-import { addOutline, ellipsisHorizontal } from "ionicons/icons";
+import { addOutline, closeOutline, ellipsisHorizontal } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -32,7 +36,9 @@ import "swiper/css";
 import 'swiper/css/pagination';
 
 import BoardStack from "../components/BoardStack";
+import MemberList from "../components/MemberList";
 import "./Board.css";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Board: React.FC = () => {
 
@@ -49,6 +55,8 @@ const Board: React.FC = () => {
   function dismiss() {
     modal.current?.dismiss();
   }
+
+  const { user } = useAuth0();
 
   return (
     <IonPage ref={page}>
@@ -101,13 +109,29 @@ const Board: React.FC = () => {
                   <IonCol >
                     <IonLabel className="ion-padding-vertical"><strong>Board Members</strong></IonLabel>
                   </IonCol>
-                  {/* <IonCol > */}
-                    {/* <div className="ion-button"> */}
-                      {/* <IonButton> */}
-                        <IonIcon slot="icon-only" icon={addOutline} />
-                      {/* </IonButton> *z/}
-                    {/* </div> */}
-                  {/* </IonCol> */}
+                  <div className="add-member-button">
+                    <IonButton size="small">
+                      <IonIcon slot="icon-only" icon={addOutline} />
+                    </IonButton>
+                  </div>
+                </IonRow>
+                <IonList inset={true}>
+                  <MemberList />
+                  <MemberList />
+                  <MemberList />
+                </IonList>
+                <IonRow className="edit-buttons">
+                  <IonCol>
+                    <IonButton color="danger">
+                      Delete
+                    </IonButton>
+                  </IonCol>
+                  <IonCol />
+                  <IonCol>
+                    <IonButton color="tertiary" >
+                      Save
+                    </IonButton>
+                  </IonCol>
                 </IonRow>
               </IonGrid>
             </IonContent>
