@@ -12,22 +12,15 @@ import {
   IonButtons,
   IonIcon,
   IonModal,
-  IonAvatar,
   IonButton,
-  IonImg,
   IonGrid,
   IonRow,
   IonToggle,
   IonInput,
   IonTextarea,
   IonCol,
-  IonNote,
-  IonItemSliding,
-  IonItemOptions,
-  IonItemOption,
-
 } from "@ionic/react";
-import { addOutline, closeOutline, ellipsisHorizontal } from "ionicons/icons";
+import { addOutline, ellipsisHorizontal } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -60,17 +53,11 @@ const Board: React.FC = () => {
 
   return (
     <IonPage ref={page}>
-      {/* <IonHeader>
-          <IonToolbar>
-            <IonTitle>SyncSpace Mobile</IonTitle>
-          </IonToolbar>
-        </IonHeader> */}
       <IonHeader collapse="fade">
         <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app" className="ion-margin-vertical" />
           </IonButtons>
-          {/* <IonTitle className="ion-padding">SyncSpace Mobile</IonTitle> */}
           <IonTitle>SyncSpace Mobile</IonTitle>
           <IonButtons slot="end">
             <IonButton id="open-modal" >
@@ -156,8 +143,6 @@ const Board: React.FC = () => {
             "--swiper-pagination-color": "#80e08b",
             "--swiper-pagination-bullet-inactive-color": "#92949c"
           }}
-        // onSwiper={(swiper) => console.log(swiper)}
-        // onSlideChange={() => console.log('slide change')}
         >
           <IonContent className="ion-padding-end">
             <SwiperSlide>
