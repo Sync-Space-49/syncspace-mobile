@@ -3,6 +3,8 @@ import { Redirect, Route } from "react-router-dom";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 
 import TabBar from "./components/TabBar";
+// import AppUrlListener from './components/AppUrlListener';
+
 import { App as CapApp } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { useEffect } from "react";
@@ -32,6 +34,8 @@ import "./theme/variables.css";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import Organization from "./pages/Organization";
+import Callback from "./components/Callback";
+import { call } from "ionicons/icons";
 // import Error from './pages/Error';
 
 setupIonicReact();
@@ -48,7 +52,7 @@ const App: React.FC = () => {
           url.includes("state") &&
           (url.includes("code") || url.includes("error"))
         ) {
-          await handleRedirectCallback(url);
+          await handleRedirectCallback(url);          
         }
         // No-op on Android
         await Browser.close();
@@ -61,6 +65,7 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonRouterOutlet>
           <Route exact path="/" component={LandingPage} />
+          <Redirect exact from={callbackUri} to="/app" />
           <Route path="/app" component={TabBar} />
           <Route exact path="/app/home" component={Home} />
           <Route exact path="/app/organization" component={Organization} />
