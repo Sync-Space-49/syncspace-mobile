@@ -9,7 +9,10 @@ import { App as CapApp } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { callbackUri } from "./auth.config";
+import axios from "axios";
+
+
+import { callbackUri, serverAdress, domain, clientId, secret } from "./auth.config";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -35,14 +38,38 @@ import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import Organization from "./pages/Organization";
 import Callback from "./components/Callback";
-import { call } from "ionicons/icons";
 // import Error from './pages/Error';
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  // Get the callback handler from the Auth0 React hook
-  const { handleRedirectCallback } = useAuth0();
+  
+  // const options = { method: 'POST', 
+  //   url: `${domain}/oauth/token`,
+  //   headers: { 'content-type': 'application/json' },
+  //   body: `{"client_id":"${clientId}, "client_secret":${secret},"audience":"127.0.0.1:8080","grant_type":"client_credentials"}`};
+  
+  // request(options, function(error, response, body) ) {
+    //   if (error) throw new Error(error);
+    // }
+    // }
+
+    const options = {
+      method: "GET",
+      url: `${serverAdress}`,
+      headers: { "authorization": "Bearer TOKEN" },
+    };
+
+    axios(options)
+      .then(response => {
+        console.log(response.data); //debug
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    
+    // Get the callback handler from the Auth0 React hook
+    const { handleRedirectCallback } = useAuth0();
 
   useEffect(() => {
     // Handle the 'appUrlOpen' event and call `handleRedirectCallback`
@@ -52,6 +79,8 @@ const App: React.FC = () => {
           url.includes("state") &&
           (url.includes("code") || url.includes("error"))
         ) {
+          const res = await fetch(`${serverAdress}`);
+          const data = await res.json();
           await handleRedirectCallback(url);          
         }
         // No-op on Android
@@ -59,6 +88,7 @@ const App: React.FC = () => {
       }
     });
   }, [handleRedirectCallback]);
+
   // console.log("app is rendering");
   return (
     <IonApp>
