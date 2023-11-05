@@ -31,10 +31,11 @@ import "swiper/css";
 import 'swiper/css/pagination';
 
 import BoardStack from "../components/BoardStack";
+import BoardView from "../components/BoardView";
 import MemberList from "../components/MemberList";
 import "./Board.css";
 import { useAuth0 } from "@auth0/auth0-react";
-import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
+// import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 
 const Board: React.FC = () => {
 
@@ -55,17 +56,8 @@ const Board: React.FC = () => {
   const { user } = useAuth0();
 
   // var for current view + handler to change
-  let boardView: String = 'Sprint 1';
+  // let boardView: String = 'Sprint 1';
   const [buttonText, setButtonText] = useState('Sprint 1');
-
-  // const changeText = (text: String) => setButtonText(text);
-
-  const viewHandler = (result: OverlayEventDetail) => {
-    boardView = result.data.action;
-    setButtonText(boardView);
-    console.log('boardView ' + boardView);
-  }
-
   return (
     <IonPage ref={page}> 
       <IonHeader collapse="fade">
@@ -148,50 +140,49 @@ const Board: React.FC = () => {
               <IonIcon slot="end" icon={chevronDownOutline} />
                 <strong>{buttonText}</strong>
             </IonButton>
-          <IonActionSheet
-            trigger="open-action-sheet"
-            header="Choose Board View"
-            buttons={[
-              {
-                text: 'Backlog',
-                data: {
-                  action: 'Backlog'
-                }
-              },
-              {
-                text: 'Sprint 1',
-                data: {
-                  action: 'Sprint 1'
-                }
-              },
-              {
-                text: 'Sprint 2',
-                data: {
-                  action: 'Sprint 2'
-                }
-              },
-              {
-                text: 'Sprint 3',
-                data: {
-                  action: 'Sprint 3'
-                }
-              },
-              {
-                text: 'Sprint 4',
-                data: {
-                  action: 'Sprint 4'
-                }
-              },
-              {
-                text: 'Cancel',
-                role: 'cancel',
-                data: {
-                  action: 'cancel'
-                }
-              }
-            ]}
-            onDidDismiss={({detail}) => viewHandler(detail)}
-          ></IonActionSheet>
+            <IonActionSheet
+    trigger="open-action-sheet"
+    header="Choose Board View"
+    buttons={[
+        {
+            text: 'Backlog',
+            data: {
+                action: 'Backlog'
+            }
+        },
+        {
+            text: 'Sprint 1',
+            data: {
+                action: 'Sprint 1'
+            }
+        },
+        {
+            text: 'Sprint 2',
+            data: {
+                action: 'Sprint 2'
+            }
+        },
+        {
+            text: 'Sprint 3',
+            data: {
+                action: 'Sprint 3'
+            }
+        },
+        {
+            text: 'Sprint 4',
+            data: {
+                action: 'Sprint 4'
+            }
+        },
+        {
+            text: 'Cancel',
+            role: 'cancel',
+            data: {
+                action: 'cancel'
+            }
+        }
+    ]}
+    onDidDismiss={({detail}) => setButtonText(detail.data.action)} />
         </IonToolbar>
           </div>
         
