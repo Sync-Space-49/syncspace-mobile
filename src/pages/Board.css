@@ -5,3 +5,11 @@
 .edit-buttons {
     padding-top: 10rem;
 }
+
+.subtitle {
+    padding-top: 0;
+}
+
+.toolbar-shrink {
+    height: 30%;
+}
