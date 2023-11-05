@@ -37,7 +37,6 @@ import "./theme/variables.css";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import Organization from "./pages/Organization";
-import Callback from "./components/Callback";
 // import Error from './pages/Error';
 
 setupIonicReact();
