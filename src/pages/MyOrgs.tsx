@@ -11,10 +11,10 @@ import {
   IonIcon,
 } from "@ionic/react";
 import { useState } from "react";
-import "./MyOrgs.css";
 import CustomList from "../components/CustomList";
 import { addOutline } from "ionicons/icons";
 import { useHistory } from "react-router";
+import "./MyOrgs.css";
 
 const MyOrgs: React.FC = () => {
   // const [showCustomList, setShowCustomList] = useState(false);
@@ -31,7 +31,7 @@ const MyOrgs: React.FC = () => {
   const history = useHistory();
 
   const handleCreateOrganization = () => {
-    console.log("org and board created");
+    console.log("org created");
     history.push("/app/organization");
     setPopoverState({ showPopover: false, event: undefined });
   };
