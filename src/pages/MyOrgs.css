@@ -18,9 +18,10 @@
 }
 
 .create-org-btn {
-    padding: 10px;
+    /* padding: 5px; */
+    /* margin: 5px; */
     cursor: pointer;
-    border-radius: 5px;
+    /* border-radius: 5px; */
     text-align: center;
     transition: background-color 0.3s;
     border: none; 
@@ -35,3 +36,9 @@
 .create-org-btn:active {
     background-color: #ccc;
 }
+
+.separator-line {
+    height: 1px; 
+    background-color: #ccc; 
+    margin: 5px 0; 
+  }
