@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
   const { user, isLoading } = useAuth0();
 
   if (isLoading) {
-    return <IonLoading />
+    return <IonLoading />;
   }
 
   return (
