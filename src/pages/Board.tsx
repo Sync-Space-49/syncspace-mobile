@@ -82,7 +82,7 @@ const Board: React.FC = () => {
               </IonToolbar>
             </IonHeader>
             {/* modal content */}
-            <IonContent className="ion-padding">
+            <IonContent className="ion-padding" scroll-y="false">
               <IonGrid>
                 <IonRow className="ion-justify-content-center">
                   <IonToggle>Enable AI</IonToggle>
@@ -193,7 +193,7 @@ const Board: React.FC = () => {
 
       {/* end of modal and headers, beginning of Board page content */}
 
-      <IonContent fullscreen>
+      <IonContent fullscreen scroll-y="false">
         <Swiper
           modules={[Pagination]}
           pagination={{

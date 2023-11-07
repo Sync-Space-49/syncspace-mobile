@@ -31,7 +31,7 @@ const Profile: React.FC = () => {
           <IonTitle>Profile</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
+      <IonContent scroll-y="false">
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Profile</IonTitle>
@@ -79,10 +79,10 @@ const Profile: React.FC = () => {
           <IonItem>
             <IonLabel>Change Password</IonLabel>
           </IonItem>
-            <LogoutButton />
+          <LogoutButton />
           {/* <IonItem> */}
-                {/* <IonLabel>Delete Account</IonLabel> */}
-              <DeleteButton />
+          {/* <IonLabel>Delete Account</IonLabel> */}
+          <DeleteButton />
           {/* </IonItem> */}
         </IonList>
       </IonContent>
