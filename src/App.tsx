@@ -11,8 +11,13 @@ import { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 
-
-import { callbackUri, serverAdress, domain, clientId, secret } from "./auth.config";
+import {
+  callbackUri,
+  serverAdress,
+  domain,
+  clientId,
+  secret,
+} from "./auth.config";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -42,33 +47,32 @@ import Organization from "./pages/Organization";
 setupIonicReact();
 
 const App: React.FC = () => {
-  
-  // const options = { method: 'POST', 
+  // const options = { method: 'POST',
   //   url: `${domain}/oauth/token`,
   //   headers: { 'content-type': 'application/json' },
   //   body: `{"client_id":"${clientId}, "client_secret":${secret},"audience":"127.0.0.1:8080","grant_type":"client_credentials"}`};
-  
+
   // request(options, function(error, response, body) ) {
-    //   if (error) throw new Error(error);
-    // }
-    // }
+  //   if (error) throw new Error(error);
+  // }
+  // }
 
-    const options = {
-      method: "GET",
-      url: `${serverAdress}`,
-      headers: { "authorization": "Bearer TOKEN" },
-    };
+  const options = {
+    method: "GET",
+    url: `${serverAdress}`,
+    headers: { authorization: "Bearer TOKEN" },
+  };
 
-    axios(options)
-      .then(response => {
-        console.log(response.data); //debug
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    
-    // Get the callback handler from the Auth0 React hook
-    const { handleRedirectCallback } = useAuth0();
+  axios(options)
+    .then((response) => {
+      console.log(response.data); //debug
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  // Get the callback handler from the Auth0 React hook
+  const { handleRedirectCallback } = useAuth0();
 
   useEffect(() => {
     // Handle the 'appUrlOpen' event and call `handleRedirectCallback`
@@ -80,7 +84,7 @@ const App: React.FC = () => {
         ) {
           const res = await fetch(`${serverAdress}`);
           const data = await res.json();
-          await handleRedirectCallback(url);          
+          await handleRedirectCallback(url);
         }
         // No-op on Android
         await Browser.close();
