@@ -27,7 +27,7 @@ const Organization: React.FC = () => {
   };
 
   const history = useHistory();
-
+  
   const handleCreateOrganization = () => {
     console.log("board created");
     history.push("/app/board");

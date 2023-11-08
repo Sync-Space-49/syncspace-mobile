@@ -10,14 +10,21 @@ import {
   IonPopover,
   IonIcon,
 } from "@ionic/react";
-import { useState } from "react";
-import CustomList from "../components/CustomList";
+import { useEffect, useState } from "react";
 import { addOutline } from "ionicons/icons";
 import { useHistory } from "react-router";
 import "./MyOrgs.css";
+import SpecificOrganization from "../components/SpecificOrganization";
+import { useAuth0 } from "@auth0/auth0-react";
+import { serverAdress } from "../auth.config";
+import axios from "axios";
+
+import type { Organization } from "../types"
 
 const MyOrgs: React.FC = () => {
-  // const [showCustomList, setShowCustomList] = useState(false);
+  const { getAccessTokenSilently, user } = useAuth0();
+  const [isLoading, setIsLoading] = useState(false);
+  const [organizations, setOrganizations] = useState<Organization[]>();
   const [popoverState, setPopoverState] = useState<{
     showPopover: boolean;
     event: Event | undefined;
@@ -35,6 +42,31 @@ const MyOrgs: React.FC = () => {
     history.push("/app/organization");
     setPopoverState({ showPopover: false, event: undefined });
   };
+
+  const getOrganizations = async () => {
+    setIsLoading(true);
+    let token = await getAccessTokenSilently();
+    const userId = user!.sub;
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/users/${userId}/organizations`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    axios(options)
+      .then((response) => {
+        const userOrganizations = response.data;
+        console.log('userOrgs: ' + userOrganizations);
+        setOrganizations(userOrganizations)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    setIsLoading(false);
+  }
+  useEffect(() => {
+    getOrganizations();
+  }, []);
 
   return (
     <IonPage>
@@ -71,28 +103,9 @@ const MyOrgs: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonSearchbar></IonSearchbar>
-
-        <CustomList
-          title="My Boards"
-          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
-          items={[{ text: "Laundry Room remodel" }, { text: "Garden" }]}
-        />
-
-        <CustomList
-          title="ACM-W's Boards"
-          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
-          items={[{ text: "Axe-Hacks" }, { text: "Fall '23" }]}
-        />
-
-        <CustomList
-          title="SyncSpace's Boards"
-          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
-          items={[
-            { text: "Frontend" },
-            { text: "Mobile" },
-            { text: "Backend" },
-          ]}
-        />
+        {organizations ? (organizations.map((organization, i) => {
+          return <SpecificOrganization org={organization} key={i} />
+        })) : (<h1 className="ion-padding">No organizations were found</h1>)}
       </IonContent>
     </IonPage>
   );
