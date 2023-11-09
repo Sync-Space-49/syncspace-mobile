@@ -7,7 +7,6 @@ interface SpecificOrganizationProps {
 const SpecificOrganization: React.FC<SpecificOrganizationProps> = (org) => {
     return (
         <>
-
             <CustomList
                 title={org.org.name}
                 titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"

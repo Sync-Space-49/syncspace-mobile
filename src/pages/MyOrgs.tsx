@@ -9,6 +9,9 @@ import {
   IonButtons,
   IonPopover,
   IonIcon,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { addOutline } from "ionicons/icons";
@@ -43,6 +46,16 @@ const MyOrgs: React.FC = () => {
     setPopoverState({ showPopover: false, event: undefined });
   };
 
+
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    setTimeout(() => {
+      // useEffect(() => {
+        getOrganizations();
+        event.detail.complete();
+      // }, []);
+    }, 2000)
+  }
+
   const getOrganizations = async () => {
     setIsLoading(true);
     let token = await getAccessTokenSilently();
@@ -64,6 +77,7 @@ const MyOrgs: React.FC = () => {
       });
     setIsLoading(false);
   }
+  
   useEffect(() => {
     getOrganizations();
   }, []);
@@ -103,6 +117,10 @@ const MyOrgs: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonSearchbar></IonSearchbar>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent>
+          </IonRefresherContent>
+        </IonRefresher>
         {organizations ? (organizations.map((organization, i) => {
           return <SpecificOrganization org={organization} key={i} />
         })) : (<h1 className="ion-padding">No organizations were found</h1>)}
