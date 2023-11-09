@@ -22,12 +22,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { serverAdress } from "../auth.config";
 import axios from "axios";
 
-import type { Organization } from "../types"
+import type { Organization, Board } from "../types"
 
 const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
   const [isLoading, setIsLoading] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>();
+  const [board, setBoard] = useState<Board[]>();
   const [popoverState, setPopoverState] = useState<{
     showPopover: boolean;
     event: Event | undefined;
@@ -50,8 +51,8 @@ const MyOrgs: React.FC = () => {
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
     setTimeout(() => {
       // useEffect(() => {
-        getOrganizations();
-        event.detail.complete();
+      getOrganizations();
+      event.detail.complete();
       // }, []);
     }, 2000)
   }
@@ -77,7 +78,30 @@ const MyOrgs: React.FC = () => {
       });
     setIsLoading(false);
   }
-  
+
+  // update when backend is updated
+  const getBoardNames = async (organizations: { id: string; }) => {
+    setIsLoading(true);
+    let token = await getAccessTokenSilently();
+    let organizationId = organizations.id;
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/organizations/${organizationId}/boards`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    axios(options)
+      .then((response) => {
+        const boards = response.data;
+        console.log('board data: ' + boards);
+        setBoard(boards);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    setIsLoading(false);
+  }
+
   useEffect(() => {
     getOrganizations();
   }, []);
@@ -89,7 +113,7 @@ const MyOrgs: React.FC = () => {
           <IonTitle>My Organizations</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">My Organizations</IonTitle>
