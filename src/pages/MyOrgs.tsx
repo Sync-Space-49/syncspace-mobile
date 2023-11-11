@@ -12,6 +12,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
+  useIonLoading,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { addOutline } from "ionicons/icons";
@@ -22,11 +23,11 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { serverAdress } from "../auth.config";
 import axios from "axios";
 
-import type { Organization, Board } from "../types"
+import type { Organization } from "../types"
 
 const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
-  const [isLoading, setIsLoading] = useState(false);
+  const [present, dismiss] = useIonLoading();
   const [organizations, setOrganizations] = useState<Organization[]>();
 
   const [popoverState, setPopoverState] = useState<{
@@ -54,7 +55,7 @@ const MyOrgs: React.FC = () => {
   }
 
   const getOrganizations = async () => {
-    setIsLoading(true);
+    present();
     let token = await getAccessTokenSilently();
     const userId = user!.sub;
     const options = {
@@ -67,11 +68,12 @@ const MyOrgs: React.FC = () => {
       .then((response) => {
         const userOrganizations = response.data;
         setOrganizations(userOrganizations)
+        dismiss();
       })
       .catch((error) => {
         console.log(error);
+        dismiss();
       });
-    setIsLoading(false);
   }
 
   useEffect(() => {
