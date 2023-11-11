@@ -28,7 +28,7 @@ const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
   const [isLoading, setIsLoading] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>();
-  const [board, setBoard] = useState<Board[]>();
+
   const [popoverState, setPopoverState] = useState<{
     showPopover: boolean;
     event: Event | undefined;
@@ -49,12 +49,8 @@ const MyOrgs: React.FC = () => {
 
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    setTimeout(() => {
-      // useEffect(() => {
-      getOrganizations();
-      event.detail.complete();
-      // }, []);
-    }, 2000)
+    getOrganizations();
+    event.detail.complete();
   }
 
   const getOrganizations = async () => {
@@ -70,31 +66,7 @@ const MyOrgs: React.FC = () => {
     axios(options)
       .then((response) => {
         const userOrganizations = response.data;
-        console.log('userOrgs: ' + userOrganizations);
         setOrganizations(userOrganizations)
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    setIsLoading(false);
-  }
-
-  // update when backend is updated
-  const getBoardNames = async (organizations: { id: string; }) => {
-    setIsLoading(true);
-    let token = await getAccessTokenSilently();
-    let organizationId = organizations.id;
-    const options = {
-      method: "GET",
-      url: `${serverAdress}api/organizations/${organizationId}/boards`,
-      headers: { authorization: `Bearer ${token}` },
-    };
-
-    axios(options)
-      .then((response) => {
-        const boards = response.data;
-        console.log('board data: ' + boards);
-        setBoard(boards);
       })
       .catch((error) => {
         console.log(error);
