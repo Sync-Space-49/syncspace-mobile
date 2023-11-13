@@ -1,10 +1,7 @@
-FROM node:13-alpine as build
+FROM node:20-alpine
 WORKDIR /app
 COPY package*.json /app/
-RUN npm install -g ionic
+RUN npm install react@latest react-dom@latest
+RUN npm install @ionic/react@7 @ionic/react-router@7
 RUN npm install
-COPY ./ /app/
-RUN npm run-script build:prod
-FROM nginx:alpine
-RUN rm -rf /usr/share/nginx/html/*
-COPY --from=build /app/www/ /usr/share/nginx/html/
+RUN ionic serve
