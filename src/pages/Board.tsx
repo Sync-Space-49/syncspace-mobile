@@ -229,13 +229,34 @@ const Board: React.FC = () => {
         >
           <IonContent className="ion-padding-end">
             <SwiperSlide>
-              <BoardStack title="Backlog"></BoardStack>
+              <BoardStack
+                title="Backlog"
+                items={[
+                  { id: "1", label: "Item A" },
+                  { id: "2", label: "Item B" },
+                  { id: "3", label: "Item C" },
+                ]}
+              ></BoardStack>
             </SwiperSlide>
             <SwiperSlide>
-              <BoardStack title="In-Progress"></BoardStack>
+              <BoardStack
+                title="In progress"
+                items={[
+                  { id: "1", label: "Item A" },
+                  { id: "2", label: "Item B" },
+                  { id: "3", label: "Item C" },
+                ]}
+              ></BoardStack>
             </SwiperSlide>
             <SwiperSlide>
-              <BoardStack title="Done"></BoardStack>
+              <BoardStack
+                title="Done"
+                items={[
+                  { id: "1", label: "Item A" },
+                  { id: "2", label: "Item B" },
+                  { id: "3", label: "Item C" },
+                ]}
+              ></BoardStack>
             </SwiperSlide>
           </IonContent>
         </Swiper>
