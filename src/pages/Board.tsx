@@ -28,6 +28,7 @@ import {
   chevronDownOutline,
 } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
@@ -37,11 +38,20 @@ import "swiper/css/pagination";
 import BoardStack from "../components/BoardStack";
 import BoardView from "../components/BoardView";
 import MemberList from "../components/MemberList";
+import { serverAdress } from "../auth.config";
 import "./Board.css";
 import { useAuth0 } from "@auth0/auth0-react";
 // import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 
-const Board: React.FC = () => {
+import type { Board, Organization } from "../types"
+
+interface BoardProps {
+  org: Organization;
+  board: Board;
+}
+
+
+const Board: React.FC<BoardProps> = ({org, board}) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
 
@@ -58,7 +68,24 @@ const Board: React.FC = () => {
     modal.current?.dismiss();
   }
 
-  const { user } = useAuth0();
+  const { getAccessTokenSilently, user } = useAuth0();
+
+  const getDetailedBoard = async () => {
+    const token = await getAccessTokenSilently();
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}/details`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+    await axios(options)
+      .then((response) => {
+        const data = response.data as Board;
+        return data;
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
 
   // var for current view + handler to change
   // let boardView: String = 'Sprint 1';

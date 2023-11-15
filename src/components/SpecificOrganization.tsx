@@ -21,18 +21,16 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({org}) => {
     const [loading, setIsLoading] = useState(false);
 
     const getBoards = async () => {
-        let organizationId = org.id;
-        let token = await getAccessTokenSilently();
+        setIsLoading(true);
+        const token = await getAccessTokenSilently();
         const options = {
             method: "GET",
-            url: `${serverAdress}api/organizations/${organizationId}/boards`,
+            url: `${serverAdress}api/organizations/${org.id}/boards`,
             headers: { authorization: `Bearer ${token}` },
         };
-        setIsLoading(true);
-        let data: any;
         await axios(options)
             .then((response) => {
-                data = response.data;
+                const data = response.data as Board[];
                 setBoards(data);
             })
             .catch((error) => {
