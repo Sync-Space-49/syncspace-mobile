@@ -10,7 +10,7 @@ interface SpecificOrganizationProps {
 }
 
 interface ListProps {
-    text: string; // the list's content
+    text?: string| null; // the list's content
     listImg?: string; //list image src
 }
 
@@ -52,6 +52,10 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({org}) => {
             }));
                 setBoardNames(updatedBoardNames);
             }
+        else {
+            const noBoards = [{}]
+            setBoardNames(noBoards);
+        }
             setIsLoading(false);
     }, [boards]);
 
