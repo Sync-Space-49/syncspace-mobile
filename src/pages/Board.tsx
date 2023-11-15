@@ -43,7 +43,7 @@ import "./Board.css";
 import { useAuth0 } from "@auth0/auth0-react";
 // import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 
-import type { Board, Organization } from "../types"
+import type { Board, Organization, User } from "../types"
 
 interface BoardProps {
   org: Organization;
@@ -77,10 +77,94 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
       url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}/details`,
       headers: { authorization: `Bearer ${token}` },
     };
+
     await axios(options)
       .then((response) => {
         const data = response.data as Board;
         return data;
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  const updateBoard = async (title:string, ownerId:string, isPrivate:boolean) => {
+    const token = await getAccessTokenSilently();
+    const data = {} as any;
+    if (title) { data.title = title }
+    if (ownerId) { data.ownerId = ownerId }
+    if (isPrivate) { data.isPrivate = isPrivate }
+      
+    const options = {
+      method: "PUT",
+      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}`,
+      headers: { authorization: `Bearer ${token}` },
+      data: data
+    };
+
+    await axios(options)
+      .then(() => {
+        // Not sure if you want to do something on success
+        return
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  const deleteBoard = async (title:string, ownerId:string, isPrivate:boolean) => {
+    const token = await getAccessTokenSilently();
+      
+    const options = {
+      method: "DELETE",
+      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then(() => {
+        // Not sure if you want to do something on success
+        return
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  // NOT IMPLEMENTED YET ON API
+  const getBoardMembers = async () => {
+    const token = await getAccessTokenSilently();
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}/members`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then((response) => {
+        const data = response.data as User[];
+        return data;
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  const addBoardMember = async (userId:string) => {
+    const token = await getAccessTokenSilently();
+    const options = {
+      method: "POST",
+      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}/members`,
+      headers: { authorization: `Bearer ${token}` },
+      data : {
+        "user_id": userId
+      }
+    };
+
+    await axios(options)
+      .then(() => {
+        // Not sure if you want to do something on success
+        return
       })
       .catch((error) => {
         console.error(error.message);
