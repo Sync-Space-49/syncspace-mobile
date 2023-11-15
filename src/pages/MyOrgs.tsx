@@ -27,7 +27,7 @@ import type { Organization } from "../types"
 
 const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
-  const [present, dismiss] = useIonLoading();
+  // const [present, dismiss] = useIonLoading();
   const [organizations, setOrganizations] = useState<Organization[]>();
 
   const [popoverState, setPopoverState] = useState<{
@@ -55,7 +55,7 @@ const MyOrgs: React.FC = () => {
   }
 
   const getOrganizations = async () => {
-    present();
+    // present();
     let token = await getAccessTokenSilently();
     const userId = user!.sub;
     const options = {
@@ -64,15 +64,15 @@ const MyOrgs: React.FC = () => {
       headers: { authorization: `Bearer ${token}` },
     };
 
-    axios(options)
-      .then((response) => {
+    await axios(options)
+      .then((response) =>  {
         const userOrganizations = response.data;
         setOrganizations(userOrganizations)
-        dismiss();
+        // dismiss();
       })
       .catch((error) => {
-        console.log(error);
-        dismiss();
+        console.log(error.message);
+        // dismiss();
       });
   }
 
