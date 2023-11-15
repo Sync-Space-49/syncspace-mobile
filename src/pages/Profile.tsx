@@ -16,13 +16,64 @@ import "./Profile.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "../components/Logout";
 import DeleteButton from "../components/DeleteAccount";
+import { domain, serverAdress, serverAudience } from "../auth.config";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Organization } from "../types";
 
 const Profile: React.FC = () => {
-  const { user, isLoading } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
 
-  if (isLoading) {
-    return <IonLoading />;
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [userSince, setUserSince] = useState();
+
+  const getOrgs = async () => {
+    let token = await getAccessTokenSilently();
+    let userId = user!.sub;
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/users/${userId}/organizations`,
+      headers: { authorization: `Bearer ${token}` },
+    }
+
+    await axios(options)
+      .then((response) => {
+        let data = response.data;
+        setOrganizations(data);
+      })
+      .catch((error) => {
+        console.error(error.message);
+      })
   }
+
+  const getUserSince = async () => {
+    let token = await getAccessTokenSilently();
+    let userId = user!.sub;
+    const options = {
+      method: "GET",
+      url: `https://${domain}/api/v2/users/${userId}`,
+      headers: { authorization: `Bearer ${token}` },
+    }
+    await axios(options)
+      .then((response) => {
+        let data = response.data;
+        setUserSince(data);
+
+      })
+      .catch((error) => {
+        console.error(error.message);
+      })
+  }
+
+  useEffect(() => {
+    getUserSince();
+    getOrgs();
+  },[]);
+
+  // useEffect(() => {
+  //   setOrganizations(data);
+  //   setUserSince(data);
+  // },[]); 
 
   return (
     <IonPage>
@@ -40,12 +91,6 @@ const Profile: React.FC = () => {
 
         {/* User Profile Pic */}
         <div className="profile-image-container">
-          {/* <img
-            // src="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png" -this was the original pic you had but i'm changing it to our fave johnny 
-            src="https://s3.us-east-1.wasabisys.com/sync-space/pfp/johnny-appleseed.png"
-            alt="user pfp"
-            className="profile-image"
-          /> */}
           <IonAvatar className="avatar">
             <img src={user?.picture} alt={user?.name} />
           </IonAvatar>
@@ -56,10 +101,11 @@ const Profile: React.FC = () => {
         {/* <div className="user-at">@johnnyp</div> */}
 
         <div className="user-name">{user?.name}</div>
-        <div className="user-at">{user?.preferred_username}</div>
+        <div className="user-at">{user?.nickname}</div>
 
         <div className="user-at">
-          <small>Member since January 2023</small>
+          <small>Member since {userSince}</small>
+          <small>Member since {user?.created_at}</small>
         </div>
 
         {/* User Organizations*/}
