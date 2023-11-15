@@ -15,8 +15,8 @@ const root = createRoot(container!);
 
 root.render(
   <Auth0Provider
-    domain={auth0Domain}
-    clientId={clientId}
+    domain={auth0Domain!}
+    clientId={clientId!}
     authorizationParams={{
       redirect_uri: callbackUri,
       audience: serverAudience,
