@@ -10,7 +10,7 @@ import {
   IonAvatar,
 } from "@ionic/react";
 import "./Profile.css";
-import { useAuth0 } from "@auth0/auth0-react";
+import { IdToken, useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "../components/Logout";
 import DeleteButton from "../components/DeleteAccount";
 import { serverAdress } from "../auth.config";
@@ -25,7 +25,7 @@ interface ListProps {
 }
 
 const Profile: React.FC = () => {
-  const { user, getAccessTokenSilently } = useAuth0();
+  const { user, getAccessTokenSilently, getIdTokenClaims } = useAuth0();
 
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [orgNames, setOrgNames] = useState<ListProps[]>([]);
@@ -50,32 +50,17 @@ const Profile: React.FC = () => {
       })
   }
 
-  // to be updated with getting userSince data
-
-  // const getUserSince = async () => {
-  //   let token = await getAccessTokenSilently();
-  //   let userId = user!.sub;
-  //   const options = {
-  //     method: "GET",
-  //     url: `https://${domain}/api/v2/users/${userId}`,
-  //     headers: { authorization: `Bearer ${token}` },
-  //   }
-  //   await axios(options)
-  //     .then((response) => {
-  //       let data = response.data;
-  //       setUserSince(data);
-
-  //     })
-  //     .catch((error) => {
-  //       console.error(error.message);
-  //     })
-  // }
-
   useEffect(() => {
-    // getUserSince();
+    getCreatedAt();
     getOrgs();
   }, []);
 
+  const getCreatedAt = async () => {
+    const data = await getIdTokenClaims();
+    const time: Date = new Date(data!.createdAt)
+    const updatedTimeString = time.toLocaleString('default', { month: 'long', year: 'numeric' });
+    setUserSince(updatedTimeString);
+  }
   useEffect(() => {
     if (organizations.length > 0) {
       const updatedOrgNames = organizations.map((org) => ({
@@ -84,7 +69,6 @@ const Profile: React.FC = () => {
       }));
       setOrgNames(updatedOrgNames);
     }
-    // setUserSince(data);
   }, [organizations]);
 
   return (
