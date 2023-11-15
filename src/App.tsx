@@ -57,19 +57,19 @@ const App: React.FC = () => {
   // }
   // }
 
-  const options = {
-    method: "GET",
-    url: `${serverAdress}`,
-    headers: { authorization: "Bearer TOKEN" },
-  };
+  // const options = {
+  //   method: "GET",
+  //   url: `${serverAdress}`,
+  //   headers: { authorization: "Bearer TOKEN" },
+  // };
 
-  axios(options)
-    .then((response) => {
-      console.log(response.data); //debug
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  // axios(options)
+  //   .then((response) => {
+  //     console.log(response.data); //debug
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
 
   // Get the callback handler from the Auth0 React hook
   const { handleRedirectCallback } = useAuth0();

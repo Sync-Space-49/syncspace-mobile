@@ -9,6 +9,10 @@ import {
   IonButtons,
   IonPopover,
   IonIcon,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+  useIonLoading,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { addOutline } from "ionicons/icons";
@@ -23,8 +27,9 @@ import type { Organization } from "../types"
 
 const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
-  const [isLoading, setIsLoading] = useState(false);
+  // const [present, dismiss] = useIonLoading();
   const [organizations, setOrganizations] = useState<Organization[]>();
+
   const [popoverState, setPopoverState] = useState<{
     showPopover: boolean;
     event: Event | undefined;
@@ -43,8 +48,14 @@ const MyOrgs: React.FC = () => {
     setPopoverState({ showPopover: false, event: undefined });
   };
 
+
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    getOrganizations();
+    event.detail.complete();
+  }
+
   const getOrganizations = async () => {
-    setIsLoading(true);
+    // present();
     let token = await getAccessTokenSilently();
     const userId = user!.sub;
     const options = {
@@ -53,17 +64,18 @@ const MyOrgs: React.FC = () => {
       headers: { authorization: `Bearer ${token}` },
     };
 
-    axios(options)
-      .then((response) => {
+    await axios(options)
+      .then((response) =>  {
         const userOrganizations = response.data;
-        console.log('userOrgs: ' + userOrganizations);
         setOrganizations(userOrganizations)
+        // dismiss();
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error.message);
+        // dismiss();
       });
-    setIsLoading(false);
   }
+
   useEffect(() => {
     getOrganizations();
   }, []);
@@ -75,7 +87,7 @@ const MyOrgs: React.FC = () => {
           <IonTitle>My Organizations</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">My Organizations</IonTitle>
@@ -103,6 +115,10 @@ const MyOrgs: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonSearchbar></IonSearchbar>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent>
+          </IonRefresherContent>
+        </IonRefresher>
         {organizations ? (organizations.map((organization, i) => {
           return <SpecificOrganization org={organization} key={i} />
         })) : (<h1 className="ion-padding">No organizations were found</h1>)}
