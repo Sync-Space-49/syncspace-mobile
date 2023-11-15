@@ -43,25 +43,25 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({org}) => {
     }, []);
 
     useEffect(() => {
-        if (boards.length > 0) {
+        if (boards && boards.length > 0) {
             const updatedBoardNames = boards.map((board) => ({
                 text: board.title,
                 listImg: "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
             }));
                 setBoardNames(updatedBoardNames);
-                setIsLoading(false);
             }
+        setIsLoading(false);
     }, [boards]);
 
     return (
         <>
             {loading ? <IonSpinner color="primary" className="ion-text-center ion-padding" />
-                : boardNames.length > 0 ? 
+                : boardNames.length > 0 ?
                 <CustomList
                     title={org.name}
                     titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
                     items={boardNames}
-                /> : <p>nothing loaded</p>}
+                /> : <p></p>}
         </>
     );
 };

@@ -10,7 +10,7 @@ import {
   IonAvatar,
 } from "@ionic/react";
 import "./Profile.css";
-import { IdToken, useAuth0 } from "@auth0/auth0-react";
+import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "../components/Logout";
 import DeleteButton from "../components/DeleteAccount";
 import { serverAdress } from "../auth.config";

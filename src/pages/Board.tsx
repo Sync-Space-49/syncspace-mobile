@@ -334,6 +334,7 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
             dynamicBullets: true,
           }}
           style={{
+            // @ts-ignore
             "--swiper-pagination-color": "#80e08b",
             "--swiper-pagination-bullet-inactive-color": "#92949c",
           }}
