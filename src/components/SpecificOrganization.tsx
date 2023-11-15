@@ -45,14 +45,14 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({org}) => {
     }, []);
 
     useEffect(() => {
-        if (boards.length > 0) {
+        if (boards && boards.length > 0) {
             const updatedBoardNames = boards.map((board) => ({
                 text: board.title,
                 listImg: "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
             }));
                 setBoardNames(updatedBoardNames);
-                setIsLoading(false);
             }
+            setIsLoading(false);
     }, [boards]);
 
     return (
@@ -63,7 +63,7 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({org}) => {
                     title={org.name}
                     titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
                     items={boardNames}
-                /> : <p>nothing loaded</p>}
+                /> : <p> </p>}
         </>
     );
 };
