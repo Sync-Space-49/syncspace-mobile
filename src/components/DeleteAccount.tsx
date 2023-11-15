@@ -1,15 +1,15 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Browser } from "@capacitor/browser";
-import { IonAlert, IonButton, IonItem, IonToast } from "@ionic/react";
-import { useState } from "react";
+import { IonAlert, IonButton, IonItem } from "@ionic/react";
+import { serverAdress } from "../auth.config";
+import axios from "axios";
 // This should reflect the URL added earlier to your "Allowed Logout URLs" setting
 // in the Auth0 dashboard.
 
 const logoutUri = "http://localhost:8100"; //hopefully links to landingpage
 
 const DeleteButton: React.FC = () => {
-  const { logout } = useAuth0();
-  const [disableButton, setDisableButton] = useState("false");
+  const { logout, user, getAccessTokenSilently } = useAuth0();
 
   const doLogout = async () => {
     await logout({
@@ -26,7 +26,23 @@ const DeleteButton: React.FC = () => {
     });
   };
 
-  // return <IonButton onClick={doLogout}>Log out</IonButton>;
+  const deleteAccount = async (userId: string, token: string) => {
+    const options = {
+      method: "DELETE",
+      url: `${serverAdress}api/users/${userId}`,
+      headers: { authorization: `Bearer ${token}` },
+    }
+
+    await axios(options)
+      .then((response) => {
+        console.log('account deleted, sorry to see you go' + response.data)
+      })
+      .catch((error) => {
+        console.error(error.message)
+      })
+
+  }
+
   return (
     <>
       <IonAlert
@@ -35,14 +51,23 @@ const DeleteButton: React.FC = () => {
         buttons={[
           {
             text: "No",
+            role: 'cancel',
             cssClass: "primary",
           },
           {
             text: "Yes",
             cssClass: "danger",
+            role: 'confirm',
+            handler: async () => {
+              console.log('alert confirmed: ')
+              let token = await getAccessTokenSilently();
+              let userId = user!.sub;
+              await deleteAccount(userId!, token);
+              doLogout();
+            }
           },
         ]}
-        onDidDismiss={doLogout}
+        onDidDismiss={({ detail }) => console.log(`dismissed with role: ${detail.role}`)}
       ></IonAlert>
       <IonButton fill="clear" id="present-alert">
         <IonItem color="danger">Delete Account</IonItem>
