@@ -2,19 +2,18 @@ import React from "react";
 import { useHistory } from "react-router";
 import { IonList, IonItem, IonLabel } from "@ionic/react";
 
-interface ListProps {
-  text: string; // the list's content
-  listImg?: string; //list image src
+interface BoardProps {
+  text?: string | null; // board's title
+  listImg?: string; //board image src
 }
 
 interface CustomListProps {
-  title?: string; //list's title
+  title?: string; //organization title (ignore how its being used in home rn)
   subTitle?: string; //subtitle, if required (for ex. "today", "yesterday" on home page)
-  items: ListProps[]; //list of items we're trying to show
-  titleImg?: string; //title image src
+  items?: BoardProps[]; //list of board items
+  titleImg?: string; //organization image src
 }
-// **TODO: users on Home page should not be taken to /app/organizations, when user is in my organization and clicks title should not be taken
-// destructuring
+
 const CustomList: React.FC<CustomListProps> = ({
   title,
   subTitle,
@@ -40,20 +39,22 @@ const CustomList: React.FC<CustomListProps> = ({
       )}
       {subTitle && <div className="sub-list-title">{subTitle}</div>}
       {/* display each item in items array as IonItem*/}
-      <IonList inset={true}>
-        {items.map((item, index) => (
-          <IonItem key={index} routerLink="/app/board">
-            {item.listImg && (
-              <img
-                src={item.listImg}
-                alt="list item icon"
-                className="item-icon"
-              />
-            )}
-            <IonLabel>{item.text}</IonLabel>
-          </IonItem>
-        ))}
-      </IonList>
+      {items && items.length > 0 && (
+        <IonList inset={true}>
+          {items.map((item, index) => (
+            <IonItem key={index} routerLink="/app/board">
+              {item.listImg && (
+                <img
+                  src={item.listImg}
+                  alt="list item icon"
+                  className="item-icon"
+                />
+              )}
+              <IonLabel>{item.text}</IonLabel>
+            </IonItem>
+          ))}
+        </IonList>
+      )}
     </div>
   );
 };
