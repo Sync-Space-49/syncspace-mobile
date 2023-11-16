@@ -20,3 +20,14 @@
 .toolbar-shrink {
     height: 30%;
 }
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+  
+  .close-btn {
+    font-size: small;
+    color: grey;
+}
