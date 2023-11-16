@@ -8,12 +8,17 @@ import {
   IonButtons,
   IonIcon,
   IonPopover,
+  IonItem,
+  IonList,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+  IonBackButton,
 } from "@ionic/react";
 import CustomList from "../components/CustomList";
 import { useEffect, useState } from "react";
-import { addOutline } from "ionicons/icons";
+import { addOutline, colorWandOutline } from "ionicons/icons";
 import { RouteComponentProps, useHistory } from "react-router";
-import "./Organization.css";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { serverAdress } from "../auth.config";
@@ -22,7 +27,7 @@ import { Board, Organization } from "../types";
 interface OrgDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
-  }> {}
+  }> { }
 
 interface ListProps {
   text: string; // the list's content
@@ -33,15 +38,15 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
   const { getAccessTokenSilently } = useAuth0();
   const history = useHistory();
 
-  const orgId:string = match.params.orgId;
-  
+  const orgId: string = match.params.orgId;
+
   const [organization, setOrganization] = useState<Organization>();
   const [boards, setBoards] = useState<Board[]>();
   const [viewableBoardsProps, setViewableBoardsProps] = useState<ListProps[]>([]);
   const [hiddenBoardsProps, setHiddenBoardsProps] = useState<ListProps[]>();
-  
+
   const customListTitle = `${organization?.name}'s boards`;
-  
+
   const [popoverState, setPopoverState] = useState<{
     showPopover: boolean;
     event: Event | undefined;
@@ -54,16 +59,13 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       url: `${serverAdress}api/organizations/${orgId}`,
       headers: { authorization: `Bearer ${token}` },
     };
-
     await axios(options)
-      .then((response) =>  {
+      .then((response) => {
         const org = response.data;
         setOrganization(org);
-        // dismiss();
       })
       .catch((error) => {
         console.log(error.message);
-        // dismiss();
       });
   }
 
@@ -74,7 +76,6 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       url: `${serverAdress}api/organizations/${orgId}/boards`,
       headers: { authorization: `Bearer ${token}` },
     };
-    // setIsLoading(true);
     let data: any;
     await axios(options)
       .then((response) => {
@@ -86,17 +87,17 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       });
   };
 
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.persist();
-    setPopoverState({ showPopover: true, event: e.nativeEvent });
-  };
+  const handleNewAI = () => {
+    console.log("New board with AI clicked!")
+  }
+  const handleNewBoard = () => {
+    console.log("New board clicked!")
+  }
 
-  const handleCreateOrganization = () => {
-    console.log("board created");
-    history.push("/app/board");
-    setPopoverState({ showPopover: false, event: undefined });
-    //redirect "create with AI to AI tour"
-  };
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    getBoards();
+    event.detail.complete();
+  }
 
   useEffect(() => {
     getOrganization();
@@ -104,10 +105,10 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
   }, []);
 
   useEffect(() => {
-    if(boards) {
+    if (boards) {
       let hiddenBoards = [];
       let nonHiddenBoards = [];
-      
+
       for (let i = 0; i < boards.length; i++) {
         if (boards[i].is_private) {
           hiddenBoards.push(boards[i])
@@ -116,68 +117,68 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
         }
       }
 
-      if(nonHiddenBoards && nonHiddenBoards.length > 0) {
+      if (nonHiddenBoards && nonHiddenBoards.length > 0) {
         const viewableListProp = nonHiddenBoards.map((board) => ({
           text: board.title
         }));
         setViewableBoardsProps(viewableListProp);
-        console.log('VLP '+viewableListProp[0].text)
       }
-      if(hiddenBoards && hiddenBoards.length > 0) {
+      if (hiddenBoards && hiddenBoards.length > 0) {
         const privateListProp = hiddenBoards.map((board) => ({
           text: board.title
         }));
         setHiddenBoardsProps(privateListProp);
-        console.log('PLP '+ privateListProp)
       }
     }
   }, [boards]);
 
   return (
     <IonPage>
-      <IonHeader>
+      {/* <IonHeader>
         <IonToolbar>
+        
           <IonTitle>{organization?.name}</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">{organization?.name}</IonTitle>
-            <IonButtons slot="end">
-              <IonButton onClick={handleButtonClick} className="add-btn">
+          <IonButtons slot="end">
+              <IonButton id="click-trigger"className="add-btn">
                 <IonIcon slot="icon-only" icon={addOutline} />
               </IonButton>
             </IonButtons>
-            <IonPopover
-              isOpen={popoverState.showPopover}
-              event={popoverState.event}
-              onDidDismiss={() =>
-                setPopoverState({ showPopover: false, event: undefined })
-              }
-            >
-              <IonContent class="ion-padding">
-                <div className="ion-padding">
-                  <button
-                    onClick={handleCreateOrganization}
-                    className="create-org-btn"
-                  >
-                    Create a New Board
-                  </button>
-                </div>
-                <div className="separator-line"></div>
-                <div className="ion-padding">
-                  <button
-                    onClick={handleCreateOrganization}
-                    className="create-org-btn"
-                  >
-                    Create a New Board with AI
-                  </button>
-                </div>
-              </IonContent>
-            </IonPopover>
-          </IonToolbar>
-        </IonHeader>
+        </IonToolbar>
+      </IonHeader> */}
+      <IonHeader collapse="condense">
+      <div className="toolbar-shrink">
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton
+              defaultHref="/app"
+              className="ion-margin-vertical"
+            />
+          </IonButtons>
+          <IonTitle >{organization?.name}</IonTitle>
+          <IonButtons slot="end">
+            <IonButton id="click-trigger">
+              <IonIcon slot="icon-only" icon={addOutline} />
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+        <IonPopover trigger="click-trigger" triggerAction="click">
+            <IonList>
+              <IonItem button={true} detail={false} onClick={handleNewAI}>
+                <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
+                New board with AI
+              </IonItem>
+              <IonItem button={true} detail={false} onClick={handleNewBoard}>
+                New board
+              </IonItem>
+            </IonList>
+          </IonPopover>
+        </div>
+      </IonHeader>
+      <IonContent fullscreen>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent>
+          </IonRefresherContent>
+        </IonRefresher>
         <CustomList
           title={customListTitle}
           titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"

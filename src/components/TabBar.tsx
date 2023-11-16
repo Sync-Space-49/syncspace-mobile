@@ -6,7 +6,6 @@ import {
   IonTabButton,
   IonTabs,
 } from "@ionic/react";
-import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router";
 import { home, layersOutline, personCircleOutline } from "ionicons/icons";
 import Home from "../pages/Home";
@@ -31,10 +30,10 @@ const TabBar: React.FC = () => {
           <Route exact path="/app/profile">
             <Profile />
           </Route>
-          <Route exact path="/app/organizations" component={OrgDetail} />
+          {/* <Route exact path="/app/organizations" component={OrgDetail} />  */}
           <Route path="/app/organizations/:orgId" component={OrgDetail} />
-          <Route exact path="/app/organizations/boards" component={Board} />
-          <Route path="/app/organizations/boards/:boardId" component={Board} />
+          {/* <Route exact path="/app/organizations/boards" component={Board} /> */}
+          <Route path="/app/organizations/:orgId/boards/:boardId" component={Board} />
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom">
