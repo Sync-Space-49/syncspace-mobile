@@ -21,10 +21,11 @@ export const Auth0ProviderWithHistory = ({ children }:any) => {
             authorizationParams={{
                 redirect_uri: callbackUri,
                 audience: serverAudience,
+                scope: "openid profile email offline_access"
             }}
             onRedirectCallback={onRedirectCallback}
             useRefreshTokens={true}
-            useRefreshTokensFallback={false}
+            useRefreshTokensFallback={true}
         >
             {children}
         </Auth0Provider>
