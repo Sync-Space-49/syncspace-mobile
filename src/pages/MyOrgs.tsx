@@ -23,7 +23,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { serverAdress } from "../auth.config";
 import axios from "axios";
 
-import type { Organization } from "../types"
+import type { Organization } from "../types";
 
 const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
@@ -48,11 +48,10 @@ const MyOrgs: React.FC = () => {
     setPopoverState({ showPopover: false, event: undefined });
   };
 
-
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
     getOrganizations();
     event.detail.complete();
-  }
+  };
 
   const getOrganizations = async () => {
     // present();
@@ -65,19 +64,53 @@ const MyOrgs: React.FC = () => {
     };
 
     await axios(options)
-      .then((response) =>  {
+      .then((response) => {
         const userOrganizations = response.data;
-        setOrganizations(userOrganizations)
+        setOrganizations(userOrganizations);
         // dismiss();
       })
       .catch((error) => {
         console.log(error.message);
         // dismiss();
       });
-  }
+  };
+
+  const createOrganization = async (title: string, description: string) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    if (title) {
+      body.append("title", title);
+    }
+    if (description) {
+      body.append("description", description);
+    }
+    console.log("Sending data:", body);
+
+    const options = {
+      method: "POST",
+      url: `${serverAdress}api/organizations`,
+      headers: { authorization: `Bearer ${token}` },
+      data: body,
+    };
+
+    await axios(options)
+      .then(async () => {
+        console.log("success, org created");
+        await getAccessTokenSilently().then(() => {
+          getOrganizations();
+        });
+      })
+      .catch((error) => {
+        console.error(
+          "ERROR: ",
+          error.response ? error.response.data : error.message
+        );
+      });
+  };
 
   useEffect(() => {
     getOrganizations();
+    createOrganization("no", "hahahahahhahah");
   }, []);
 
   return (
@@ -116,12 +149,15 @@ const MyOrgs: React.FC = () => {
         </IonHeader>
         <IonSearchbar></IonSearchbar>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent>
-          </IonRefresherContent>
+          <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-        {organizations ? (organizations.map((organization, i) => {
-          return <SpecificOrganization org={organization} key={i} />
-        })) : (<h1 className="ion-padding">No organizations were found</h1>)}
+        {organizations ? (
+          organizations.map((organization, i) => {
+            return <SpecificOrganization org={organization} key={i} />;
+          })
+        ) : (
+          <h1 className="ion-padding">No organizations were found</h1>
+        )}
       </IonContent>
     </IonPage>
   );

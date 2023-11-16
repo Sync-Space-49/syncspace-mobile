@@ -22,22 +22,23 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org }) => {
 
   const getBoards = async () => {
     let organizationId = org.id;
-    let token = await getAccessTokenSilently();
-    const options = {
-      method: "GET",
-      url: `${serverAdress}api/organizations/${organizationId}/boards`,
-      headers: { authorization: `Bearer ${token}` },
-    };
-    setIsLoading(true);
-    let data: any;
-    await axios(options)
-      .then((response) => {
-        data = response.data;
-        setBoards(data);
-      })
-      .catch((error) => {
-        console.error(error.message);
-      });
+    await getAccessTokenSilently({ cacheMode: "off" }).then(async (token) => {
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/organizations/${organizationId}/boards`,
+        headers: { authorization: `Bearer ${token}` },
+      };
+      setIsLoading(true);
+      let data: any;
+      await axios(options)
+        .then((response) => {
+          data = response.data;
+          setBoards(data);
+        })
+        .catch((error) => {
+          console.error(error.message);
+        });
+    });
   };
 
   useEffect(() => {

@@ -20,10 +20,11 @@ root.render(
     authorizationParams={{
       redirect_uri: callbackUri,
       audience: serverAudience,
+      scope: "openid profile email offline_access",
     }}
     useRefreshTokens={true}
-    useRefreshTokensFallback={false}
+    useRefreshTokensFallback={true}
   >
     <App />
-  </Auth0Provider>,
+  </Auth0Provider>
 );
