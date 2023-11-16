@@ -8,6 +8,9 @@ import {
   IonTitle,
   IonToolbar,
   IonAvatar,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from "@ionic/react";
 import "./Profile.css";
 import { IdToken, useAuth0 } from "@auth0/auth0-react";
@@ -56,8 +59,8 @@ const Profile: React.FC = () => {
   }, []);
 
   const getCreatedAt = async () => {
-    const data = await getIdTokenClaims();
-    const time: Date = new Date(data!.createdAt)
+    const data = user!.createdAt;
+    const time: Date = new Date(data)
     const updatedTimeString = time.toLocaleString('default', { month: 'long', year: 'numeric' });
     setUserSince(updatedTimeString);
   }
@@ -78,7 +81,7 @@ const Profile: React.FC = () => {
           <IonTitle>Profile</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent scroll-y="false">
+      <IonContent>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Profile</IonTitle>
@@ -103,7 +106,13 @@ const Profile: React.FC = () => {
             <IonLabel>Change Password</IonLabel>
           </IonItem>
           <LogoutButton />
-          <DeleteButton />
+          <IonGrid>
+            <IonRow>
+              <IonCol />
+              <DeleteButton />
+              <IonCol />
+            </IonRow>
+          </IonGrid>
         </IonList>
       </IonContent>
     </IonPage>

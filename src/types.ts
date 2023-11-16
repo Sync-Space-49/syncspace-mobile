@@ -1,6 +1,6 @@
 interface Organization {
     id: string, 
-    ownerId: string,
+    owner_id: string,
     name: string,
     description: string
 }
@@ -8,10 +8,10 @@ interface Board {
     id: string,
     ownerId: string,
     title: string,
-    createdAt: string,
-    modifiedAt: string,
-    isPrivate: boolean,
-    organizationId: string
+    created_at: string,
+    modified_at: string,
+    is_private: boolean,
+    organization_id: string
 }
 
 interface Panel {
@@ -25,8 +25,26 @@ interface Stack {
     id: string,
     title: string,
     position: Number,
-    panelId: string,
-    stackId: string
+    panel_d: string,
+    stack_id: string
 }
 
-export type { Organization, Board, Panel, Stack };
+interface Card {
+    id: string,
+    title: string,
+    description: string,
+    position: Number,
+    stack_id: string
+}
+
+interface User {
+    user_id: string
+    email: string
+    username: string
+    name: string
+    created_at: string
+    updated_at: string
+    picture: string
+}
+
+export type { Organization, Board, Panel, Stack, Card, User };
