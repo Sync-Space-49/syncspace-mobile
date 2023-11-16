@@ -36,7 +36,7 @@ const BoardStack: React.FC<StackProps> = ({ title, items, aiDisabled }) => {
     setSelectedItem(null);
   };
 
-  function handleReoder(event: CustomEvent<ItemReorderEventDetail>) {
+  function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
     console.log("dragged from index", event.detail.from, "to", event.detail.to);
     event.detail.complete();
   }
@@ -45,7 +45,7 @@ const BoardStack: React.FC<StackProps> = ({ title, items, aiDisabled }) => {
     <IonCard className="ion-padding">
       <IonCardTitle>{title}</IonCardTitle>
       <IonCardContent>
-        <IonReorderGroup disabled={false} onIonItemReorder={handleReoder}>
+        <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
           {items.map((item) => (
             <IonItem key={item.id} onClick={() => handleItemClick(item)}>
               <IonLabel>{item.label}</IonLabel>
@@ -67,26 +67,3 @@ const BoardStack: React.FC<StackProps> = ({ title, items, aiDisabled }) => {
 };
 
 export default BoardStack;
-
-{
-  /* <IonItem>
-            <IonLabel>Item 1</IonLabel>
-            <IonReorder slot="end"></IonReorder>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Item 2</IonLabel>
-            <IonReorder slot="end"></IonReorder>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Item 2</IonLabel>
-            <IonReorder slot="end"></IonReorder>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Item 2</IonLabel>
-            <IonReorder slot="end"></IonReorder>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Item 2</IonLabel>
-            <IonReorder slot="end"></IonReorder>
-          </IonItem> */
-}
