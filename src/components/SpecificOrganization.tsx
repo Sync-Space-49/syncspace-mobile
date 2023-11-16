@@ -45,12 +45,14 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org }) => {
     getBoards();
   }, []);
 
+  // todo: distinguish hidden boards from other boards
+
   useEffect(() => {
     if (boards && boards.length > 0) {
       const updatedBoardNames = boards.map((board) => ({
         text: board.title,
-        listImg:
-          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+        listImg: "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+        boardId: board.id
       }));
       setBoardNames(updatedBoardNames);
     } else {
@@ -68,6 +70,7 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org }) => {
       ) : (
         <CustomList
           title={org.name}
+          orgId={org.id}
           titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={boardNames}
         />

@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.syncspace.syncspace',
+  appId: 'com.app.syncspace',
   appName: 'SyncSpace',
   webDir: 'dist',
   ios: {

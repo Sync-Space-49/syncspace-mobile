@@ -3,12 +3,14 @@ import { useHistory } from "react-router";
 import { IonList, IonItem, IonLabel } from "@ionic/react";
 
 interface BoardProps {
+  boardId?: string
   text?: string | null; // board's title
   listImg?: string; //board image src
 }
 
 interface CustomListProps {
   title?: string; //organization title (ignore how its being used in home rn)
+  orgId?: string;
   subTitle?: string; //subtitle, if required (for ex. "today", "yesterday" on home page)
   items?: BoardProps[]; //list of board items
   titleImg?: string; //organization image src
@@ -16,14 +18,15 @@ interface CustomListProps {
 
 const CustomList: React.FC<CustomListProps> = ({
   title,
+  orgId,
   subTitle,
   items,
   titleImg,
 }) => {
   const history = useHistory();
+
   const navigateToOrganization = () => {
-    console.log("Navigating to /app/organization");
-    history.push("/app/organization");
+    history.push(`/app/organizations/${orgId}`);
   };
 
   return (
@@ -42,7 +45,7 @@ const CustomList: React.FC<CustomListProps> = ({
       {items && items.length > 0 && (
         <IonList inset={true}>
           {items.map((item, index) => (
-            <IonItem key={index} routerLink="/app/board">
+            <IonItem key={index} routerLink={`/app/organizations/${orgId}/boards/${item.boardId}`}>
               {item.listImg && (
                 <img
                   src={item.listImg}
