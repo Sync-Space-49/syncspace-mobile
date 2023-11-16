@@ -8,6 +8,9 @@ import {
   IonTitle,
   IonToolbar,
   IonAvatar,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from "@ionic/react";
 import "./Profile.css";
 import { IdToken, useAuth0 } from "@auth0/auth0-react";
@@ -103,7 +106,13 @@ const Profile: React.FC = () => {
             <IonLabel>Change Password</IonLabel>
           </IonItem>
           <LogoutButton />
-          <DeleteButton />
+          <IonGrid>
+            <IonRow>
+              <IonCol />
+              <DeleteButton />
+              <IonCol />
+            </IonRow>
+          </IonGrid>
         </IonList>
       </IonContent>
     </IonPage>
