@@ -6,7 +6,7 @@ export const serverAdress = process.env.REACT_APP_SERVER_ADDRESS;
 export const secret = process.env.REACT_APP_AUTH0_FRONTEND_CLIENT_SECRET;
 export const serverAudience = process.env.REACT_APP_SERVER_AUDIENCE;
 
-const appId = "com.syncspace.syncspace";
+const appId = "com.app.syncspace";
 
 // Use `auth0Domain` in string interpolation below so that it doesn't
 // get replaced by the quickstart auto-packager
@@ -15,4 +15,4 @@ const iosOrAndroid = isPlatform('hybrid');
 
 export const callbackUri = iosOrAndroid
   ? `${appId}://${auth0Domain}/capacitor/${appId}/callback`
-  : 'http://localhost:8100/app';
+  : 'http://localhost:8100/callback';

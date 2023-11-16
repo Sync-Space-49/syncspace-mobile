@@ -17,9 +17,7 @@ import Organization from "../pages/Organization";
 import Board from "../pages/Board";
 
 const TabBar: React.FC = () => {
-  //   console.log("tabbar is rendering");
   return (
-    <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
           <Redirect exact path="/app" to="/app/home" />
@@ -50,7 +48,6 @@ const TabBar: React.FC = () => {
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
-    </IonReactRouter>
   );
 };
 
