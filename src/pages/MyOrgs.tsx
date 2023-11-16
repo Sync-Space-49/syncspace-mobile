@@ -44,7 +44,8 @@ const MyOrgs: React.FC = () => {
 
   const handleCreateOrganization = () => {
     console.log("org created");
-    history.push("/app/organization");
+    const orgId = '1234';
+    history.push(`/app/organizations/${orgId}`); 
     setPopoverState({ showPopover: false, event: undefined });
   };
 

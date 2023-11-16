@@ -41,7 +41,7 @@ import "./theme/variables.css";
 /* Pages */
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
-import Organization from "./pages/Organization";
+import Organization from "./pages/OrgDetail";
 import { Capacitor } from "@capacitor/core";
 // import Error from './pages/Error';
 
@@ -110,13 +110,14 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonRouterOutlet>
           <Route exact path="/" component={LandingPage} />
-          {/* <Redirect exact from={callbackUri} to="/app" /> */}
           <Route path="/app" component={TabBar} />
-          {/* <Route path="/callback" component={TabBar} /> */}
+          <Route path="/callback" component={TabBar}>
+            <Redirect to="/app" /> 
+          </Route>
           <Redirect from="/callback" to="/app" />
           <Route exact path="/app/home" component={Home} />
           <Route exact path="/app/organization" component={Organization} />
-          {/* <Route exact path="/error" component={Error} /> */}
+          {/* <Route path="*" component={Error} /> */}
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

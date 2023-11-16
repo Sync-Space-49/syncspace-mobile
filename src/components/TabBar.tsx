@@ -12,13 +12,14 @@ import { home, layersOutline, personCircleOutline } from "ionicons/icons";
 import Home from "../pages/Home";
 import MyOrgs from "../pages/MyOrgs";
 import Profile from "../pages/Profile";
-import Organization from "../pages/Organization";
+import OrgDetail from "../pages/OrgDetail";
 
 import Board from "../pages/Board";
 
 const TabBar: React.FC = () => {
   return (
       <IonTabs>
+
         <IonRouterOutlet>
           <Redirect exact path="/app" to="/app/home" />
           <Route exact path="/app/home">
@@ -30,9 +31,12 @@ const TabBar: React.FC = () => {
           <Route exact path="/app/profile">
             <Profile />
           </Route>
-          <Route path="/app/board" component={Board} />
-          <Route exact path="/app/organization" component={Organization} />
+          <Route exact path="/app/organizations" component={OrgDetail} />
+          <Route path="/app/organizations/:orgId" component={OrgDetail} />
+          <Route exact path="/app/organizations/boards" component={Board} />
+          <Route path="/app/organizations/boards/:boardId" component={Board} />
         </IonRouterOutlet>
+
         <IonTabBar slot="bottom">
           <IonTabButton tab="Home" href="/app/home">
             <IonIcon aria-hidden="true" icon={home} />

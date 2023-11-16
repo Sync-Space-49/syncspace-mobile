@@ -22,8 +22,8 @@ const CustomList: React.FC<CustomListProps> = ({
 }) => {
   const history = useHistory();
   const navigateToOrganization = () => {
-    console.log("Navigating to /app/organization");
-    history.push("/app/organization");
+    const orgId = '189db961-a7f0-4746-ae09-de6e3ee9232b';
+    history.push(`/app/organizations/${orgId}`);
   };
 
   return (

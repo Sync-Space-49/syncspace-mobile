@@ -40,6 +40,6 @@ src/pages/Error.tsx
 src/pages/Error.css
 src/components/BoardSettings.tsx
 src/components/BoardView.tsx
-./ios
-./android
+/ios
+/android
 ./vscode
