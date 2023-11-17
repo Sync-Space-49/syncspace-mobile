@@ -109,9 +109,12 @@ const MyOrgs: React.FC = () => {
       });
   };
 
+  const updateOrgList = () => {
+    getOrganizations();
+  }
+
   useEffect(() => {
     getOrganizations();
-    createOrganization("no", "hahahahahhahah");
   }, []);
 
   return (
@@ -154,7 +157,7 @@ const MyOrgs: React.FC = () => {
         </IonRefresher>
         {organizations ? (
           organizations.map((organization, i) => {
-            return <SpecificOrganization org={organization} key={i} />;
+            return <SpecificOrganization org={organization} updateOrgList={updateOrgList} key={i} />;
           })
         ) : (
           <h1 className="ion-padding">No organizations were found</h1>
