@@ -7,6 +7,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { IonSpinner } from "@ionic/react";
 interface SpecificOrganizationProps {
   org: Organization;
+  updateOrgList: () => void;
 }
 
 interface ListProps {
@@ -14,7 +15,7 @@ interface ListProps {
   listImg?: string; //list image src
 }
 
-const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org }) => {
+const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org, updateOrgList }) => {
   const { getAccessTokenSilently, user } = useAuth0();
   const [boards, setBoards] = useState<Board[]>([]);
   const [boardNames, setBoardNames] = useState<ListProps[]>([]);
@@ -34,6 +35,7 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org }) => {
         .then((response) => {
           data = response.data;
           setBoards(data);
+          updateOrgList();
         })
         .catch((error) => {
           console.error(error.message);
