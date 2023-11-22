@@ -40,6 +40,8 @@ src/pages/Error.tsx
 src/pages/Error.css
 src/components/BoardSettings.tsx
 src/components/BoardView.tsx
+src/components/BoardPanel.tsx
+src/components/SpecificCard.tsx
 /ios
 /android
 ./vscode
