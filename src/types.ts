@@ -12,6 +12,7 @@ interface Board {
     modified_at: string,
     is_private: boolean,
     organization_id: string
+    panels: []
 }
 
 interface Panel {
@@ -25,11 +26,13 @@ interface Stack {
     id: string,
     title: string,
     position: Number,
-    panel_d: string,
-    stack_id: string
+    panel_id: string,
+    cards: []
+    stack_id?: string
 }
 
 interface Card {
+    assignments?: [],
     id: string,
     title: string,
     description: string,

@@ -19,8 +19,10 @@ import {
   IonInput,
   IonTextarea,
   IonCol,
-  IonNote,
   IonActionSheet,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
 } from "@ionic/react";
 import {
   addOutline,
@@ -36,68 +38,98 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 import BoardStack from "../components/BoardStack";
-import BoardView from "../components/BoardView";
 import MemberList from "../components/MemberList";
 import { serverAdress } from "../auth.config";
 import "./Board.css";
 import { useAuth0 } from "@auth0/auth0-react";
-// import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 
-import type { Board, Organization, User } from "../types"
+import { Stack, type Board, type Organization, type Panel, type User } from "../types"
+import { RouteComponentProps, useHistory } from "react-router";
+interface BoardDetailPageProps
+  extends RouteComponentProps<{
+    orgId: string;
+    boardId: string;
+  }> { }
 
-interface BoardProps {
-  org: Organization;
-  board: Board;
+interface PanelProps {
+  title: string;
+  id: string;
+  position: Number;
+  boardId: string;
+  stacks: []
 }
 
+interface ButtonProps {
+  text: string;
+  data: {};
+}
 
-const Board: React.FC<BoardProps> = ({org, board}) => {
+interface ActionSheetProps {
+  text: string;
+  data: {};
+  role?: string
+}
+
+interface StackProps {
+  id: string,
+  title: string,
+  position: Number,
+  panelId?: string,
+}
+
+const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
+  const orgId: string = match.params.orgId;
+  const boardId: string = match.params.boardId;
+
+  const history = useHistory();
+  const { getAccessTokenSilently, user } = useAuth0();
+
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
 
-  const [canDismiss, setCanDismiss] = useState(false); // prevents user from discarding unsaved changes
+  // const [canDismiss, setCanDismiss] = useState(false); // prevents user from discarding unsaved changes
+  const [board, setBoard] = useState<Board>();
+  const [panels, setPanels] = useState<Panel[]>();
+  const [panelNames, setPanelNames] = useState<ButtonProps[]>([]);
+  const [currentPanel, setCurrentPanel] = useState('');
+  const [stacks, setStacks] = useState<Stack[]>([]);
+
   const [presentingElement, setPresentingElement] = useState<
     HTMLElement | undefined
   >(undefined);
-
-  useEffect(() => {
-    setPresentingElement(page.current);
-  }, []);
 
   function dismiss() {
     modal.current?.dismiss();
   }
 
-  const { getAccessTokenSilently, user } = useAuth0();
-
   const getDetailedBoard = async () => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}/details`,
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/details`,
       headers: { authorization: `Bearer ${token}` },
     };
 
     await axios(options)
       .then((response) => {
         const data = response.data as Board;
-        return data;
+        setBoard(data);
       })
       .catch((error) => {
         console.error(error.message);
       });
   }
 
-  const updateBoard = async (title:string, ownerId:string, isPrivate:boolean) => {
+  const updateBoard = async (title: string, ownerId: string, isPrivate: boolean) => {
     const token = await getAccessTokenSilently();
     const data = {} as any;
     if (title) { data.title = title }
     if (ownerId) { data.ownerId = ownerId }
     if (isPrivate) { data.isPrivate = isPrivate }
-      
+
     const options = {
       method: "PUT",
-      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}`,
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
       headers: { authorization: `Bearer ${token}` },
       data: data
     };
@@ -112,12 +144,12 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
       });
   }
 
-  const deleteBoard = async (title:string, ownerId:string, isPrivate:boolean) => {
+  const deleteBoard = async (title: string, ownerId: string, isPrivate: boolean) => {
     const token = await getAccessTokenSilently();
-      
+
     const options = {
       method: "DELETE",
-      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}`,
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
       headers: { authorization: `Bearer ${token}` },
     };
 
@@ -136,7 +168,7 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}/members`,
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/members`,
       headers: { authorization: `Bearer ${token}` },
     };
 
@@ -150,13 +182,13 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
       });
   }
 
-  const addBoardMember = async (userId:string) => {
+  const addBoardMember = async (userId: string) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "POST",
-      url: `${serverAdress}api/organizations/${org.id}/boards/${board.id}/members`,
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/members`,
       headers: { authorization: `Bearer ${token}` },
-      data : {
+      data: {
         "user_id": userId
       }
     };
@@ -171,9 +203,54 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
       });
   }
 
-  // var for current view + handler to change
-  // let boardView: String = 'Sprint 1';
-  const [buttonText, setButtonText] = useState("Sprint 1");
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    getDetailedBoard();
+    event.detail.complete();
+  };
+
+  useEffect(() => {
+    getDetailedBoard();
+  }, []);
+
+  useEffect(() => {
+    setPresentingElement(page.current);
+  }, []);
+
+  useEffect(() => {
+    if (board && board.panels?.length > 0) {
+      const panelNames = board.panels.map((panel: PanelProps) => ({
+        title: panel.title,
+        id: panel.id,
+        position: panel.position,
+        boardId: panel.boardId
+      }));
+      setPanels(panelNames);
+      setCurrentPanel(panelNames[0].title || '');
+    }
+  }, [board]);
+
+  useEffect(() => {
+    if (panels && panels.length > 0) {
+      const updatedPanelNames: ActionSheetProps[] = panels.map((panel) => ({
+        text: panel.title,
+        data: {
+          action: panel.title
+        }
+      }));
+      updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' } });
+      setPanelNames(updatedPanelNames);
+    }
+  }, [panels]);
+
+  useEffect(() => {
+    if (board && board.panels?.length > 0) {
+      const allStacks = board.panels.flatMap((panel: PanelProps) =>
+        panel.stacks.map((stack) => stack)
+      )
+      setStacks(allStacks);
+    }
+  }, [board]);
+
   return (
     <IonPage ref={page}>
       <IonHeader collapse="fade">
@@ -185,7 +262,7 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
                 className="ion-margin-vertical"
               />
             </IonButtons>
-            <IonTitle>SyncSpace Mobile</IonTitle>
+            <IonTitle>{board?.title}</IonTitle>
             <IonButtons slot="end">
               <IonButton id="open-modal">
                 <IonIcon slot="icon-only" icon={ellipsisHorizontal} />
@@ -270,63 +347,25 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
               id="open-action-sheet"
             >
               <IonIcon slot="end" icon={chevronDownOutline} />
-              <strong>{buttonText}</strong>
+              <strong>{currentPanel}</strong>
             </IonButton>
             <IonActionSheet
               trigger="open-action-sheet"
               header="Choose Board View"
-              buttons={[
-                {
-                  text: "Backlog",
-                  data: {
-                    action: "Backlog",
-                  },
-                },
-                {
-                  text: "Sprint 1",
-                  data: {
-                    action: "Sprint 1",
-                  },
-                },
-                {
-                  text: "Sprint 2",
-                  data: {
-                    action: "Sprint 2",
-                  },
-                },
-                {
-                  text: "Sprint 3",
-                  data: {
-                    action: "Sprint 3",
-                  },
-                },
-                {
-                  text: "Sprint 4",
-                  data: {
-                    action: "Sprint 4",
-                  },
-                },
-                {
-                  text: "Cancel",
-                  role: "cancel",
-                  data: {
-                    action: "cancel",
-                  },
-                },
-              ]}
-              onDidDismiss={({ detail }) => setButtonText(detail.data.action)}
+              buttons={panelNames}
+              onDidDismiss={({ detail }) => setCurrentPanel(detail.data.action)}
             />
           </IonToolbar>
         </div>
-
         <IonToolbar>
           <IonSearchbar />
         </IonToolbar>
       </IonHeader>
-
-      {/* end of modal and headers, beginning of Board page content */}
-
-      <IonContent fullscreen scroll-y="false">
+      <IonContent fullscreen>
+        {/* end of modal and headers, beginning of Board page content */}
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
         <Swiper
           modules={[Pagination]}
           pagination={{
@@ -334,41 +373,21 @@ const Board: React.FC<BoardProps> = ({org, board}) => {
             dynamicBullets: true,
           }}
           style={{
+            //@ts-ignore
             "--swiper-pagination-color": "#80e08b",
             "--swiper-pagination-bullet-inactive-color": "#92949c",
           }}
         >
           <IonContent className="ion-padding-end">
-            <SwiperSlide>
-              <BoardStack
-                title="Backlog"
-                items={[
-                  { id: "1", label: "Item A" },
-                  { id: "2", label: "Item B" },
-                  { id: "3", label: "Item C" },
-                ]}
-              ></BoardStack>
-            </SwiperSlide>
-            <SwiperSlide>
-              <BoardStack
-                title="In progress"
-                items={[
-                  { id: "1", label: "Item A" },
-                  { id: "2", label: "Item B" },
-                  { id: "3", label: "Item C" },
-                ]}
-              ></BoardStack>
-            </SwiperSlide>
-            <SwiperSlide>
-              <BoardStack
-                title="Done"
-                items={[
-                  { id: "1", label: "Item A" },
-                  { id: "2", label: "Item B" },
-                  { id: "3", label: "Item C" },
-                ]}
-              ></BoardStack>
-            </SwiperSlide>
+            {stacks && stacks.length > 0 ? (
+              stacks.map((stack) => {
+                return <SwiperSlide key={stack.id}>
+                  <BoardStack stack={stack} key={stack.id} />
+                </SwiperSlide>
+              })
+            ) : (
+              <h1 className="ion-padding">No stacks were found</h1>
+            )}
           </IonContent>
         </Swiper>
       </IonContent>

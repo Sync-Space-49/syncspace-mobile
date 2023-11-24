@@ -13,9 +13,11 @@ import {
   IonRefresherContent,
   RefresherEventDetail,
   useIonLoading,
+  IonItem,
+  IonList,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
-import { addOutline } from "ionicons/icons";
+import { addOutline, colorWandOutline } from "ionicons/icons";
 import { useHistory } from "react-router";
 import "./MyOrgs.css";
 import SpecificOrganization from "../components/SpecificOrganization";
@@ -129,25 +131,16 @@ const MyOrgs: React.FC = () => {
           <IonToolbar>
             <IonTitle size="large">My Organizations</IonTitle>
             <IonButtons slot="end">
-              <IonButton onClick={handleButtonClick} className="add-btn">
+              <IonButton id="click-trigger">
                 <IonIcon slot="icon-only" icon={addOutline} />
               </IonButton>
             </IonButtons>
-            <IonPopover
-              isOpen={popoverState.showPopover}
-              event={popoverState.event}
-              onDidDismiss={() =>
-                setPopoverState({ showPopover: false, event: undefined })
-              }
-            >
-              <IonContent class="ion-padding">
-                <button
-                  onClick={handleCreateOrganization}
-                  className="create-org-btn"
-                >
-                  Create a New Organization
-                </button>
-              </IonContent>
+            <IonPopover trigger="click-trigger" triggerAction="click">
+            <IonList>
+              <IonItem button={true} detail={false} onClick={handleCreateOrganization} lines="none">
+                Create a new organization
+              </IonItem>
+            </IonList>
             </IonPopover>
           </IonToolbar>
         </IonHeader>
@@ -155,7 +148,7 @@ const MyOrgs: React.FC = () => {
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-        {organizations ? (
+        {organizations && organizations.length > 0 ? (
           organizations.map((organization, i) => {
             return <SpecificOrganization org={organization} updateOrgList={updateOrgList} key={i} />;
           })

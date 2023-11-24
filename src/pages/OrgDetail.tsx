@@ -23,6 +23,7 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { serverAdress } from "../auth.config";
 import { Board, Organization } from "../types";
+import SpecificOrgList from "../components/SpecificOrgList";
 
 interface OrgDetailPageProps
   extends RouteComponentProps<{
@@ -32,6 +33,7 @@ interface OrgDetailPageProps
 interface ListProps {
   text: string; // the list's content
   listImg?: string; //list image src
+  boardId: string;
 }
 
 const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
@@ -119,13 +121,15 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
       if (nonHiddenBoards && nonHiddenBoards.length > 0) {
         const viewableListProp = nonHiddenBoards.map((board) => ({
-          text: board.title
+          text: board.title,
+          boardId: board.id
         }));
         setViewableBoardsProps(viewableListProp);
       }
       if (hiddenBoards && hiddenBoards.length > 0) {
         const privateListProp = hiddenBoards.map((board) => ({
-          text: board.title
+          text: board.title,
+          boardId: board.id
         }));
         setHiddenBoardsProps(privateListProp);
       }
@@ -134,34 +138,23 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
   return (
     <IonPage>
-      {/* <IonHeader>
-        <IonToolbar>
-        
-          <IonTitle>{organization?.name}</IonTitle>
-          <IonButtons slot="end">
-              <IonButton id="click-trigger"className="add-btn">
+      <IonHeader collapse="condense">
+        <div className="toolbar-shrink">
+          <IonToolbar>
+            <IonButtons slot="start">
+              <IonBackButton
+                defaultHref="/app"
+                className="ion-margin-vertical"
+              />
+            </IonButtons>
+            <IonTitle >{organization?.name}</IonTitle>
+            <IonButtons slot="end">
+              <IonButton id="click-trigger">
                 <IonIcon slot="icon-only" icon={addOutline} />
               </IonButton>
             </IonButtons>
-        </IonToolbar>
-      </IonHeader> */}
-      <IonHeader collapse="condense">
-      <div className="toolbar-shrink">
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton
-              defaultHref="/app"
-              className="ion-margin-vertical"
-            />
-          </IonButtons>
-          <IonTitle >{organization?.name}</IonTitle>
-          <IonButtons slot="end">
-            <IonButton id="click-trigger">
-              <IonIcon slot="icon-only" icon={addOutline} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-        <IonPopover trigger="click-trigger" triggerAction="click">
+          </IonToolbar>
+          <IonPopover trigger="click-trigger" triggerAction="click">
             <IonList>
               <IonItem button={true} detail={false} onClick={handleNewAI}>
                 <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
@@ -180,11 +173,13 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
           </IonRefresherContent>
         </IonRefresher>
         <CustomList
+          orgId={orgId}
           title={customListTitle}
           titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={viewableBoardsProps}
         />
         <CustomList
+          orgId={orgId}
           title="Hidden Boards"
           titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={hiddenBoardsProps}
