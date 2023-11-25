@@ -23,10 +23,6 @@ import {
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
-  IonCard,
-  IonCardContent,
-  IonCardTitle,
-  IonCardHeader,
 } from "@ionic/react";
 import {
   addOutline,
@@ -49,6 +45,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 import { Stack, type Board, type Organization, type Panel, type User } from "../types"
 import { RouteComponentProps, useHistory } from "react-router";
+import NewStack from "../components/NewStack";
 interface BoardDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
@@ -89,6 +86,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [panels, setPanels] = useState<Panel[]>();
   const [panelNames, setPanelNames] = useState<ButtonProps[]>([]);
   const [currentPanel, setCurrentPanel] = useState<number>();
+  const [panelId, setPanelId] = useState<string>('');
   const [stacks, setStacks] = useState<Stack[]>([]);
 
   const [presentingElement, setPresentingElement] = useState<
@@ -223,7 +221,13 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
         stacks: panel.stacks
       }));
       setPanels(updatedPanels);
-      setCurrentPanel(0);
+      
+      if(typeof currentPanel !== 'number') {
+        setCurrentPanel(0);
+      }
+      else {
+        setPanelId(panels![currentPanel].id);
+      }
     }
   }, [board]);
 
@@ -235,17 +239,18 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
           action: panel.position
         }
       }));
-      updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => {console.log("dismissed")} });
+      updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => { console.log("dismissed") } });
       setPanelNames(updatedPanelNames);
     }
-  }, [panels]);
+  }, [panels, board]);
 
   useEffect(() => {
     if (panels && typeof currentPanel === 'number') {
       const allStacks = panels[currentPanel].stacks;
       setStacks(allStacks);
+      setPanelId(panels[currentPanel].id)
     }
-  }, [currentPanel]);
+  }, [currentPanel, board]);
 
   return (
     <IonPage ref={page}>
@@ -343,7 +348,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
               id="open-action-sheet"
             >
               <IonIcon slot="end" icon={chevronDownOutline} />
-              <strong>{panels && typeof currentPanel === 'number' ? panels[currentPanel].title : '' }</strong>
+              <strong>{panels && typeof currentPanel === 'number' ? panels[currentPanel].title : ''}</strong>
             </IonButton>
             <IonActionSheet
               trigger="open-action-sheet"
@@ -351,10 +356,10 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
               buttons={panelNames}
               onDidDismiss={({ detail }) => {
                 console.log(detail);
-                if ( detail.role === "backdrop" || detail.role === "cancel") {
-                  console.log('cancelled') 
-                } 
-                else  {
+                if (detail.role === "backdrop" || detail.role === "cancel") {
+                  console.log('cancelled')
+                }
+                else {
                   setCurrentPanel(detail.data.action);
                 }
               }}
@@ -384,20 +389,33 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
         >
           <IonContent className="ion-padding-end">
             {stacks && stacks.length > 0 ? (
-              stacks.map((stack) => {
-                return <SwiperSlide key={stack.id}>
+              stacks.map((stack, index: number) => (
+                <>
+                <SwiperSlide key={stack.id}>
                   <BoardStack stack={stack} key={stack.id} />
                 </SwiperSlide>
-              })
+                { index === stacks.length - 1 && (
+                    <SwiperSlide key={index}>
+                      <NewStack
+                        panelId={panelId}
+                        orgId={orgId}
+                        boardId={boardId}
+                        hasStacks={true}
+                        getBoard={getDetailedBoard}
+                      />
+                    </SwiperSlide>
+                  )}
+                  </>
+              ))
             ) : (
               <SwiperSlide>
-                <IonCard>
-                    <IonCardHeader>
-                      <IonCardTitle>No stacks were found</IonCardTitle>
-                    </IonCardHeader>
-                    <IonCardContent>Get started by creating your first stack</IonCardContent>
-                    <IonButton fill="clear">Create Stack</IonButton>
-                </IonCard>
+                <NewStack
+                  panelId={panelId}
+                  orgId={orgId}
+                  boardId={boardId}
+                  hasStacks={false}
+                  getBoard={getDetailedBoard}
+                />
               </SwiperSlide>
             )}
           </IonContent>
