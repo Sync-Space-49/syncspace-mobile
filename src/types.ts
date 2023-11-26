@@ -18,8 +18,9 @@ interface Board {
 interface Panel {
     id: string,
     title: string,
-    position: Number,
+    position: number,
     boardId: string
+    stacks: []
 }
 
 interface Stack {
