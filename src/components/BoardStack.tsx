@@ -10,11 +10,12 @@ import {
   ItemReorderEventDetail,
 } from "@ionic/react";
 import CardSettings from "../components/CardSettings";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Stack, Card } from "../types";
-// import SpecificCard from "./SpecificCard";
 import "swiper/css";
 import "swiper/css/pagination";
+import { useAuth0 } from "@auth0/auth0-react";
+import StackSettings from "./StackSettings";
 
 interface Item {
   id: string;
@@ -23,10 +24,15 @@ interface Item {
 
 interface StackProps {
   stack: Stack;
+  orgId: string;
+  boardId: string;
+  ownerId: string;
   updateStackList?: () => void;
 }
 
-const BoardStack: React.FC<StackProps> = ({ stack }) => {
+const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) => {
+
+  const { user } = useAuth0();
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,13 +40,10 @@ const BoardStack: React.FC<StackProps> = ({ stack }) => {
   const [currentCard, setCurrentCard] = useState<Card>();
   const [title, setTitle] = useState<String>();
 
-  // modal vars
-  const modal = useRef<HTMLIonModalElement>(null);
-  const page = useRef(undefined);
+  const userId = user?.sub;
 
   const handleItemClick = (card: Card) => {
     console.log('clicked');
-    // console.log(item);
     setCurrentCard(card)
     setSelectedItem(card);
     setIsModalOpen(true);
@@ -67,7 +70,9 @@ const BoardStack: React.FC<StackProps> = ({ stack }) => {
 
   return (
     <IonCard className="ion-padding">
-      <IonCardTitle>{title}</IonCardTitle>
+      <IonCardHeader>
+        <IonCardTitle>{title}</IonCardTitle>
+      </IonCardHeader>
       <IonCardContent>
         <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
           {cards && cards.length > 0 ? (
@@ -84,7 +89,18 @@ const BoardStack: React.FC<StackProps> = ({ stack }) => {
           )}
         </IonReorderGroup>
       </IonCardContent>
+      {userId === ownerId ?
+      <StackSettings 
+        stack={stack}
+        orgId={orgId}
+        boardId={boardId}
+      />
+        :
+        <></>
+      }
+
       {/* Modal */}
+
       {selectedItem && (
         <CardSettings
           key={currentCard?.id}

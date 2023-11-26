@@ -28,7 +28,7 @@ interface OrgProps {
 
 const OrgList: React.FC<OrgProps> = ({ orgs, updateOrgList }) => {
 
-  const { getAccessTokenSilently} = useAuth0();
+  const { getAccessTokenSilently } = useAuth0();
 
   const [showAlert, setShowAlert] = useState(false);
   const [orgIdToDelete, setOrgIdToDelete] = useState<string | null>(null);
@@ -50,7 +50,7 @@ const OrgList: React.FC<OrgProps> = ({ orgs, updateOrgList }) => {
         console.error(error.message);
       })
   }
-  
+
 
   const handleOnClick = (orgId: string) => {
     setShowAlert(true)
@@ -67,10 +67,10 @@ const OrgList: React.FC<OrgProps> = ({ orgs, updateOrgList }) => {
               <IonItem routerLink={`/app/organizations/${org.id}`}>
                 {org.listImg && (
                   <img
-                  src={org.listImg}
-                  alt="list item icon"
-                  className="item-icon"
-                />
+                    src={org.listImg}
+                    alt="list item icon"
+                    className="item-icon"
+                  />
                 )}
                 <IonLabel>{org?.text}</IonLabel>
               </IonItem>
@@ -84,26 +84,26 @@ const OrgList: React.FC<OrgProps> = ({ orgs, updateOrgList }) => {
         </IonList>
       )}
       <IonAlert
-      isOpen={showAlert}
-    trigger="present-alert"
-    header="Are you sure you want to delete this org?"
-    buttons={[
-      {
-        text: "Cancel",
-        role: "cancel",
-      },
-      {
-        text: "Delete",
-        role: 'confirm',
-      },
-    ]}
-    onIonAlertDidDismiss={({ detail }) => {
-      if(detail.role === 'confirm') {
-        deleteOrg(orgIdToDelete!);
-      }
-      setShowAlert(false); 
-    }}
-  />
+        isOpen={showAlert}
+        trigger="present-alert"
+        header="Are you sure you want to delete this org?"
+        buttons={[
+          {
+            text: "Cancel",
+            role: "cancel",
+          },
+          {
+            text: "Delete",
+            role: 'confirm',
+          },
+        ]}
+        onIonAlertDidDismiss={({ detail }) => {
+          if (detail.role === 'confirm') {
+            deleteOrg(orgIdToDelete!);
+          }
+          setShowAlert(false);
+        }}
+      />
     </>
   )
 };

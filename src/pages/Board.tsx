@@ -83,6 +83,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
 
   // const [canDismiss, setCanDismiss] = useState(false); // prevents user from discarding unsaved changes
   const [board, setBoard] = useState<Board>();
+  const [ownerId, setOwnerId] = useState<string>();
   const [panels, setPanels] = useState<Panel[]>();
   const [panelNames, setPanelNames] = useState<ButtonProps[]>([]);
   const [currentPanel, setCurrentPanel] = useState<number>();
@@ -109,6 +110,8 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       .then((response) => {
         const data = response.data as Board;
         setBoard(data);
+        console.log(data.owner_id);
+        setOwnerId(data.owner_id);
       })
       .catch((error) => {
         console.error(error.message);
@@ -200,6 +203,11 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
     getDetailedBoard();
+    if (board) {
+      setOwnerId(board.owner_id);
+      console.log(board);
+      console.log(ownerId)
+    }
     event.detail.complete();
   };
 
@@ -221,8 +229,8 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
         stacks: panel.stacks
       }));
       setPanels(updatedPanels);
-      
-      if(typeof currentPanel !== 'number') {
+
+      if (typeof currentPanel !== 'number') {
         setCurrentPanel(0);
       }
       else {
@@ -265,7 +273,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
             </IonButtons>
             <IonTitle>{board?.title}</IonTitle>
             <IonButtons slot="end">
-              <IonButton id="open-modal">
+              <IonButton id="open-modal" slot="icon-only">
                 <IonIcon slot="icon-only" icon={ellipsisHorizontal} />
               </IonButton>
             </IonButtons>
@@ -315,7 +323,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                       </IonLabel>
                     </IonCol>
                     <div className="add-member-button">
-                      <IonButton size="small">
+                      <IonButton size="small" slot="icon-only">
                         <IonIcon slot="icon-only" icon={addOutline} />
                       </IonButton>
                     </div>
@@ -339,13 +347,15 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
             </IonModal>
           </IonToolbar>
         </div>
-        <div className="subtitle">
-          <IonToolbar>
+        {/* <div className="subtitle"> */}
+        <IonToolbar>
+          <div className="toolbar-action-sheet-button">
             <IonButton
               size="small"
               fill="clear"
               color="medium"
               id="open-action-sheet"
+              className="ion-justify-content-center"
             >
               <IonIcon slot="end" icon={chevronDownOutline} />
               <strong>{panels && typeof currentPanel === 'number' ? panels[currentPanel].title : ''}</strong>
@@ -364,8 +374,9 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                 }
               }}
             />
-          </IonToolbar>
-        </div>
+          </div>
+        </IonToolbar>
+        {/* </div> */}
         <IonToolbar>
           <IonSearchbar />
         </IonToolbar>
@@ -391,10 +402,10 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
             {stacks && stacks.length > 0 ? (
               stacks.map((stack, index: number) => (
                 <>
-                <SwiperSlide key={stack.id}>
-                  <BoardStack stack={stack} key={stack.id} />
-                </SwiperSlide>
-                { index === stacks.length - 1 && (
+                  <SwiperSlide key={stack.id}>
+                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!} />
+                  </SwiperSlide>
+                  {index === stacks.length - 1 && (
                     <SwiperSlide key={index}>
                       <NewStack
                         panelId={panelId}
@@ -405,7 +416,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                       />
                     </SwiperSlide>
                   )}
-                  </>
+                </>
               ))
             ) : (
               <SwiperSlide>

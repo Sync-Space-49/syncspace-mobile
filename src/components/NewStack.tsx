@@ -40,7 +40,6 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
         await axios(options)
             .then(() => {
                 getBoard();
-                console.log('stack created');
             })
             .catch((error) => {
                 console.error(error.message);
