@@ -46,6 +46,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Stack, type Board, type Organization, type Panel, type User } from "../types"
 import { RouteComponentProps, useHistory } from "react-router";
 import NewStack from "../components/NewStack";
+import BoardSettings from "../components/BoardSettings";
 interface BoardDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
@@ -64,13 +65,6 @@ interface ActionSheetProps {
   handler?: () => boolean | void | Promise<boolean | void>;
 }
 
-interface StackProps {
-  id: string,
-  title: string,
-  position: Number,
-  panelId?: string,
-}
-
 const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const orgId: string = match.params.orgId;
   const boardId: string = match.params.boardId;
@@ -82,6 +76,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const page = useRef(undefined);
 
   // const [canDismiss, setCanDismiss] = useState(false); // prevents user from discarding unsaved changes
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [board, setBoard] = useState<Board>();
   const [ownerId, setOwnerId] = useState<string>();
   const [panels, setPanels] = useState<Panel[]>();
@@ -208,6 +203,12 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     event.detail.complete();
   };
 
+  const handleMenuClick = () => {
+    console.log('settings clicked')
+    setIsModalOpen(true);
+    console.log(isModalOpen)
+  };
+
   useEffect(() => {
     getDetailedBoard();
   }, []);
@@ -280,78 +281,11 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
             </IonButtons>
             <IonTitle>{board?.title}</IonTitle>
             <IonButtons slot="end">
-              <IonButton id="open-modal" slot="icon-only">
+              <IonButton onClick={() => handleMenuClick()} slot="icon-only">
                 <IonIcon slot="icon-only" icon={ellipsisHorizontal} />
               </IonButton>
             </IonButtons>
-            <IonModal
-              ref={modal}
-              trigger="open-modal"
-              presentingElement={presentingElement!}
-            >
-              <IonHeader>
-                <IonToolbar>
-                  <IonTitle>Board Settings</IonTitle>
-                  <IonButtons slot="end">
-                    <IonButton onClick={() => dismiss()}>Close</IonButton>
-                  </IonButtons>
-                </IonToolbar>
-              </IonHeader>
-              {/* modal content */}
-              <IonContent className="ion-padding" scroll-y="false">
-                <IonGrid>
-                  <IonRow className="ion-justify-content-center">
-                    <IonToggle>Enable AI</IonToggle>
-                  </IonRow>
-                  <IonRow>
-                    <IonLabel className="ion-padding-vertical">
-                      <strong>Actions</strong>
-                    </IonLabel>
-                    <form>
-                      <IonList inset={true}>
-                        <IonItem>
-                          <IonInput label="Title:" placeholder="Backend" />
-                        </IonItem>
-                        <IonItem>
-                          <IonTextarea
-                            rows={3}
-                            autoGrow={true}
-                            label="Description:"
-                            placeholder="A board dedicated to the backend team"
-                          />
-                        </IonItem>
-                      </IonList>
-                    </form>
-                  </IonRow>
-                  <IonRow>
-                    <IonCol>
-                      <IonLabel className="ion-padding-vertical">
-                        <strong>Board Members</strong>
-                      </IonLabel>
-                    </IonCol>
-                    <div className="add-member-button">
-                      <IonButton size="small" slot="icon-only">
-                        <IonIcon slot="icon-only" icon={addOutline} />
-                      </IonButton>
-                    </div>
-                  </IonRow>
-                  <IonList inset={true}>
-                    <MemberList />
-                    <MemberList />
-                    <MemberList />
-                  </IonList>
-                  <IonRow className="edit-buttons">
-                    <IonCol>
-                      <IonButton color="danger">Delete</IonButton>
-                    </IonCol>
-                    <IonCol />
-                    <IonCol>
-                      <IonButton color="tertiary">Save</IonButton>
-                    </IonCol>
-                  </IonRow>
-                </IonGrid>
-              </IonContent>
-            </IonModal>
+            <BoardSettings board={board!} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onOpenChange={(isOpen) => setIsModalOpen(isOpen)}/>
           </IonToolbar>
         </div>
         {/* <div className="subtitle"> */}
