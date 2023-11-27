@@ -6,7 +6,7 @@ interface Organization {
 }
 interface Board {
     id: string,
-    ownerId: string,
+    owner_id: string,
     title: string,
     created_at: string,
     modified_at: string,
