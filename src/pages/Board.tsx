@@ -110,7 +110,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       .then((response) => {
         const data = response.data as Board;
         setBoard(data);
-        console.log(data.owner_id);
         setOwnerId(data.owner_id);
       })
       .catch((error) => {
@@ -205,14 +204,22 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     getDetailedBoard();
     if (board) {
       setOwnerId(board.owner_id);
-      console.log(board);
-      console.log(ownerId)
     }
     event.detail.complete();
   };
 
   useEffect(() => {
     getDetailedBoard();
+  }, []);
+
+  useEffect(() => {
+    const listenerHandler = () => {
+      getDetailedBoard();
+    }
+    window.addEventListener('updateStack', listenerHandler);
+    return () => {
+      window.removeEventListener('updateStack', listenerHandler);
+    }
   }, []);
 
   useEffect(() => {
@@ -365,7 +372,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
               header="Choose Board View"
               buttons={panelNames}
               onDidDismiss={({ detail }) => {
-                console.log(detail);
                 if (detail.role === "backdrop" || detail.role === "cancel") {
                   console.log('cancelled')
                 }
@@ -403,7 +409,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
               stacks.map((stack, index: number) => (
                 <>
                   <SwiperSlide key={stack.id}>
-                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!} />
+                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!}/>
                   </SwiperSlide>
                   {index === stacks.length - 1 && (
                     <SwiperSlide key={index}>

@@ -21,9 +21,30 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
 
     const [editAlert, setEditAlert] = useState(false);
     const [deleteAlert, setDeleteAlert] = useState(false);
-
     const panelId = stack.panel_id;
 
+    // const updateBoardPage = () => {
+    //     const event = new CustomEvent('updateStack')
+    //     window.dispatchEvent(event);
+    // };
+
+    const getStacks = async () => {
+        const token = await getAccessTokenSilently();
+
+        const options = {
+            method: "GET",
+            url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks`,
+            headers: { authorization: `Bearer ${token}` },
+        };
+
+        await axios(options)
+            .then((response) => {
+                stack = response.data
+            })
+            .catch((error) => {
+                console.error(error.message);
+            });
+    };
 
     const deleteStack = async () => {
         let token = await getAccessTokenSilently();
@@ -35,7 +56,8 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
 
         await axios(options)
             .then((response) => {
-                console.log('stack deleted' + response.data);
+                getStacks();
+                // updateBoardPage();
             })
             .catch((error) => {
                 console.error(error.message);
@@ -44,25 +66,30 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
 
     const updateStack = async (title: string) => {
         const token = await getAccessTokenSilently();
-        const data = {} as any;
-        if (title) { data.title = title }
 
-        const options = {
-            method: "PUT",
-            url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
-            headers: { authorization: `Bearer ${token}` },
-            data: data
-        };
+        if (title !== stack.title) {
 
-        await axios(options)
-            .then(() => {
-                // Not sure if you want to do something on success
-                console.log('updated');
-            })
-            .catch((error) => {
-                console.error(error.message);
-            });
+            const body = new FormData();
+            body.append("title", title);
+
+            const options = {
+                method: "PUT",
+                url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stack.id}`,
+                headers: { authorization: `Bearer ${token}` },
+                data: body
+            };
+
+            await axios(options)
+                .then(() => {
+                    getStacks();
+                    // updateBoardPage();
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                });
+        }
     };
+
 
     const handleButtonClick = (stackId: string, editOrDelete: string) => {
         if (editOrDelete === "edit") { setEditAlert(true) }

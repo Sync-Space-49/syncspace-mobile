@@ -65,7 +65,6 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
   }, [stack]);
 
   useEffect(() => {
-    console.log(isModalOpen);
   }, [isModalOpen])
 
   return (
