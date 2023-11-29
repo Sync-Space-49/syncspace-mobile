@@ -139,22 +139,22 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
   return (
     <IonPage>
       <IonHeader collapse="condense">
-        <div className="toolbar-shrink">
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonBackButton
-                defaultHref="/app"
-                className="ion-margin-vertical"
-              />
-            </IonButtons>
-            <IonTitle >{organization?.name}</IonTitle>
-            <IonButtons slot="end">
-              <IonButton id="click-trigger">
-                <IonIcon slot="icon-only" icon={addOutline} />
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-          <IonPopover trigger="click-trigger" triggerAction="click">
+      <div className="toolbar-shrink">
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton
+              defaultHref="/app"
+              className="ion-margin-vertical"
+            />
+          </IonButtons>
+          <IonTitle >{organization?.name}</IonTitle>
+          <IonButtons slot="end">
+            <IonButton id="click-trigger">
+              <IonIcon slot="icon-only" icon={addOutline} />
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+        <IonPopover trigger="click-trigger" triggerAction="click">
             <IonList>
               <IonItem button={true} detail={false} onClick={handleNewAI}>
                 <IonIcon slot="end" icon={colorWandOutline}></IonIcon>

@@ -17,17 +17,25 @@ import {
   IonRow,
   IonToggle,
   IonInput,
-  IonTextarea,
   IonCol,
   IonActionSheet,
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
+  IonPopover,
+  IonAlert,
+  IonListHeader,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
 } from "@ionic/react";
 import {
   addOutline,
   ellipsisHorizontal,
   chevronDownOutline,
+  createOutline,
+  albumsOutline,
+  closeOutline,
 } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
@@ -46,7 +54,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Stack, type Board, type Organization, type Panel, type User } from "../types"
 import { RouteComponentProps, useHistory } from "react-router";
 import NewStack from "../components/NewStack";
-import BoardSettings from "../components/BoardSettings";
+import { OverlayEventDetail } from "@ionic/core";
 interface BoardDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
@@ -75,7 +83,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
 
-  // const [canDismiss, setCanDismiss] = useState(false); // prevents user from discarding unsaved changes
+  const [canDismiss, setCanDismiss] = useState(false); // prevents user from discarding unsaved changes
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [board, setBoard] = useState<Board>();
   const [ownerId, setOwnerId] = useState<string>();
@@ -84,14 +92,16 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [currentPanel, setCurrentPanel] = useState<number>();
   const [panelId, setPanelId] = useState<string>('');
   const [stacks, setStacks] = useState<Stack[]>([]);
+  const [panelViewIsOpen, setPanelViewIsOpen] = useState(false);
+  const [deletePanelAlert, setDeletePanelAlert] = useState(false);
+  const [panelIdToDelete, setPanelIdToDelete] = useState<string | null>(null);
+  const [editAlert, setEditAlert] = useState(false);
+  const [panelModal, setPanelModal] = useState(false);
+  const [boardModal, setBoardModal] = useState(false);
 
   const [presentingElement, setPresentingElement] = useState<
     HTMLElement | undefined
   >(undefined);
-
-  function dismiss() {
-    modal.current?.dismiss();
-  }
 
   const getDetailedBoard = async () => {
     const token = await getAccessTokenSilently();
@@ -155,6 +165,69 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   }
 
+  const createPanel = async (title: string) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    body.append("title", title);
+
+    const options = {
+      method: "POST",
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels`,
+      headers: { authorization: `Bearer ${token}` },
+      data: body
+    };
+
+    await axios(options)
+      .then(() => {
+        // Not sure if you want to do something on success
+        return
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  const updatePanel = async (title: string) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    body.append("title", title);
+
+    const options = {
+      method: "PUT",
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}`,
+      headers: { authorization: `Bearer ${token}` },
+      data: body
+    };
+
+    await axios(options)
+      .then(() => {
+        // Not sure if you want to do something on success
+        return
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  const deletePanel = async (panelId: string) => {
+    const token = await getAccessTokenSilently();
+
+    const options = {
+      method: "DELETE",
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then(() => {
+        // Not sure if you want to do something on success
+        return
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
   // NOT IMPLEMENTED YET ON API
   const getBoardMembers = async () => {
     const token = await getAccessTokenSilently();
@@ -195,6 +268,17 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   }
 
+  function dismiss() {
+    modal.current?.dismiss();
+    setBoardModal(false);
+    setPanelModal(false);
+  }
+  const onWillDisimss = (event: CustomEvent<OverlayEventDetail>) => {
+    // if (event.detail.role === )
+    console.log(event)
+    dismiss();
+  }
+
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
     getDetailedBoard();
     if (board) {
@@ -208,6 +292,16 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     setIsModalOpen(true);
     console.log(isModalOpen)
   };
+
+  // this needs to take in the diff panel ids and their new things and then call updatepanel for each one 
+  const handleUpdatePanel = () => {
+
+  }
+
+  const handleDeletePanel = (panelId: string) => {
+    setDeletePanelAlert(true)
+    setPanelIdToDelete(panelId);
+  }
 
   useEffect(() => {
     getDetailedBoard();
@@ -252,7 +346,8 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       const updatedPanelNames: ActionSheetProps[] = panels.map((panel) => ({
         text: panel.title,
         data: {
-          action: panel.position
+          action: panel.position,
+          id: panel.id
         }
       }));
       updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => { console.log("dismissed") } });
@@ -281,28 +376,132 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
             </IonButtons>
             <IonTitle>{board?.title}</IonTitle>
             <IonButtons slot="end">
-              <IonButton onClick={() => handleMenuClick()} slot="icon-only">
+              <IonButton onClick={() => setBoardModal(true)} slot="icon-only">
                 <IonIcon slot="icon-only" icon={ellipsisHorizontal} />
               </IonButton>
             </IonButtons>
-            <BoardSettings board={board!} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onOpenChange={(isOpen) => setIsModalOpen(isOpen)}/>
+            {/* board modal  */}
+            <IonModal
+              ref={modal}
+              isOpen={boardModal}
+              onWillDismiss={(event) => onWillDisimss(event)}
+              presentingElement={presentingElement!}
+            >
+              <IonHeader>
+                <IonToolbar>
+                  <IonTitle>Board Settings</IonTitle>
+                  <IonButtons slot="end">
+                    <IonButton onClick={() => setBoardModal(false)}>Close</IonButton>
+                  </IonButtons>
+                </IonToolbar>
+              </IonHeader>
+              <IonContent className="ion-padding" scroll-y="false">
+                <IonGrid>
+                  <IonRow className="ion-justify-content-center">
+                    <IonToggle>Enable AI</IonToggle>
+                  </IonRow>
+                  <IonRow>
+                    <IonLabel className="ion-padding-vertical">
+                      <strong>Actions</strong>
+                    </IonLabel>
+                    <form>
+                      <IonList inset={true}>
+                        <IonItem>
+                          <IonInput label="Title:" placeholder={board?.title} />
+                        </IonItem>
+                      </IonList>
+                    </form>
+                  </IonRow>
+                  <IonRow>
+                    <IonCol>
+                      <IonLabel className="ion-padding-vertical">
+                        <strong>Board Members</strong>
+                      </IonLabel>
+                    </IonCol>
+                    <div className="add-member-button">
+                      <IonButton size="small" slot="icon-only">
+                        <IonIcon slot="icon-only" icon={addOutline} />
+                      </IonButton>
+                    </div>
+                  </IonRow>
+                  <IonList inset={true}>
+                    <MemberList />
+                    <MemberList />
+                    <MemberList />
+                  </IonList>
+                  <IonRow className="edit-buttons">
+                    <IonCol>
+                      <IonButton color="danger">Delete</IonButton>
+                    </IonCol>
+                    <IonCol />
+                    <IonCol>
+                      <IonButton color="tertiary">Save</IonButton>
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+              </IonContent>
+            </IonModal>
+
           </IonToolbar>
         </div>
-        {/* <div className="subtitle"> */}
         <IonToolbar>
           <div className="toolbar-action-sheet-button">
             <IonButton
               size="small"
               fill="clear"
               color="medium"
-              id="open-action-sheet"
+              id="open-popover"
               className="ion-justify-content-center"
             >
               <IonIcon slot="end" icon={chevronDownOutline} />
               <strong>{panels && typeof currentPanel === 'number' ? panels[currentPanel].title : ''}</strong>
             </IonButton>
+            <IonPopover trigger="open-popover" triggerAction="click" dismissOnSelect={true}>
+              <IonList>
+                <IonItem button={true} detail={false} onClick={() => setPanelModal(true)}>
+                  <IonIcon slot="end" icon={createOutline}></IonIcon>
+                  Edit panels
+                </IonItem>
+                <IonItem button={true} detail={false} onClick={() => setPanelViewIsOpen(true)}>
+                  <IonIcon slot="end" icon={albumsOutline}></IonIcon>
+                  Switch panels
+                </IonItem>
+              </IonList>
+            </IonPopover>
+            <IonAlert
+              isOpen={editAlert}
+              header="Edit"
+              buttons={[
+                {
+                  text: 'Cancel',
+                  role: 'cancel',
+                  handler: () => {
+                    console.log('Alert cancelled')
+                  }
+                },
+                {
+                  text: 'Confirm change',
+                  role: 'confirm',
+                }
+              ]}
+              inputs={[
+                {
+                  placeholder: 'Title',
+                  attributes: {
+                    maxLength: 255
+                  }
+                }
+              ]}
+              onDidDismiss={({ detail }) => {
+                if (detail.role === 'confirm') {
+                  let title = detail.data.values[0]
+
+                }
+                setEditAlert(false);
+              }}
+            />
             <IonActionSheet
-              trigger="open-action-sheet"
+              isOpen={panelViewIsOpen}
               header="Choose Board View"
               buttons={panelNames}
               onDidDismiss={({ detail }) => {
@@ -312,11 +511,88 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                 else {
                   setCurrentPanel(detail.data.action);
                 }
+                setPanelViewIsOpen(false);
               }}
             />
+            {/* Panel modal  */}
+            <IonModal
+              ref={modal}
+              isOpen={panelModal}
+              // presentingElement={presentingElement!}
+              initialBreakpoint={.75}
+              breakpoints={[0, .75]}
+            >
+              <IonHeader>
+                <IonToolbar>
+                  <IonTitle>Edit Panels</IonTitle>
+                  <IonButtons slot="end">
+                    <IonButton onClick={() => setPanelModal(false)}>Close</IonButton>
+                  </IonButtons>
+                </IonToolbar>
+              </IonHeader>
+              {/* modal content */}
+              <IonContent className="ion-padding" >
+                <IonGrid>
+                  <IonRow className="ion-justify-content-center">
+                    <IonListHeader>{board?.title}'s panels</IonListHeader>
+                    <IonList inset={true} >
+                      {panelNames && panelNames.length > 0 ? (
+                        panelNames.slice(0, -1).map((panel, index) => (
+                          <IonItemSliding key={index}>
+                            <IonItem key={index}>
+                              <IonInput label="Title:" placeholder='Sprint 1' value={panel.text} />
+                            </IonItem>
+                            <IonItemOptions slot="end">
+                              <IonItemOption color="danger" id="delete-panel-alert" onClick={() => handleDeletePanel(panel.data.id)}>
+                                <IonIcon slot="icon-only" icon={closeOutline} />
+                              </IonItemOption>
+                            </IonItemOptions>
+                          </IonItemSliding>
+                        ))
+                      ) : (
+                        <IonItem>
+                          <IonLabel>
+                            No panels found
+                          </IonLabel>
+                        </IonItem>
+                      )}
+                    </IonList>
+                    <IonAlert
+                      isOpen={deletePanelAlert}
+                      trigger="delete-panel-alert"
+                      header="Are you sure you want to delete this panel?"
+                      buttons={[
+                        {
+                          text: "Cancel",
+                          role: "cancel",
+                        },
+                        {
+                          text: "Delete",
+                          role: 'confirm',
+                        },
+                      ]}
+                      onIonAlertDidDismiss={({ detail }) => {
+                        if (detail.role === 'confirm') {
+                          deletePanel(panelIdToDelete!);
+                        }
+                        setDeletePanelAlert(false);
+                      }}
+                    />
+                  </IonRow>
+                  <IonRow className="ion-justify-content-center">
+                    <IonButton className="ion-margin-bottom" size="small" shape="round" color={'success'}>
+                      <IonIcon icon={addOutline}></IonIcon>
+                      Add panel
+                    </IonButton>
+                  </IonRow>
+                  <IonRow className="ion-justify-content-end ion-padding-end">
+                    <IonButton color="tertiary">Save</IonButton>
+                  </IonRow>
+                </IonGrid>
+              </IonContent>
+            </IonModal>
           </div>
         </IonToolbar>
-        {/* </div> */}
         <IonToolbar>
           <IonSearchbar />
         </IonToolbar>
@@ -343,7 +619,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
               stacks.map((stack, index: number) => (
                 <>
                   <SwiperSlide key={stack.id}>
-                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!}/>
+                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!} />
                   </SwiperSlide>
                   {index === stacks.length - 1 && (
                     <SwiperSlide key={index}>
