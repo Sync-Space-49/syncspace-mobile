@@ -12,9 +12,9 @@ import {
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
-  useIonLoading,
   IonItem,
   IonList,
+  IonAlert,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { addOutline, colorWandOutline } from "ionicons/icons";
@@ -29,26 +29,13 @@ import type { Organization } from "../types";
 
 const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
-  // const [present, dismiss] = useIonLoading();
-  const [organizations, setOrganizations] = useState<Organization[]>();
-
-  const [popoverState, setPopoverState] = useState<{
-    showPopover: boolean;
-    event: Event | undefined;
-  }>({ showPopover: false, event: undefined });
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.persist();
-    setPopoverState({ showPopover: true, event: e.nativeEvent });
-  };
-
   const history = useHistory();
+  const [organizations, setOrganizations] = useState<Organization[]>();
+  const [showAlert, setShowAlert] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleCreateOrganization = () => {
-    console.log("org created");
-    const orgId = '1234';
-    history.push(`/app/organizations/${orgId}`); 
-    setPopoverState({ showPopover: false, event: undefined });
+    setShowAlert(true);
   };
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
@@ -97,11 +84,20 @@ const MyOrgs: React.FC = () => {
     };
 
     await axios(options)
-      .then(async () => {
-        console.log("success, org created");
+      .then(async (response) => {
+        console.log("success, org created, response: ", response);
+        const orgId = response.data.id;
+        console.log("orgId: ", orgId);
+
         await getAccessTokenSilently().then(() => {
           getOrganizations();
         });
+
+        //redirecting users to specific org, currently shows as undefined
+        //need to return to my orgs, refresh a couple times, and then click
+        // history.push(`/app/organizations/${orgId}`);
+
+        setIsPopoverOpen(false);
       })
       .catch((error) => {
         console.error(
@@ -113,7 +109,7 @@ const MyOrgs: React.FC = () => {
 
   const updateOrgList = () => {
     getOrganizations();
-  }
+  };
 
   useEffect(() => {
     getOrganizations();
@@ -131,16 +127,54 @@ const MyOrgs: React.FC = () => {
           <IonToolbar>
             <IonTitle size="large">My Organizations</IonTitle>
             <IonButtons slot="end">
-              <IonButton id="click-trigger">
+              <IonButton
+                id="click-trigger"
+                onClick={() => setIsPopoverOpen(true)}
+              >
                 <IonIcon slot="icon-only" icon={addOutline} />
               </IonButton>
             </IonButtons>
-            <IonPopover trigger="click-trigger" triggerAction="click">
-            <IonList>
-              <IonItem button={true} detail={false} onClick={handleCreateOrganization} lines="none">
-                Create a new organization
-              </IonItem>
-            </IonList>
+            <IonPopover
+              isOpen={isPopoverOpen}
+              onDidDismiss={() => setIsPopoverOpen(false)}
+              trigger="click-trigger"
+              triggerAction="click"
+            >
+              <IonList>
+                <IonItem
+                  button={true}
+                  detail={false}
+                  onClick={handleCreateOrganization}
+                >
+                  Create a new organization
+                </IonItem>
+                <IonAlert
+                  isOpen={showAlert}
+                  onDidDismiss={() => setShowAlert(false)}
+                  header="Please enter your organization details"
+                  buttons={[
+                    {
+                      text: "Finish",
+                      handler: (alertData) => {
+                        const title = alertData.title;
+                        const description = alertData.description;
+                        createOrganization(title, description);
+                      },
+                    },
+                  ]}
+                  inputs={[
+                    {
+                      name: "title",
+                      placeholder: "Title",
+                    },
+                    {
+                      name: "description",
+                      type: "textarea",
+                      placeholder: "Description",
+                    },
+                  ]}
+                />
+              </IonList>
             </IonPopover>
           </IonToolbar>
         </IonHeader>
@@ -150,7 +184,13 @@ const MyOrgs: React.FC = () => {
         </IonRefresher>
         {organizations && organizations.length > 0 ? (
           organizations.map((organization, i) => {
-            return <SpecificOrganization org={organization} updateOrgList={updateOrgList} key={i} />;
+            return (
+              <SpecificOrganization
+                org={organization}
+                updateOrgList={updateOrgList}
+                key={i}
+              />
+            );
           })
         ) : (
           <h1 className="ion-padding">No organizations were found</h1>

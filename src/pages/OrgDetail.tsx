@@ -14,6 +14,7 @@ import {
   IonRefresherContent,
   RefresherEventDetail,
   IonBackButton,
+  IonSpinner,
 } from "@ionic/react";
 import CustomList from "../components/CustomList";
 import { useEffect, useState } from "react";
@@ -23,12 +24,11 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { serverAdress } from "../auth.config";
 import { Board, Organization } from "../types";
-import SpecificOrgList from "../components/SpecificOrgList";
 
 interface OrgDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
-  }> { }
+  }> {}
 
 interface ListProps {
   text: string; // the list's content
@@ -44,8 +44,11 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
   const [organization, setOrganization] = useState<Organization>();
   const [boards, setBoards] = useState<Board[]>();
-  const [viewableBoardsProps, setViewableBoardsProps] = useState<ListProps[]>([]);
+  const [viewableBoardsProps, setViewableBoardsProps] = useState<ListProps[]>(
+    []
+  );
   const [hiddenBoardsProps, setHiddenBoardsProps] = useState<ListProps[]>();
+  // const [loading, setLoading] = useState(true);
 
   const customListTitle = `${organization?.name}'s boards`;
 
@@ -65,11 +68,12 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       .then((response) => {
         const org = response.data;
         setOrganization(org);
+        // setLoading(false);
       })
       .catch((error) => {
-        console.log(error.message);
+        console.log("failed to fetch organizations: ", error.message);
       });
-  }
+  };
 
   const getBoards = async () => {
     let token = await getAccessTokenSilently();
@@ -83,28 +87,33 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       .then((response) => {
         data = response.data;
         setBoards(data);
+        // setLoading(false);
       })
       .catch((error) => {
-        console.error(error.message);
+        console.error("failed to fetchboards: ", error.message);
+        // setLoading(false);
       });
   };
 
   const handleNewAI = () => {
-    console.log("New board with AI clicked!")
-  }
+    console.log("New board with AI clicked!");
+  };
   const handleNewBoard = () => {
-    console.log("New board clicked!")
-  }
+    console.log("New board clicked!");
+  };
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
     getBoards();
     event.detail.complete();
-  }
+  };
 
   useEffect(() => {
+    // setLoading(true);
+    setOrganization(undefined);
+    setBoards(undefined);
     getOrganization();
     getBoards();
-  }, []);
+  }, [orgId]);
 
   useEffect(() => {
     if (boards) {
@@ -113,23 +122,23 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
       for (let i = 0; i < boards.length; i++) {
         if (boards[i].is_private) {
-          hiddenBoards.push(boards[i])
+          hiddenBoards.push(boards[i]);
         } else {
-          nonHiddenBoards.push(boards[i])
+          nonHiddenBoards.push(boards[i]);
         }
       }
 
       if (nonHiddenBoards && nonHiddenBoards.length > 0) {
         const viewableListProp = nonHiddenBoards.map((board) => ({
           text: board.title,
-          boardId: board.id
+          boardId: board.id,
         }));
         setViewableBoardsProps(viewableListProp);
       }
       if (hiddenBoards && hiddenBoards.length > 0) {
         const privateListProp = hiddenBoards.map((board) => ({
           text: board.title,
-          boardId: board.id
+          boardId: board.id,
         }));
         setHiddenBoardsProps(privateListProp);
       }
@@ -147,14 +156,14 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                 className="ion-margin-vertical"
               />
             </IonButtons>
-            <IonTitle >{organization?.name}</IonTitle>
+            <IonTitle>{organization?.name}</IonTitle>
             <IonButtons slot="end">
-              <IonButton id="click-trigger">
+              <IonButton id="new-board-btn">
                 <IonIcon slot="icon-only" icon={addOutline} />
               </IonButton>
             </IonButtons>
           </IonToolbar>
-          <IonPopover trigger="click-trigger" triggerAction="click">
+          <IonPopover trigger="new-board-btn" triggerAction="click">
             <IonList>
               <IonItem button={true} detail={false} onClick={handleNewAI}>
                 <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
@@ -168,9 +177,12 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
         </div>
       </IonHeader>
       <IonContent fullscreen>
+        {/* {loading ? (
+          <IonSpinner color="primary" className="ion-padding" />
+        ) : (
+          <> */}
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent>
-          </IonRefresherContent>
+          <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
         <CustomList
           orgId={orgId}
@@ -184,6 +196,8 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
           titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={hiddenBoardsProps}
         />
+        {/* </>
+        )} */}
       </IonContent>
     </IonPage>
   );
