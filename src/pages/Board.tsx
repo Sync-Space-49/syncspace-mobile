@@ -55,6 +55,7 @@ import { Stack, type Board, type Organization, type Panel, type User } from "../
 import { RouteComponentProps, useHistory } from "react-router";
 import NewStack from "../components/NewStack";
 import { OverlayEventDetail } from "@ionic/core";
+import NewPanel from "../components/NewPanel";
 interface BoardDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
@@ -98,6 +99,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [editAlert, setEditAlert] = useState(false);
   const [panelModal, setPanelModal] = useState(false);
   const [boardModal, setBoardModal] = useState(false);
+  const [panelTitles, setPanelTitles] = useState({});
 
   const [presentingElement, setPresentingElement] = useState<
     HTMLElement | undefined
@@ -153,28 +155,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       method: "DELETE",
       url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
       headers: { authorization: `Bearer ${token}` },
-    };
-
-    await axios(options)
-      .then(() => {
-        // Not sure if you want to do something on success
-        return
-      })
-      .catch((error) => {
-        console.error(error.message);
-      });
-  }
-
-  const createPanel = async (title: string) => {
-    const token = await getAccessTokenSilently();
-    const body = new FormData();
-    body.append("title", title);
-
-    const options = {
-      method: "POST",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels`,
-      headers: { authorization: `Bearer ${token}` },
-      data: body
     };
 
     await axios(options)
@@ -331,7 +311,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
         stacks: panel.stacks
       }));
       setPanels(updatedPanels);
-
       if (typeof currentPanel !== 'number') {
         setCurrentPanel(0);
       }
@@ -352,6 +331,10 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       }));
       updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => { console.log("dismissed") } });
       setPanelNames(updatedPanelNames);
+      const updatedPanelTitles = panels.map((panel) => ({
+        title: panel.title,
+        id: panel.id
+      }))
     }
   }, [panels, board]);
 
@@ -536,14 +519,14 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                   <IonRow className="ion-justify-content-center">
                     <IonListHeader>{board?.title}'s panels</IonListHeader>
                     <IonList inset={true} >
-                      {panelNames && panelNames.length > 0 ? (
-                        panelNames.slice(0, -1).map((panel, index) => (
+                      {panels && panels.length > 0 ? (
+                        panels.map((panel, index) => (
                           <IonItemSliding key={index}>
-                            <IonItem key={index}>
-                              <IonInput label="Title:" placeholder='Sprint 1' value={panel.text} />
+                            <IonItem key={panel.id}>
+                              <IonInput label="Title:" placeholder='Sprint 1' value={panel.title} onIonChange={(e) => setPanelTitles({ ...panelTitles, [panel.title]: e.detail.value! })}/>
                             </IonItem>
                             <IonItemOptions slot="end">
-                              <IonItemOption color="danger" id="delete-panel-alert" onClick={() => handleDeletePanel(panel.data.id)}>
+                              <IonItemOption color="danger" id="delete-panel-alert" onClick={() => handleDeletePanel(panel.id)}>
                                 <IonIcon slot="icon-only" icon={closeOutline} />
                               </IonItemOption>
                             </IonItemOptions>
@@ -580,10 +563,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                     />
                   </IonRow>
                   <IonRow className="ion-justify-content-center">
-                    <IonButton className="ion-margin-bottom" size="small" shape="round" color={'success'}>
-                      <IonIcon icon={addOutline}></IonIcon>
-                      Add panel
-                    </IonButton>
+                      <NewPanel orgId={orgId} boardId={boardId} />
                   </IonRow>
                   <IonRow className="ion-justify-content-end ion-padding-end">
                     <IonButton color="tertiary">Save</IonButton>

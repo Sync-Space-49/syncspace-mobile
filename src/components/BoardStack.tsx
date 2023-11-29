@@ -104,22 +104,20 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
       </IonCardContent>
       {
         userId === ownerId ? (
-          <>
-            <StackSettings
-              stack={stack}
-              orgId={orgId}
-              boardId={boardId}
-            />
-            <NewCard
-              stack={stack}
-              orgId={orgId}
-              boardId={boardId}
-            />
-          </>
+          <StackSettings
+            stack={stack}
+            orgId={orgId}
+            boardId={boardId}
+          />
         )
           :
           <></>
       }
+      <NewCard
+        stack={stack}
+        orgId={orgId}
+        boardId={boardId}
+      />
 
       {/* Modal */}
 
