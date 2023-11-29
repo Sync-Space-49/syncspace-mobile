@@ -15,7 +15,10 @@ interface ListProps {
   listImg?: string; //list image src
 }
 
-const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org, updateOrgList }) => {
+const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({
+  org,
+  updateOrgList,
+}) => {
   const { getAccessTokenSilently, user } = useAuth0();
   const [boards, setBoards] = useState<Board[]>([]);
   const [boardNames, setBoardNames] = useState<ListProps[]>([]);
@@ -53,8 +56,9 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({ org, update
     if (boards && boards.length > 0) {
       const updatedBoardNames = boards.map((board) => ({
         text: board.title,
-        listImg: "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-        boardId: board.id
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+        boardId: board.id,
       }));
       setBoardNames(updatedBoardNames);
     } else {
