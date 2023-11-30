@@ -1,11 +1,8 @@
 import {
-  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
-  IonIcon,
   IonItem,
   IonLabel,
   IonList,
@@ -20,7 +17,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import StackSettings from "./StackSettings";
-import { addOutline } from "ionicons/icons";
 import NewCard from "./NewCard";
 
 interface Item {
@@ -33,10 +29,11 @@ interface StackProps {
   orgId: string;
   boardId: string;
   ownerId: string;
-  updateStackList?: () => void;
+  handleRefresh?: () => void;
+  getBoard?: () => void;
 }
 
-const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) => {
+const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId, handleRefresh, getBoard }) => {
 
   const { user } = useAuth0();
 
@@ -50,7 +47,7 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
 
   const handleItemClick = (card: Card) => {
     console.log('clicked');
-    setCurrentCard(card)
+    setCurrentCard(card);
     setSelectedItem(card);
     setIsModalOpen(true);
   };
@@ -74,7 +71,6 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
   }, [isModalOpen])
 
   return (
-    // <IonCard className="ion-padding">
     <IonCard>
       <IonCardHeader>
         <IonCardTitle>{title}</IonCardTitle>
@@ -91,16 +87,12 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
 
               ))
             ) : (
-              // <IonItem lines="inset">
               <IonItem >
                 <IonLabel>This stack has no cards</IonLabel>
               </IonItem>
             )}
           </IonReorderGroup>
         </IonList>
-        {/* <IonButton fill="clear" className="ion-align-items-center">
-          <IonIcon slot="icon-only" icon={addOutline}></IonIcon>
-        </IonButton> */}
       </IonCardContent>
       {
         userId === ownerId ? (
@@ -108,6 +100,7 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
             stack={stack}
             orgId={orgId}
             boardId={boardId}
+            getBoard={getBoard}
           />
         )
           :
@@ -117,10 +110,9 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
         stack={stack}
         orgId={orgId}
         boardId={boardId}
+        handleRefresh={handleRefresh}
+        getBoard={getBoard}
       />
-
-      {/* Modal */}
-
       {
         selectedItem && (
           <CardSettings

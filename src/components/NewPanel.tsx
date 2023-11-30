@@ -12,9 +12,10 @@ import { useState } from "react";
 interface NewPanelProps {
     orgId: string;
     boardId: string;
+    handleRefresh?: () => void;
 }
 
-const NewPanel: React.FC<NewPanelProps> = ({ orgId, boardId }) => {
+const NewPanel: React.FC<NewPanelProps> = ({ orgId, boardId, handleRefresh }) => {
     const { getAccessTokenSilently } = useAuth0();
 
     const [showAlert, setShowAlert] = useState(false);
@@ -32,9 +33,11 @@ const NewPanel: React.FC<NewPanelProps> = ({ orgId, boardId }) => {
         };
 
         await axios(options)
-            .then(() => {
+            .then(async () => {
                 // Not sure if you want to do something on success
-                return
+                await getAccessTokenSilently({ cacheMode: "off" }).then((token) => {
+                    handleRefresh!();
+                });
             })
             .catch((error) => {
                 console.error(error.message);

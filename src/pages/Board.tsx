@@ -89,8 +89,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
 
-  const [canDismiss, setCanDismiss] = useState(true); // prevents user from discarding unsaved changes
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [canDismiss, setCanDismiss] = useState(true);
   const [board, setBoard] = useState<Board>();
   const [ownerId, setOwnerId] = useState<string>();
   const [panels, setPanels] = useState<Panel[]>();
@@ -101,7 +100,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [panelViewIsOpen, setPanelViewIsOpen] = useState(false);
   const [deletePanelAlert, setDeletePanelAlert] = useState(false);
   const [panelIdToDelete, setPanelIdToDelete] = useState<string | null>(null);
-  const [editAlert, setEditAlert] = useState(false);
   const [panelModal, setPanelModal] = useState(false);
   const [boardModal, setBoardModal] = useState(false);
 
@@ -109,16 +107,19 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     HTMLElement | undefined
   >(undefined);
 
-  const getDetailedBoard = async () => {
-    const token = await getAccessTokenSilently();
-    const options = {
-      method: "GET",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/details`,
-      headers: { authorization: `Bearer ${token}` },
-    };
+  const getDetailedBoard = async (newToken?: string) => {
+    if(newToken){
+      const token = newToken
 
-    await axios(options)
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/details`,
+        headers: { authorization: `Bearer ${token}` },
+      };
+
+      await axios(options)
       .then((response) => {
+        console.log('new token');
         const data = response.data as Board;
         setBoard(data);
         setOwnerId(data.owner_id);
@@ -126,6 +127,27 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       .catch((error) => {
         console.error(error.message);
       });
+    }
+    else {
+      const token = await getAccessTokenSilently();
+
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/details`,
+        headers: { authorization: `Bearer ${token}` },
+      };
+
+      await axios(options)
+      .then((response) => {
+        console.log('old token');
+        const data = response.data as Board;
+        setBoard(data);
+        setOwnerId(data.owner_id);
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+    }
   }
 
   const updateBoard = async (title: string, ownerId: string, isPrivate: boolean) => {
@@ -187,6 +209,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     await axios(options)
       .then(() => {
         setCanDismiss(true);
+        getDetailedBoard();
       })
       .catch((error) => {
         console.error(error.message);
@@ -205,7 +228,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     await axios(options)
       .then(() => {
         // Not sure if you want to do something on success
-        return
+        getDetailedBoard();
       })
       .catch((error) => {
         console.error(error.message);
@@ -243,8 +266,10 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     };
 
     await axios(options)
-      .then(() => {
-      })
+      .then(async () => {
+        await getAccessTokenSilently({cacheMode: "off"}).then((token) => {
+          getDetailedBoard();
+      })})
       .catch((error) => {
         console.error(error.message);
       });
@@ -259,12 +284,14 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     dismiss();
   }
 
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+  const handleRefresh = (event?: CustomEvent<RefresherEventDetail>) => {
     getDetailedBoard();
     if (board) {
       setOwnerId(board.owner_id);
     }
-    event.detail.complete();
+    if (event) {
+      event.detail.complete();
+    }
   };
 
   const handleUpdatePanel = (event: React.FormEvent<HTMLFormElement> ) => {
@@ -328,7 +355,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
           id: panel.id
         }
       }));
-      updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => { console.log("dismissed") } });
+      updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => {} });
       setPanelNames(updatedPanelNames);
     }
   }, [panels, board]);
@@ -446,45 +473,13 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                 </IonItem>
               </IonList>
             </IonPopover>
-            <IonAlert
-              isOpen={editAlert}
-              header="Edit"
-              buttons={[
-                {
-                  text: 'Cancel',
-                  role: 'cancel',
-                  handler: () => {
-                    console.log('Alert cancelled')
-                  }
-                },
-                {
-                  text: 'Confirm change',
-                  role: 'confirm',
-                }
-              ]}
-              inputs={[
-                {
-                  placeholder: 'Title',
-                  attributes: {
-                    maxLength: 255
-                  }
-                }
-              ]}
-              onDidDismiss={({ detail }) => {
-                if (detail.role === 'confirm') {
-                  let title = detail.data.values[0]
-
-                }
-                setEditAlert(false);
-              }}
-            />
             <IonActionSheet
               isOpen={panelViewIsOpen}
               header="Choose Board View"
               buttons={panelNames}
               onDidDismiss={({ detail }) => {
                 if (detail.role === "backdrop" || detail.role === "cancel") {
-                  console.log('cancelled')
+                  // console.log('cancelled')
                 }
                 else {
                   setCurrentPanel(detail.data.action);
@@ -560,7 +555,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                       />
                     </IonRow>
                     <IonRow className="ion-justify-content-center">
-                      <NewPanel orgId={orgId} boardId={boardId} />
+                      <NewPanel orgId={orgId} boardId={boardId} handleRefresh={handleRefresh}/>
                     </IonRow>
                     <IonRow className="ion-justify-content-end ion-padding-end">
                       <IonButton color="tertiary" type="submit">Save</IonButton>
@@ -597,16 +592,18 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
               stacks.map((stack, index: number) => (
                 <>
                   <SwiperSlide key={stack.id}>
-                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!} />
+                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!} handleRefresh={handleRefresh} getBoard={getDetailedBoard}/>
                   </SwiperSlide>
                   {index === stacks.length - 1 && (
                     <SwiperSlide key={index}>
                       <NewStack
+                        board={board!}
                         panelId={panelId}
                         orgId={orgId}
                         boardId={boardId}
                         hasStacks={true}
                         getBoard={getDetailedBoard}
+                        handleRefresh={handleRefresh}
                       />
                     </SwiperSlide>
                   )}
@@ -615,11 +612,13 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
             ) : (
               <SwiperSlide>
                 <NewStack
+                  board={board!}
                   panelId={panelId}
                   orgId={orgId}
                   boardId={boardId}
                   hasStacks={false}
                   getBoard={getDetailedBoard}
+                  handleRefresh={handleRefresh}
                 />
               </SwiperSlide>
             )}

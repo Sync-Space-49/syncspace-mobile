@@ -14,19 +14,15 @@ interface StackSettingsProps {
     stack: Stack;
     orgId: string;
     boardId: string;
+    getBoard?: (token: String) => void;
 }
 
-const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
+const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId, getBoard }) => {
     const { getAccessTokenSilently } = useAuth0();
 
     const [editAlert, setEditAlert] = useState(false);
     const [deleteAlert, setDeleteAlert] = useState(false);
     const panelId = stack.panel_id;
-
-    // const updateBoardPage = () => {
-    //     const event = new CustomEvent('updateStack')
-    //     window.dispatchEvent(event);
-    // };
 
     const getStacks = async () => {
         const token = await getAccessTokenSilently();
@@ -46,7 +42,26 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
             });
     };
 
-    const deleteStack = async () => {
+    const deleteStack = async (newToken?: string) => {
+
+        if (newToken) {
+            const options = {
+                method: "DELETE",
+                url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stack.id}`,
+                headers: { authorization: `Bearer ${newToken}` },
+            }
+    
+            await axios(options)
+            await getAccessTokenSilently({ cacheMode: "off" }).then((token) => {
+                getStacks();
+                getBoard!(newToken);
+            })
+                .catch((error) => {
+                    console.error(error.message);
+                })
+        }
+
+
         let token = await getAccessTokenSilently();
         const options = {
             method: "DELETE",
@@ -55,10 +70,10 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
         }
 
         await axios(options)
-            .then((response) => {
-                getStacks();
-                // updateBoardPage();
-            })
+        await getAccessTokenSilently({ cacheMode: "off" }).then((token) => {
+            getStacks();
+            getBoard!(token);
+        })
             .catch((error) => {
                 console.error(error.message);
             })
@@ -80,9 +95,11 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
             };
 
             await axios(options)
-                .then(() => {
-                    getStacks();
-                    // updateBoardPage();
+                .then(async () => {
+                    await getAccessTokenSilently({ cacheMode: "off" }).then((token) => {
+                        getStacks();
+                        getBoard!(token);
+                    })
                 })
                 .catch((error) => {
                     console.error(error.message);

@@ -12,18 +12,23 @@ import { createOutline } from "ionicons/icons";
 import axios from "axios";
 import { serverAdress } from "../auth.config";
 import { useAuth0 } from "@auth0/auth0-react";
+import { Board } from "../types";
+import { useState } from "react";
 
 interface NewStackProps {
+    board: Board;
     panelId: string;
     orgId: string;
     boardId: string
     hasStacks: boolean;
-    getBoard: () => void;
+    getBoard: (token: string) => void;
+    handleRefresh?: () => void;
 }
 
-const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId, getBoard }) => {
+const NewStack: React.FC<NewStackProps> = ({ board, hasStacks, panelId, orgId, boardId, getBoard, handleRefresh }) => {
 
     const { getAccessTokenSilently } = useAuth0();
+    const [currentBoard, setCurrentBoard] = useState(board);
 
     const createStack = async (title: string) => {
         const token = await getAccessTokenSilently();
@@ -38,8 +43,11 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
         };
 
         await axios(options)
-            .then(() => {
-                getBoard();
+            .then(async () => {
+                await getAccessTokenSilently({ cacheMode: "off" }).then((token) => {
+                    handleRefresh!();
+                    getBoard(token);
+                });
             })
             .catch((error) => {
                 console.error(error.message);

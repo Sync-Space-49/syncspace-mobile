@@ -82,21 +82,17 @@ const MyOrgs: React.FC = () => {
       headers: { authorization: `Bearer ${token}` },
       data: body,
     };
-
+    console.log(token)
     await axios(options)
       .then(async (response) => {
         console.log("success, org created, response: ", response);
         const orgId = response.data.id;
         console.log("orgId: ", orgId);
 
-        await getAccessTokenSilently().then(() => {
+        await getAccessTokenSilently({cacheMode: "off"}).then(() => {
           getOrganizations();
         });
-
-        //redirecting users to specific org, currently shows as undefined
-        //need to return to my orgs, refresh a couple times, and then click
-        // history.push(`/app/organizations/${orgId}`);
-
+        history.push(`/app/organizations/${orgId}`);
         setIsPopoverOpen(false);
       })
       .catch((error) => {

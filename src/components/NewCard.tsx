@@ -7,24 +7,24 @@ import { addOutline } from "ionicons/icons";
 import axios from "axios";
 import { serverAdress } from "../auth.config";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Stack } from "../types";
+import { Board, Stack } from "../types";
 import { useState } from "react";
 
 interface NewCardProps {
     stack: Stack;
     orgId: string;
     boardId: string;
+    handleRefresh?: () => void;
+    getBoard?: () => void;
 }
 
-const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId }) => {
+const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId, handleRefresh, getBoard }) => {
     const { getAccessTokenSilently } = useAuth0();
 
     const [showAlert, setShowAlert] = useState(false);
 
     const stackId = stack.id;
     const panelId = stack.panel_id;
-
-
 
     const createCard = async (title: string, description: string) => {
         const token = await getAccessTokenSilently();
@@ -40,9 +40,12 @@ const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId }) => {
         };
 
         await axios(options)
-            .then(() => {
-                // getBoard();
-                console.log('created card')
+            .then(async () => {
+                await getAccessTokenSilently({ cacheMode: "off" }).then((token) => {
+                    getBoard!();
+                    handleRefresh!();
+                    console.log('created card')
+                })
             })
             .catch((error) => {
                 console.error(error.message);
@@ -52,7 +55,6 @@ const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId }) => {
     const handleButtonClick = () => {
         setShowAlert(true)
     }
-
 
     return (
         <>
@@ -84,7 +86,7 @@ const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId }) => {
                         }
                     },
                     {
-                        name:'description',
+                        name: 'description',
                         type: 'textarea',
                         placeholder: 'Description'
                     }
