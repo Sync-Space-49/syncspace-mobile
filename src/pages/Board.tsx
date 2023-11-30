@@ -104,7 +104,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [editAlert, setEditAlert] = useState(false);
   const [panelModal, setPanelModal] = useState(false);
   const [boardModal, setBoardModal] = useState(false);
-  const [panelTitles, setPanelTitles] = useState(['']);
 
   const [presentingElement, setPresentingElement] = useState<
     HTMLElement | undefined
@@ -172,13 +171,9 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   }
 
-  // const updatePanel = async (title: string) => {
-  // const updatePanel = async (e: React.FormEvent<HTMLInputElement>) => {
   const updatePanel = async (panelId: string, data: UpdatePanelProps) => {
-    console.log(panelId)
     const token = await getAccessTokenSilently();
     const body = new FormData();
-    console.log(data);
     if (data.title) { body.append('title', data.title) }
     if (data.position) { body.append('position', data.position.toString()) }
 
@@ -191,8 +186,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
 
     await axios(options)
       .then(() => {
-        // Not sure if you want to do something on success
-        return
+        setCanDismiss(true);
       })
       .catch((error) => {
         console.error(error.message);
@@ -250,8 +244,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
 
     await axios(options)
       .then(() => {
-        // Not sure if you want to do something on success
-        return
       })
       .catch((error) => {
         console.error(error.message);
@@ -264,8 +256,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     setPanelModal(false);
   }
   const onWillDisimss = (event: CustomEvent<OverlayEventDetail>) => {
-    // if (event.detail.role === )
-    console.log(event)
     dismiss();
   }
 
@@ -277,27 +267,14 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     event.detail.complete();
   };
 
-  const handleMenuClick = () => {
-    console.log('settings clicked')
-    setIsModalOpen(true);
-    console.log(isModalOpen)
-  };
-
-  // this needs to take in the diff panel ids and their new things and then call updatepanel for each one 
   const handleUpdatePanel = (event: React.FormEvent<HTMLFormElement> ) => {
     event.preventDefault();
-    
     panels?.forEach((panel) => {
-      console.log(`panel_name_id_${panel.id}`)
       let possible_new_name = (event.target as any)[`panel_name_id_${panel.id}`].value;
       if (possible_new_name !== panel.title) {
         updatePanel(panel.id, {'title': possible_new_name})
       }
     })
-    console.log((event.target as any)[`panel_name_id_fbc89ee1-4d3b-4bfd-9914-d55d9f8ed423`].value)
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
-    console.log(formData);
   } 
 
   const handleDeletePanel = (panelId: string) => {
@@ -353,11 +330,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       }));
       updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => { console.log("dismissed") } });
       setPanelNames(updatedPanelNames);
-
-      const updatedPanelTitles = panels.map((panel) => ({
-        title: panel.title
-      }))
-      // setPanelTitles(updatedPanelTitles);
     }
   }, [panels, board]);
 
@@ -524,16 +496,14 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
             <IonModal
               ref={modal}
               isOpen={panelModal}
-              // presentingElement={presentingElement!}
               initialBreakpoint={.75}
               breakpoints={[0, .75]}
-            // canDismiss={canDismiss}
+              onDidDismiss={() => setPanelModal(false)}
             >
               <IonHeader>
                 <IonToolbar>
                   <IonTitle>Edit Panels</IonTitle>
                   <IonButtons slot="end">
-                    {/* <IonButton onClick={() => setPanelModal(false)}>Close</IonButton> */}
                     <IonButton onClick={() => setPanelModal(false)}>Close</IonButton>
                   </IonButtons>
                 </IonToolbar>
@@ -549,8 +519,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                           panels.map((panel, index) => (
                             <IonItemSliding key={index}>
                               <IonItem key={panel.id}>
-                                {/* <IonInput label="Title:" placeholder='Sprint 1' value={panel.title} onIonChange={(e) => setPanelTitles({ ...panelTitles, [panel.title]: e.detail.value! })}/> */}
-                                {/* check dylan's code in web for it working */}
                                 <IonInput label="Panel title:" placeholder='Sprint 1' value={panel.title} name={`panel_name_id_${panel.id}`} onIonChange={(e) => setCanDismiss(false)} />
                               </IonItem>
                               <IonItemOptions slot="end">
@@ -595,7 +563,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                       <NewPanel orgId={orgId} boardId={boardId} />
                     </IonRow>
                     <IonRow className="ion-justify-content-end ion-padding-end">
-                      {/* <IonButton color="tertiary" type="submit" onClick={() => setCanDismiss(true)}>Save</IonButton> */}
                       <IonButton color="tertiary" type="submit">Save</IonButton>
                     </IonRow>
                   </form>
