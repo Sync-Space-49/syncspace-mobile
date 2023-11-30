@@ -15,7 +15,7 @@ import {
 } from "@ionic/react";
 import CardSettings from "../components/CardSettings";
 import { useEffect, useState } from "react";
-import { Stack, Card } from "../types";
+import { Stack, Card, Board } from "../types";
 import "swiper/css";
 import "swiper/css/pagination";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -33,10 +33,10 @@ interface StackProps {
   orgId: string;
   boardId: string;
   ownerId: string;
-  updateStackList?: () => void;
+  setBoard: (React.Dispatch<React.SetStateAction<Board | undefined>>);
 }
 
-const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) => {
+const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId, setBoard }) => {
 
   const { user } = useAuth0();
 
@@ -128,7 +128,10 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
             card={currentCard!}
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
+            stack={stack}
+            boardId={boardId}
+            orgId={orgId}
+            setBoard={setBoard}
           />
         )
       }
