@@ -24,7 +24,7 @@ import { addOutline } from "ionicons/icons";
 import { Card } from "../types";
 
 interface ItemModalProps {
-  card: Card
+  card: Card;
   isOpen: boolean;
   onClose?: () => void;
   onOpenChange?: (isOpen: boolean) => void;
@@ -33,7 +33,7 @@ interface ItemModalProps {
 const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onOpenChange, card }) => {
   const [selectedMembers, setSelectedMembers] = useState([]);
 
-  const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
+  // const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
   const page = useRef(undefined);
   const modal = useRef<HTMLIonModalElement>(null);
   const [opened, setOpened] = useState(isOpen);
@@ -50,7 +50,7 @@ const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onOpenChange, card }) => 
   };
 
   useEffect(() => {
-    setPresentingElement(page.current);
+    // setPresentingElement(page.current);
   }, []);
 
   useEffect(() => {
@@ -67,10 +67,10 @@ const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onOpenChange, card }) => 
 
   return (
     <IonModal
-      ref={modal}
+      // ref={modal}
       isOpen={opened}
       onDidDismiss={dismiss}
-      presentingElement={presentingElement}
+      // presentingElement={presentingElement}
     >
       <IonHeader>
         <IonToolbar>
