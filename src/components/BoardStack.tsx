@@ -1,10 +1,14 @@
 import {
+  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
+  IonCardSubtitle,
   IonCardTitle,
+  IonIcon,
   IonItem,
   IonLabel,
+  IonList,
   IonReorder,
   IonReorderGroup,
   ItemReorderEventDetail,
@@ -16,6 +20,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import StackSettings from "./StackSettings";
+import { addOutline } from "ionicons/icons";
+import NewCard from "./NewCard";
 
 interface Item {
   id: string;
@@ -68,48 +74,65 @@ const BoardStack: React.FC<StackProps> = ({ stack, orgId, boardId, ownerId }) =>
   }, [isModalOpen])
 
   return (
-    <IonCard className="ion-padding">
+    // <IonCard className="ion-padding">
+    <IonCard>
       <IonCardHeader>
         <IonCardTitle>{title}</IonCardTitle>
       </IonCardHeader>
       <IonCardContent>
-        <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
-          {cards && cards.length > 0 ? (
-            cards.map((card: Card, i) => (
-              <IonItem key={card.id} onClick={() => handleItemClick(card)}>
-                <IonLabel>{card.title}</IonLabel>
-                <IonReorder slot="end"></IonReorder>
+        <IonList inset={true}>
+          <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
+            {cards && cards.length > 0 ? (
+              cards.map((card: Card, i) => (
+                <IonItem key={card.id} onClick={() => handleItemClick(card)} lines="inset" >
+                  <IonLabel>{card.title}</IonLabel>
+                  <IonReorder slot="end"></IonReorder>
+                </IonItem>
+
+              ))
+            ) : (
+              // <IonItem lines="inset">
+              <IonItem >
+                <IonLabel>This stack has no cards</IonLabel>
               </IonItem>
-            ))
-          ) : (
-            <IonItem>
-              <IonLabel>This stack has no cards</IonLabel>
-            </IonItem>
-          )}
-        </IonReorderGroup>
+            )}
+          </IonReorderGroup>
+        </IonList>
+        {/* <IonButton fill="clear" className="ion-align-items-center">
+          <IonIcon slot="icon-only" icon={addOutline}></IonIcon>
+        </IonButton> */}
       </IonCardContent>
-      {userId === ownerId ?
-      <StackSettings 
+      {
+        userId === ownerId ? (
+          <StackSettings
+            stack={stack}
+            orgId={orgId}
+            boardId={boardId}
+          />
+        )
+          :
+          <></>
+      }
+      <NewCard
         stack={stack}
         orgId={orgId}
         boardId={boardId}
       />
-        :
-        <></>
-      }
 
       {/* Modal */}
 
-      {selectedItem && (
-        <CardSettings
-          key={currentCard?.id}
-          card={currentCard!}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
-        />
-      )}
-    </IonCard>
+      {
+        selectedItem && (
+          <CardSettings
+            key={currentCard?.id}
+            card={currentCard!}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
+          />
+        )
+      }
+    </IonCard >
   );
 };
 
