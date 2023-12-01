@@ -38,28 +38,49 @@ const MyOrgs: React.FC = () => {
     setShowAlert(true);
   };
 
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    getOrganizations();
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
+    let token = await getAccessTokenSilently();
+    getOrganizations(token);
     event.detail.complete();
   };
 
-  const getOrganizations = async () => {
-    let token = await getAccessTokenSilently();
-    const userId = user!.sub;
-    const options = {
-      method: "GET",
-      url: `${serverAdress}api/users/${userId}/organizations`,
-      headers: { authorization: `Bearer ${token}` },
-    };
+  const getOrganizations = async (newToken?: string) => {
+    if (newToken) {
+      const userId = user!.sub;
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/users/${userId}/organizations`,
+        headers: { authorization: `Bearer ${newToken}` },
+      };
 
-    await axios(options)
-      .then((response) => {
-        const userOrganizations = response.data;
-        setOrganizations(userOrganizations);
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
+      await axios(options)
+        .then((response) => {
+          console.log("newtoken");
+          const userOrganizations = response.data;
+          setOrganizations(userOrganizations);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    } else {
+      let token = await getAccessTokenSilently();
+      console.log("old token");
+      const userId = user!.sub;
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/users/${userId}/organizations`,
+        headers: { authorization: `Bearer ${token}` },
+      };
+
+      await axios(options)
+        .then((response) => {
+          const userOrganizations = response.data;
+          setOrganizations(userOrganizations);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    }
   };
 
   const createOrganization = async (title: string, description: string) => {
@@ -84,9 +105,10 @@ const MyOrgs: React.FC = () => {
         const orgId = response.data.id;
         console.log("orgId: ", orgId);
 
-        await getAccessTokenSilently().then(() => {
-          getOrganizations();
+        await getAccessTokenSilently().then((token) => {
+          getOrganizations(token);
         });
+        // history.push(`/app/myorgs/organizations/${orgId}`);
         setIsPopoverOpen(false);
       })
       .catch((error) => {
