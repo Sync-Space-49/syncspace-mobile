@@ -86,12 +86,13 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
     let data: any;
     await axios(options)
       .then((response) => {
+        console.log("OrgDetail, Boards fetched: ", response.data);
         data = response.data;
         setBoards(data);
         // setLoading(false);
       })
       .catch((error) => {
-        console.error("failed to fetchboards: ", error.message);
+        console.error("OrgDetail, failed to fetch boards: ", error.message);
         // setLoading(false);
       });
   };
@@ -157,6 +158,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
   useEffect(() => {
     if (boards) {
+      console.log("boards before processing: ", boards);
       let hiddenBoards = [];
       let nonHiddenBoards = [];
 
@@ -168,12 +170,16 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
         }
       }
 
+      // console.log("Hidden Boards:", hiddenBoards);
+      // console.log("Non-Hidden Boards:", nonHiddenBoards);
+
       if (nonHiddenBoards && nonHiddenBoards.length > 0) {
         const viewableListProp = nonHiddenBoards.map((board) => ({
           text: board.title,
           boardId: board.id,
         }));
         setViewableBoardsProps(viewableListProp);
+        console.log("Viewable Boards Props:", viewableListProp);
       }
       if (hiddenBoards && hiddenBoards.length > 0) {
         const privateListProp = hiddenBoards.map((board) => ({
@@ -181,6 +187,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
           boardId: board.id,
         }));
         setHiddenBoardsProps(privateListProp);
+        console.log("Hidden Boards Props:", privateListProp);
       }
     }
   }, [boards]);
@@ -229,7 +236,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                     text: "Finish",
                     handler: (alertData) => {
                       const title = alertData.title;
-                      const isPrivate = alertData.isPrivate === "true";
+                      const isPrivate = alertData.privacy === "private";
                       createBoard(title, isPrivate);
                     },
                   },
@@ -238,23 +245,21 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                   {
                     name: "title",
                     placeholder: "Title",
+                    type: "text",
                   },
                   {
-                    name: "isPrivate",
-                    placeholder: "isPrivate",
+                    name: "privacy",
+                    type: "radio",
+                    label: "Public",
+                    value: "public", // Value when this radio option is selected
+                    checked: true, // Default selected option
                   },
-                  // {
-                  //   label: "IsPrivate",
-                  //   type: "radio",
-                  //   value: "isPrivate",
-                  // },
-                  // {
-                  //   name: "isPrivate",
-                  //   type: "checkbox",
-                  //   label: "Private Board",
-                  //   value: "true", // default val when checked
-                  //   checked: false,
-                  // },
+                  {
+                    name: "privacy",
+                    type: "radio",
+                    label: "Private",
+                    value: "private", // Value when this radio option is selected
+                  },
                 ]}
               />
             </IonList>
