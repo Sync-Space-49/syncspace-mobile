@@ -64,7 +64,7 @@ const OrgList: React.FC<OrgProps> = ({ orgs, updateOrgList }) => {
         <IonList inset={true}>
           {orgs.map((org, index) => (
             <IonItemSliding key={index}>
-              <IonItem routerLink={`/app/organizations/${org.id}`}>
+              <IonItem routerLink={`/app/profile/organizations/${org.id}`}>
                 {org.listImg && (
                   <img
                     src={org.listImg}
