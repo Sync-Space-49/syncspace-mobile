@@ -26,12 +26,12 @@ import OrgList from "../components/OrgList";
 interface ListProps {
   text: string; // the list's content
   listImg?: string; //list image src
-  id: string
+  id: string;
 }
 interface org {
-  text: string
-  id: string,
-  listImg?: string
+  text: string;
+  id: string;
+  listImg?: string;
 }
 
 const Profile: React.FC = () => {
@@ -39,7 +39,7 @@ const Profile: React.FC = () => {
 
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [orgNames, setOrgNames] = useState<ListProps[]>([]);
-  const [userSince, setUserSince] = useState<string>('October 2023');
+  const [userSince, setUserSince] = useState<string>("October 2023");
   const [orgList, setOrgList] = useState<org[]>([]);
 
   const getOrgs = async () => {
@@ -49,7 +49,7 @@ const Profile: React.FC = () => {
       method: "GET",
       url: `${serverAdress}api/users/${userId}/organizations`,
       headers: { authorization: `Bearer ${token}` },
-    }
+    };
 
     await axios(options)
       .then((response) => {
@@ -58,19 +58,22 @@ const Profile: React.FC = () => {
       })
       .catch((error) => {
         console.error(error.message);
-      })
-  }
-  
+      });
+  };
+
   const getCreatedAt = async () => {
     const data = user!.createdAt;
-    const time: Date = new Date(data)
-    const updatedTimeString = time.toLocaleString('default', { month: 'long', year: 'numeric' });
+    const time: Date = new Date(data);
+    const updatedTimeString = time.toLocaleString("default", {
+      month: "long",
+      year: "numeric",
+    });
     setUserSince(updatedTimeString);
-  }
+  };
 
   const updateOrgList = () => {
     getOrgs();
-  }
+  };
 
   useEffect(() => {
     getCreatedAt();
@@ -78,11 +81,12 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (organizations.length > 0) {
+    if (organizations && organizations.length > 0) {
       const updatedOrgNames = organizations.map((org) => ({
         text: org.name,
         id: org.id,
-        listImg: "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
       }));
       setOrgNames(updatedOrgNames);
     }
@@ -112,7 +116,7 @@ const Profile: React.FC = () => {
           <small>Member since {userSince}</small>
         </div>
         <div className="list-title">Your Organizations</div>
-        <OrgList orgs={orgNames} updateOrgList={updateOrgList}/>
+        <OrgList orgs={orgNames} updateOrgList={updateOrgList} />
         <div className="list-title">Actions</div>
         <IonList inset={true}>
           <IonItem>

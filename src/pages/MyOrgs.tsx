@@ -108,6 +108,7 @@ const MyOrgs: React.FC = () => {
         await getAccessTokenSilently().then((token) => {
           getOrganizations(token);
         });
+        // history.push(`/app/myorgs/organizations/${orgId}`);
         setIsPopoverOpen(false);
       })
       .catch((error) => {
