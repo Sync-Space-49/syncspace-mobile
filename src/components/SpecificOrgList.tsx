@@ -43,7 +43,7 @@ const SpecificOrgList: React.FC<CustomListProps> = ({
             {items && items.length > 0 && (
                 <IonList inset={true}>
                     {items.map((item, index) => (
-                        <IonItem key={index} routerLink={`/app/organizations/${orgId}/boards/${item.boardId}`}>
+                        <IonItem key={index} routerLink={`/app/myorgs/organizations/${orgId}/boards/${item.boardId}`}>
                             {item.listImg && (
                                 <img
                                     src={item.listImg}
