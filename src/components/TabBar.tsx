@@ -27,13 +27,13 @@ const TabBar: React.FC = () => {
           <Route exact path="/app/myorgs">
             <MyOrgs />
           </Route>
+          <Route exact path="/app/myorgs/organizations/:orgId" component={OrgDetail} />
+          <Route exact path="/app/myorgs/organizations/:orgId/boards/:boardId" component={Board} />
           <Route exact path="/app/profile">
             <Profile />
           </Route>
-          {/* <Route exact path="/app/organizations" component={OrgDetail} />  */}
-          <Route path="/app/organizations/:orgId" component={OrgDetail} />
-          {/* <Route exact path="/app/organizations/boards" component={Board} /> */}
-          <Route path="/app/organizations/:orgId/boards/:boardId" component={Board} />
+          <Route exact path ="/app/profile/organizations/:orgId" component={OrgDetail}/>
+
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom">

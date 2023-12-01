@@ -17,7 +17,7 @@ import {
   IonAlert,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
-import { addOutline, colorWandOutline } from "ionicons/icons";
+import { addOutline } from "ionicons/icons";
 import { useHistory } from "react-router";
 import "./MyOrgs.css";
 import SpecificOrganization from "../components/SpecificOrganization";
@@ -97,8 +97,6 @@ const MyOrgs: React.FC = () => {
     if (description) {
       body.append("description", description);
     }
-    console.log("Sending data:", body);
-
     const options = {
       method: "POST",
       url: `${serverAdress}api/organizations`,
@@ -115,11 +113,6 @@ const MyOrgs: React.FC = () => {
         await getAccessTokenSilently().then((token) => {
           getOrganizations(token);
         });
-
-        //redirecting users to specific org, currently shows as undefined
-        //need to return to my orgs, refresh a couple times, and then click
-        // history.push(`/app/organizations/${orgId}`);
-
         setIsPopoverOpen(false);
       })
       .catch((error) => {
