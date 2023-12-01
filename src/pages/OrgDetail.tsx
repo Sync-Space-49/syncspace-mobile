@@ -15,6 +15,7 @@ import {
   RefresherEventDetail,
   IonBackButton,
   IonSpinner,
+  IonAlert,
 } from "@ionic/react";
 import CustomList from "../components/CustomList";
 import { useEffect, useState } from "react";
@@ -39,7 +40,6 @@ interface ListProps {
 const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
   const { getAccessTokenSilently } = useAuth0();
   const history = useHistory();
-
   const orgId: string = match.params.orgId;
 
   const [organization, setOrganization] = useState<Organization>();
@@ -48,7 +48,8 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
     []
   );
   const [hiddenBoardsProps, setHiddenBoardsProps] = useState<ListProps[]>();
-  // const [loading, setLoading] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const customListTitle = `${organization?.name}'s boards`;
 
@@ -95,11 +96,50 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       });
   };
 
+  const createBoard = async (title: string, isPrivate: boolean) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    if (title) {
+      body.append("title", title);
+    }
+    body.append("isPrivate", isPrivate ? "1" : "0");
+    console.log("Sending data:", body);
+
+    const options = {
+      method: "POST",
+      url: `${serverAdress}api/organizations/${orgId}/boards`,
+      headers: { authorization: `Bearer ${token}` },
+      data: body,
+    };
+
+    await axios(options)
+      .then(async (response) => {
+        console.log("success, board created, response: ", response);
+        const boardId = response.data.id;
+        console.log("boardId: ", boardId);
+
+        await getAccessTokenSilently().then(() => {
+          getBoards();
+        });
+
+        setIsPopoverOpen(false);
+      })
+      .catch((error) => {
+        console.error(
+          "ERROR: ",
+          error.response ? error.response.data : error.message
+        );
+      });
+  };
+
   const handleNewAI = () => {
     console.log("New board with AI clicked!");
   };
   const handleNewBoard = () => {
     console.log("New board clicked!");
+  };
+  const handleCreateBoard = () => {
+    setShowAlert(true);
   };
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
@@ -158,20 +198,65 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
             </IonButtons>
             <IonTitle>{organization?.name}</IonTitle>
             <IonButtons slot="end">
-              <IonButton id="new-board-btn">
+              <IonButton
+                id="new-board-btn"
+                onClick={() => setIsPopoverOpen(true)}
+              >
                 <IonIcon slot="icon-only" icon={addOutline} />
               </IonButton>
             </IonButtons>
           </IonToolbar>
-          <IonPopover trigger="new-board-btn" triggerAction="click">
+          <IonPopover
+            isOpen={isPopoverOpen}
+            onDidDismiss={() => setIsPopoverOpen(false)}
+            trigger="new-board-btn"
+            triggerAction="click"
+          >
             <IonList>
+              <IonItem button={true} detail={false} onClick={handleCreateBoard}>
+                New board
+              </IonItem>
               <IonItem button={true} detail={false} onClick={handleNewAI}>
                 <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
                 New board with AI
               </IonItem>
-              <IonItem button={true} detail={false} onClick={handleNewBoard}>
-                New board
-              </IonItem>
+              <IonAlert
+                isOpen={showAlert}
+                onDidDismiss={() => setShowAlert(false)}
+                header="Enter Board Name"
+                buttons={[
+                  {
+                    text: "Finish",
+                    handler: (alertData) => {
+                      const title = alertData.title;
+                      const isPrivate = alertData.isPrivate === "true";
+                      createBoard(title, isPrivate);
+                    },
+                  },
+                ]}
+                inputs={[
+                  {
+                    name: "title",
+                    placeholder: "Title",
+                  },
+                  {
+                    name: "isPrivate",
+                    placeholder: "isPrivate",
+                  },
+                  // {
+                  //   label: "IsPrivate",
+                  //   type: "radio",
+                  //   value: "isPrivate",
+                  // },
+                  // {
+                  //   name: "isPrivate",
+                  //   type: "checkbox",
+                  //   label: "Private Board",
+                  //   value: "true", // default val when checked
+                  //   checked: false,
+                  // },
+                ]}
+              />
             </IonList>
           </IonPopover>
         </div>
