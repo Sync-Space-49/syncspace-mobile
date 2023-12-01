@@ -119,6 +119,27 @@ const ItemModal: React.FC<ItemModalProps> = ({ isOpen, card, stack, boardId, org
       });
   }
 
+  const handleUpdateCard = (event: React.FormEvent<HTMLFormElement> ) => {
+    event.preventDefault();
+    let possible_new_title;
+    let possible_new_description;
+    let body:UpdateCardProps = {'title': undefined, 'description': undefined}
+
+    if ((event.target as any)[`card_title_id_${card.id}`].value !== card.title) {
+      possible_new_title = (event.target as any)[`card_title_id_${card.id}`].value;
+      body.title = possible_new_title
+    }
+    if ((event.target as any)[`card_description_id_${card.id}`].value !== card.description) {
+      possible_new_description = (event.target as any)[`card_description_id_${card.id}`].value;
+      body.description = possible_new_description
+    }
+    console.log(body);
+
+    if (body.description !== '' || body.title !== '') {
+      updateCard(body)
+    }
+  }
+
   const dismiss = () => {
     modal.current?.dismiss();
     setOpened(false);
@@ -161,20 +182,22 @@ const ItemModal: React.FC<ItemModalProps> = ({ isOpen, card, stack, boardId, org
             <IonLabel className="ion-padding-vertical">
               <strong>Details</strong>
             </IonLabel>
-            <form>
+            <form onSubmit={(event) => handleUpdateCard(event)}>
               <IonList inset={true}>
                 <IonItem>
-                  <IonInput label="Title:" placeholder={card.title} />
+                  <IonInput label="Card Title:" value={card.title} name={`card_title_id_${card.id}`}/>
                 </IonItem>
                 <IonItem>
                   <IonTextarea
                     rows={3}
                     autoGrow={true}
                     label="Description:"
-                    placeholder={card.description}
+                    value={card.description}
+                    name={`card_description_id_${card.id}`}
                   />
                 </IonItem>
               </IonList>
+              <IonButton className="ion-justify-content-center"color="tertiary" size="small" type="submit">Save</IonButton>
             </form>
           </IonRow>
           <IonRow>
@@ -205,14 +228,15 @@ const ItemModal: React.FC<ItemModalProps> = ({ isOpen, card, stack, boardId, org
                 {member}
               </IonSelectOption>
             ))}
+            Select Member
           </IonSelect>
           <IonRow className="edit-buttons">
             <IonCol>
               <IonButton color="danger" id="delete-card-alert">Delete</IonButton>
             </IonCol>
-            <IonCol>
+            {/* <IonCol>
               <IonButton color="tertiary">Save</IonButton>
-            </IonCol>
+            </IonCol> */}
           </IonRow>
           <IonAlert
             isOpen={deleteCardAlert}

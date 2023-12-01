@@ -28,6 +28,16 @@ import {
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonReorder,
+  IonReorderGroup,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea,
+  ItemReorderEventDetail,
 } from "@ionic/react";
 import {
   addOutline,
@@ -51,11 +61,13 @@ import { serverAdress } from "../auth.config";
 import "./Board.css";
 import { useAuth0 } from "@auth0/auth0-react";
 
-import { Stack, type Board, type Organization, type Panel, type User } from "../types"
+import { Stack, type Board, type Organization, type Panel, type User, Card } from "../types"
 import { RouteComponentProps, useHistory } from "react-router";
 import NewStack from "../components/NewStack";
 import { OverlayEventDetail } from "@ionic/core";
 import NewPanel from "../components/NewPanel";
+import NewCard from "../components/NewCard";
+import StackSettings from "../components/StackSettings";
 interface BoardDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
@@ -76,7 +88,18 @@ interface ActionSheetProps {
 
 interface UpdatePanelProps {
   title?: string;
-  position?: number; 
+  position?: number;
+}
+
+interface Item {
+  id: string;
+  title: string;
+}
+
+interface UpdateCardProps {
+  title?: string;
+  description?: string;
+  position?: number;
 }
 
 const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
@@ -88,9 +111,9 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
 
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
+  const userId = user!.sub;
 
   const [canDismiss, setCanDismiss] = useState(true); // prevents user from discarding unsaved changes
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [board, setBoard] = useState<Board>();
   const [ownerId, setOwnerId] = useState<string>();
   const [panels, setPanels] = useState<Panel[]>();
@@ -105,6 +128,18 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [panelModal, setPanelModal] = useState(false);
   const [boardModal, setBoardModal] = useState(false);
 
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [currentCard, setCurrentCard] = useState<Card>();
+  const [cardModal, setCardModal] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [deleteCardAlert, setDeleteCardAlert] = useState(false);
+  const [cardIdToDelete ,setCardIdToDelete] = useState<string>();
+  const [prevPanels, setPrevPanels] = useState<Panel[]>();
+  const [updaetedPanels, setUpdatedPanels] = useState<Panel[]>();
+
+
+  const members = ["Member 1", "Member 2", "Member 3"];
+
   const [presentingElement, setPresentingElement] = useState<
     HTMLElement | undefined
   >(undefined);
@@ -118,10 +153,11 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     };
 
     await axios(options)
-      .then((response) => {
+      .then(async (response) => {
         const data = response.data as Board;
-        setBoard(data);
-        setOwnerId(data.owner_id);
+        await setBoard(data);
+        console.log('getdetailedboard set board');
+        setOwnerId(board!.owner_id);
       })
       .catch((error) => {
         console.error(error.message);
@@ -187,6 +223,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     await axios(options)
       .then(() => {
         setCanDismiss(true);
+        getDetailedBoard();
       })
       .catch((error) => {
         console.error(error.message);
@@ -205,7 +242,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     await axios(options)
       .then(() => {
         // Not sure if you want to do something on success
-        return
+        getDetailedBoard();
       })
       .catch((error) => {
         console.error(error.message);
@@ -250,10 +287,80 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   }
 
+  const updateCard = async (data: UpdateCardProps, card: Card) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    if (data.title) { body.append('title', data.title) }
+    if (data.position) { body.append('position', data.position.toString()) }
+    if (data.description) { body.append('description', data.description) }
+
+    const options = {
+      method: "PUT",
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${card.stack_id}/cards/${card.id}`,
+      headers: { authorization: `Bearer ${token}` },
+      data: body
+    };
+
+    await axios(options)
+      .then(async () => {
+        await getAccessTokenSilently({ cacheMode: 'off' }).then(() => {
+          getDetailedBoard();
+        })
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  const deleteCard = async (card: Card) => {
+    const token = await getAccessTokenSilently();
+
+    const options = {
+      method: "DELETE",
+      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${card.stack_id}/cards/${card.id}`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then(async () => {
+        await getAccessTokenSilently({ cacheMode: 'off' }).then(() => {
+          getDetailedBoard();
+          setCardModal(false);
+        })
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  const createStack = async (title: string) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    body.append("title", title);
+
+    const options = {
+        method: "POST",
+        url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks`,
+        headers: { authorization: `Bearer ${token}` },
+        data: body
+    };
+
+    await axios(options)
+        .then(async () => {
+          await getAccessTokenSilently().then(() => {
+            getDetailedBoard();
+          })
+        })
+        .catch((error) => {
+            console.error(error.message);
+        });
+}
+
   function dismiss() {
     modal.current?.dismiss();
     setBoardModal(false);
     setPanelModal(false);
+    setCardModal(false);
   }
   const onWillDisimss = (event: CustomEvent<OverlayEventDetail>) => {
     dismiss();
@@ -262,39 +369,78 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
     getDetailedBoard();
     if (board) {
-      setOwnerId(board.owner_id);
+      setOwnerId(board!.owner_id);
     }
     event.detail.complete();
   };
 
-  const handleUpdatePanel = (event: React.FormEvent<HTMLFormElement> ) => {
+  const handleUpdatePanel = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     panels?.forEach((panel) => {
       let possible_new_name = (event.target as any)[`panel_name_id_${panel.id}`].value;
       if (possible_new_name !== panel.title) {
-        updatePanel(panel.id, {'title': possible_new_name})
+        updatePanel(panel.id, { 'title': possible_new_name })
       }
     })
-  } 
+  }
+
+  function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
+    console.log("dragged from index", event.detail.from, "to", event.detail.to);
+    event.detail.complete();
+  }
 
   const handleDeletePanel = (panelId: string) => {
     setDeletePanelAlert(true)
     setPanelIdToDelete(panelId);
   }
 
-  useEffect(() => {
-    getDetailedBoard();
-  }, []);
+  const handleItemClick = (card: Card) => {
+    console.log('clicked');
+    setCurrentCard(card)
+    setSelectedItem(card);
+    setCardModal(true)
+  };
+
+  const handleUpdateCard = (event: React.FormEvent<HTMLFormElement>, card: Card) => {
+    event.preventDefault();
+    let possible_new_title;
+    let possible_new_description;
+    let body: UpdateCardProps = { 'title': undefined, 'description': undefined }
+
+    if ((event.target as any)[`card_title_id_${card.id}`].value !== card.title) {
+      possible_new_title = (event.target as any)[`card_title_id_${card.id}`].value;
+      body.title = possible_new_title
+    }
+    if ((event.target as any)[`card_description_id_${card.id}`].value !== card.description) {
+      possible_new_description = (event.target as any)[`card_description_id_${card.id}`].value;
+      body.description = possible_new_description
+    }
+    console.log(body);
+
+    if (body.description !== '' || body.title !== '') {
+      updateCard(body, card)
+    }
+  }
+
+  const handleDeleteCard = (cardId: string) => {
+    setDeleteCardAlert(true);
+    setCardIdToDelete(cardId);
+  }
 
   useEffect(() => {
-    const listenerHandler = () => {
-      getDetailedBoard();
-    }
-    window.addEventListener('updateStack', listenerHandler);
-    return () => {
-      window.removeEventListener('updateStack', listenerHandler);
-    }
+    getDetailedBoard();
+    console.log('useeffect set board');
   }, []);
+
+  // useEffect(() => {
+  //   const listenerHandler = () => {
+  //     getDetailedBoard();
+  //   }
+  //   window.addEventListener('updateStack', listenerHandler);
+  //   return () => {
+  //     window.removeEventListener('updateStack', listenerHandler);
+  //   }
+  // }, []);
 
   useEffect(() => {
     setPresentingElement(page.current);
@@ -310,6 +456,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
         stacks: panel.stacks
       }));
       setPanels(updatedPanels);
+      console.log('useeffect set panels');
       if (typeof currentPanel !== 'number') {
         setCurrentPanel(0);
       }
@@ -317,10 +464,11 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
         setPanelId(panels![currentPanel].id);
       }
     }
-  }, [board]);
+  }, [board, stacks]);
 
   useEffect(() => {
     if (panels && panels.length > 0) {
+      setPrevPanels(panels);
       const updatedPanelNames: ActionSheetProps[] = panels.map((panel) => ({
         text: panel.title,
         data: {
@@ -330,6 +478,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       }));
       updatedPanelNames.push({ text: 'Cancel', role: 'cancel', data: { action: 'cancel' }, handler: () => { console.log("dismissed") } });
       setPanelNames(updatedPanelNames);
+      console.log('useeffect set panelNames');
     }
   }, [panels, board]);
 
@@ -338,6 +487,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       const allStacks = panels[currentPanel].stacks;
       setStacks(allStacks);
       setPanelId(panels[currentPanel].id)
+      console.log('useeffect set stacks');
     }
   }, [currentPanel, board]);
 
@@ -597,17 +747,236 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
               stacks.map((stack, index: number) => (
                 <>
                   <SwiperSlide key={stack.id}>
-                    <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!} setBoard={setBoard}/>
+                    {/* <BoardStack stack={stack} key={stack.id} orgId={orgId} boardId={boardId} ownerId={ownerId!} setBoard={setBoard}/> */}
+                    <IonCard>
+                      <IonCardHeader>
+                        <IonCardTitle>{stack.title}</IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        <IonList inset={true}>
+                          <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
+                            {stacks[index].cards && stacks[index].cards.length > 0 ? (
+                              stacks[index].cards.map((card: Card, i) => (
+                                // <IonItem key={card.id} onClick={() => handleItemClick(card)} lines="inset" >
+                                <IonItem key={card.id} onClick={() => handleItemClick(card)} lines="inset">
+                                  <IonLabel>{card.title}</IonLabel>
+                                  <IonReorder slot="end"></IonReorder>
+                                </IonItem>
+
+                              ))
+                            ) : (
+                              // <IonItem lines="inset">
+                              <IonItem >
+                                <IonLabel>This stack has no cards</IonLabel>
+                              </IonItem>
+                            )}
+                          </IonReorderGroup>
+                        </IonList>
+                        {/* <IonButton fill="clear" className="ion-align-items-center">
+          <IonIcon slot="icon-only" icon={addOutline}></IonIcon>
+        </IonButton> */}
+                      </IonCardContent>
+                      {
+                        userId === ownerId ? (
+                          <StackSettings
+                            stack={stack}
+                            orgId={orgId}
+                            boardId={boardId}
+                          />
+                        )
+                          :
+                          <></>
+                      }
+                      <NewCard
+                        stack={stack}
+                        orgId={orgId}
+                        boardId={boardId}
+                      />
+
+                      {/* Modal */}
+
+                      {
+                        selectedItem && (
+                          // <CardSettings
+                          //   key={currentCard?.id}
+                          //   card={currentCard!}
+                          //   isOpen={isModalOpen}
+                          //   onClose={() => setIsModalOpen(false)}
+                          //   stack={stack}
+                          //   boardId={boardId}
+                          //   orgId={orgId}
+                          //   setBoard={setBoard}
+                          // />
+                          <IonModal
+                            ref={modal}
+                            isOpen={cardModal}
+                            // trigger="open-card-modal"
+                            onWillDismiss={(event) => onWillDisimss(event)}
+
+                            // onDidDismiss={() => setCardModal(false)}
+                            presentingElement={presentingElement}
+                          >
+                            <IonHeader>
+                              <IonToolbar>
+                                <IonTitle>Card Settings</IonTitle>
+                                <IonButtons slot="end">
+                                  <IonButton onClick={() => setCardModal(false)}>Close</IonButton>
+                                </IonButtons>
+                              </IonToolbar>
+                            </IonHeader>
+                            <IonContent className="ion-padding">
+                              <IonGrid>
+                                <IonRow>
+                                  <IonLabel className="ion-padding-vertical">
+                                    <strong>Details</strong>
+                                  </IonLabel>
+                                  { currentCard ?
+                                    <form onSubmit={(event) => handleUpdateCard(event, currentCard!)}>
+                                      <IonList inset={true}>
+                                        <IonItem>
+                                          <IonInput label="Card Title:" value={currentCard?.title} name={`card_title_id_${currentCard?.title}`} />
+                                        </IonItem>
+                                        <IonItem>
+                                          <IonTextarea
+                                            rows={3}
+                                            autoGrow={true}
+                                            label="Description:"
+                                            value={currentCard?.description}
+                                            name={`card_description_id_${currentCard?.description}`}
+                                          />
+                                        </IonItem>
+                                      </IonList>
+                                      <IonButton className="ion-justify-content-center" color="tertiary" size="small" type="submit">Save</IonButton>
+                                    </form>
+                                    :
+                                    <IonList inset={true}>
+                                      <IonItem>
+                                        <IonLabel>
+                                          No card found
+                                        </IonLabel>
+                                      </IonItem>
+                                      </IonList>
+                                  }
+                                </IonRow>
+                                <IonRow>
+                                  <IonCol>
+                                    <IonLabel className="ion-padding-vertical">
+                                      <strong>Assigned Members</strong>
+                                    </IonLabel>
+                                  </IonCol>
+                                  <div className="add-member-button">
+                                    <IonButton size="small">
+                                      <IonIcon slot="icon-only" icon={addOutline} />
+                                    </IonButton>
+                                  </div>
+                                </IonRow>
+                                <IonList inset={true}>
+                                  <MemberList />
+                                  <MemberList />
+                                  <MemberList />
+                                </IonList>
+                                {/* I tried to implement the select thing but i couldn't so lol don't even worry about it rn */}
+                                <IonSelect
+                                  multiple={true}
+                                  value={selectedMembers}
+                                  onIonChange={(e) => setSelectedMembers(e.detail.value)}
+                                >
+                                  {members.map((member, index) => (
+                                    <IonSelectOption key={index} value={member}>
+                                      {member}
+                                    </IonSelectOption>
+                                  ))}
+                                  Select Member
+                                </IonSelect>
+                                <IonRow className="edit-buttons">
+                                  <IonCol>
+                                {/* <IonItemOption color="danger" id="delete-panel-alert" onClick={() => handleDeletePanel(panel.id)}> */}
+                                    <IonButton color="danger" id="delete-card-alert" onClick={() => handleDeleteCard(currentCard!.id)}>Delete</IonButton>
+                                  </IonCol>
+                                  {/* <IonCol>
+              <IonButton color="tertiary">Save</IonButton>
+            </IonCol> */}
+                                </IonRow>
+                                <IonAlert
+                                  isOpen={deleteCardAlert}
+                                  trigger="delete-card-alert"
+                                  header="Are you sure you want to delete this card?"
+                                  buttons={[
+                                    {
+                                      text: "Cancel",
+                                      role: "cancel",
+                                    },
+                                    {
+                                      text: "Delete",
+                                      role: 'confirm',
+                                    },
+                                  ]}
+                                  onIonAlertDidDismiss={({ detail }) => {
+                                    if (detail.role === 'confirm') {
+                                      console.log('delete clicked')
+                                      deleteCard(currentCard!);
+                                    }
+                                    setDeleteCardAlert(false);
+                                  }}
+                                />
+                              </IonGrid>
+                            </IonContent>
+                          </IonModal>
+                        )
+                      }
+                    </IonCard >
                   </SwiperSlide>
                   {index === stacks.length - 1 && (
                     <SwiperSlide key={index}>
-                      <NewStack
+                      {/* <NewStack
                         panelId={panelId}
                         orgId={orgId}
                         boardId={boardId}
                         hasStacks={true}
                         getBoard={getDetailedBoard}
-                      />
+                      /> */}
+                      <IonCard className="ion-padding">
+            <IonCardHeader>
+                {!stacks ? <IonCardTitle>No stacks were found</IonCardTitle>
+                    :
+                    <IonCardTitle>Create new stack</IonCardTitle>
+                }
+            </IonCardHeader>
+            <IonButton id="add-stack" fill="clear">
+                <IonIcon slot="icon-only" icon={createOutline} />
+            </IonButton>
+            <IonAlert
+                trigger="add-stack"
+                header="What are do you want the stack to be called?"
+                buttons={[
+                    {
+                        text: 'Cancel',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Alert cancelled')
+                        }
+                    },
+                    {
+                        text: 'Create new stack',
+                        role: 'confirm',
+                    }
+                ]}
+                inputs={[
+                    {
+                        placeholder: 'Title',
+                        attributes: {
+                            maxLength: 255
+                        }
+                    }
+                ]}
+                onDidDismiss={({ detail }) => {
+                    if (detail.role === 'confirm') {
+                        let title = detail.data.values[0]
+                        createStack(title);
+                    }
+                }}
+            />
+        </IonCard>
                     </SwiperSlide>
                   )}
                 </>
