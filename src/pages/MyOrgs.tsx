@@ -38,31 +38,54 @@ const MyOrgs: React.FC = () => {
     setShowAlert(true);
   };
 
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    getOrganizations();
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
+    let token = await getAccessTokenSilently();
+    getOrganizations(token);
     event.detail.complete();
   };
 
-  const getOrganizations = async () => {
+  const getOrganizations = async (newToken?: string) => {
     // present();
-    let token = await getAccessTokenSilently();
-    const userId = user!.sub;
-    const options = {
-      method: "GET",
-      url: `${serverAdress}api/users/${userId}/organizations`,
-      headers: { authorization: `Bearer ${token}` },
-    };
+    if (newToken) {
+      const userId = user!.sub;
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/users/${userId}/organizations`,
+        headers: { authorization: `Bearer ${newToken}` },
+      };
 
-    await axios(options)
-      .then((response) => {
-        const userOrganizations = response.data;
-        setOrganizations(userOrganizations);
-        // dismiss();
-      })
-      .catch((error) => {
-        console.log(error.message);
-        // dismiss();
-      });
+      await axios(options)
+        .then((response) => {
+          console.log("newtoken");
+          const userOrganizations = response.data;
+          setOrganizations(userOrganizations);
+          // dismiss();
+        })
+        .catch((error) => {
+          console.log(error.message);
+          // dismiss();
+        });
+    } else {
+      let token = await getAccessTokenSilently();
+      console.log("old token");
+      const userId = user!.sub;
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/users/${userId}/organizations`,
+        headers: { authorization: `Bearer ${token}` },
+      };
+
+      await axios(options)
+        .then((response) => {
+          const userOrganizations = response.data;
+          setOrganizations(userOrganizations);
+          // dismiss();
+        })
+        .catch((error) => {
+          console.log(error.message);
+          // dismiss();
+        });
+    }
   };
 
   const createOrganization = async (title: string, description: string) => {
@@ -89,8 +112,8 @@ const MyOrgs: React.FC = () => {
         const orgId = response.data.id;
         console.log("orgId: ", orgId);
 
-        await getAccessTokenSilently().then(() => {
-          getOrganizations();
+        await getAccessTokenSilently().then((token) => {
+          getOrganizations(token);
         });
 
         //redirecting users to specific org, currently shows as undefined
