@@ -39,7 +39,6 @@ interface ListProps {
 
 const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
   const { getAccessTokenSilently } = useAuth0();
-  const history = useHistory();
   const orgId: string = match.params.orgId;
 
   const [organization, setOrganization] = useState<Organization>();
@@ -52,11 +51,6 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const customListTitle = `${organization?.name}'s boards`;
-
-  const [popoverState, setPopoverState] = useState<{
-    showPopover: boolean;
-    event: Event | undefined;
-  }>({ showPopover: false, event: undefined });
 
   const getOrganization = async () => {
     let token = await getAccessTokenSilently();
@@ -236,7 +230,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                     text: "Finish",
                     handler: (alertData) => {
                       const title = alertData.title;
-                      const isPrivate = alertData.privacy === "private";
+                      const isPrivate = alertData.isPrivate;
                       createBoard(title, isPrivate);
                     },
                   },
@@ -248,17 +242,9 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                     type: "text",
                   },
                   {
-                    name: "privacy",
-                    type: "radio",
-                    label: "Public",
-                    value: "public", // Value when this radio option is selected
-                    checked: true, // Default selected option
-                  },
-                  {
-                    name: "privacy",
-                    type: "radio",
-                    label: "Private",
-                    value: "private", // Value when this radio option is selected
+                    name: "isPrivate",
+                    placeholder: "isPrivate",
+                    type: "text",
                   },
                 ]}
               />
@@ -267,10 +253,6 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
         </div>
       </IonHeader>
       <IonContent fullscreen>
-        {/* {loading ? (
-          <IonSpinner color="primary" className="ion-padding" />
-        ) : (
-          <> */}
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
@@ -286,8 +268,6 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
           titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
           items={hiddenBoardsProps}
         />
-        {/* </>
-        )} */}
       </IonContent>
     </IonPage>
   );

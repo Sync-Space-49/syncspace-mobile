@@ -45,7 +45,6 @@ const MyOrgs: React.FC = () => {
   };
 
   const getOrganizations = async (newToken?: string) => {
-    // present();
     if (newToken) {
       const userId = user!.sub;
       const options = {
@@ -59,11 +58,9 @@ const MyOrgs: React.FC = () => {
           console.log("newtoken");
           const userOrganizations = response.data;
           setOrganizations(userOrganizations);
-          // dismiss();
         })
         .catch((error) => {
           console.log(error.message);
-          // dismiss();
         });
     } else {
       let token = await getAccessTokenSilently();
@@ -79,11 +76,9 @@ const MyOrgs: React.FC = () => {
         .then((response) => {
           const userOrganizations = response.data;
           setOrganizations(userOrganizations);
-          // dismiss();
         })
         .catch((error) => {
           console.log(error.message);
-          // dismiss();
         });
     }
   };
