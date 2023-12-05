@@ -12,45 +12,56 @@ import Home from "../pages/Home";
 import MyOrgs from "../pages/MyOrgs";
 import Profile from "../pages/Profile";
 import OrgDetail from "../pages/OrgDetail";
+import CreateAIBoard from "../pages/CreateAIBoard";
 
 import Board from "../pages/Board";
 
 const TabBar: React.FC = () => {
   return (
-      <IonTabs>
+    <IonTabs>
+      <IonRouterOutlet>
+        <Redirect exact path="/app" to="/app/home" />
+        <Route exact path="/app/home">
+          <Home />
+        </Route>
+        <Route exact path="/app/myorgs">
+          <MyOrgs />
+        </Route>
+        <Route
+          exact
+          path="/app/myorgs/organizations/:orgId"
+          component={OrgDetail}
+        />
+        <Route
+          exact
+          path="/app/myorgs/organizations/:orgId/boards/:boardId"
+          component={Board}
+        />
+        <Route exact path="/app/profile">
+          <Profile />
+        </Route>
+        <Route
+          exact
+          path="/app/profile/organizations/:orgId"
+          component={OrgDetail}
+        />
+      </IonRouterOutlet>
 
-        <IonRouterOutlet>
-          <Redirect exact path="/app" to="/app/home" />
-          <Route exact path="/app/home">
-            <Home />
-          </Route>
-          <Route exact path="/app/myorgs">
-            <MyOrgs />
-          </Route>
-          <Route exact path="/app/myorgs/organizations/:orgId" component={OrgDetail} />
-          <Route exact path="/app/myorgs/organizations/:orgId/boards/:boardId" component={Board} />
-          <Route exact path="/app/profile">
-            <Profile />
-          </Route>
-          <Route exact path ="/app/profile/organizations/:orgId" component={OrgDetail}/>
-
-        </IonRouterOutlet>
-
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="Home" href="/app/home">
-            <IonIcon aria-hidden="true" icon={home} />
-            <IonLabel>Home</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="My Organizations" href="/app/myorgs">
-            <IonIcon aria-hidden="true" icon={layersOutline} />
-            <IonLabel>My Orgs</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="Profile" href="/app/profile">
-            <IonIcon aria-hidden="true" icon={personCircleOutline} />
-            <IonLabel>Profile</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
+      <IonTabBar slot="bottom">
+        <IonTabButton tab="Home" href="/app/home">
+          <IonIcon aria-hidden="true" icon={home} />
+          <IonLabel>Home</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="My Organizations" href="/app/myorgs">
+          <IonIcon aria-hidden="true" icon={layersOutline} />
+          <IonLabel>My Orgs</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="Profile" href="/app/profile">
+          <IonIcon aria-hidden="true" icon={personCircleOutline} />
+          <IonLabel>Profile</IonLabel>
+        </IonTabButton>
+      </IonTabBar>
+    </IonTabs>
   );
 };
 
