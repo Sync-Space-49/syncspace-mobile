@@ -1,8 +1,7 @@
 FROM node:20.1-alpine
 WORKDIR /app
-COPY package*.json /app/
-RUN npm install react@latest react-dom@latest
-RUN npm install @ionic/react@7 @ionic/react-router@7
-RUN npm install @ionic/cli
+COPY / /app/
 RUN npm install
-CMD [ "ionic", "serve" ]
+RUN npm uninstall -g @ionic/cli
+RUN npm install -g @ionic/cli@latest
+CMD [ "ionic", "serve", "--no-livereload", "--host", "0.0.0.0" ]
