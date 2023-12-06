@@ -148,7 +148,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
   return (
     <IonPage>
       <IonHeader collapse="condense">
-        <div className="toolbar-shrink">
+        {/* <div className="toolbar-shrink"> */}
           <IonToolbar>
             <IonButtons slot="start">
               <IonBackButton
@@ -174,7 +174,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
               </IonItem>
             </IonList>
           </IonPopover>
-        </div>
+        {/* </div> */}
       </IonHeader>
       <IonContent fullscreen>
         {/* {loading ? (

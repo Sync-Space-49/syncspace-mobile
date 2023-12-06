@@ -5,7 +5,7 @@ import {
 } from "@ionic/react";
 import { useState } from "react";
 import { pencilOutline, trashOutline } from "ionicons/icons";
-import { Stack } from "../types";
+import { Board, Panel, Stack } from "../types";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import { serverAdress } from "../auth.config";
@@ -14,19 +14,17 @@ interface StackSettingsProps {
     stack: Stack;
     orgId: string;
     boardId: string;
+    getDetailedBoard?: () => void;
+    detailedBoard?: Board;
+    detailedPanels?: Panel[];
 }
 
-const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
+const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId, getDetailedBoard }) => {
     const { getAccessTokenSilently } = useAuth0();
 
     const [editAlert, setEditAlert] = useState(false);
     const [deleteAlert, setDeleteAlert] = useState(false);
     const panelId = stack.panel_id;
-
-    // const updateBoardPage = () => {
-    //     const event = new CustomEvent('updateStack')
-    //     window.dispatchEvent(event);
-    // };
 
     const getStacks = async () => {
         const token = await getAccessTokenSilently();
@@ -38,8 +36,10 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
         };
 
         await axios(options)
-            .then((response) => {
-                stack = response.data
+            .then(() => {
+                if (getDetailedBoard) {
+                    getDetailedBoard();
+                }
             })
             .catch((error) => {
                 console.error(error.message);
@@ -56,8 +56,9 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
 
         await axios(options)
             .then((response) => {
-                getStacks();
-                // updateBoardPage();
+                if (getDetailedBoard) {
+                    getDetailedBoard();
+                }
             })
             .catch((error) => {
                 console.error(error.message);
@@ -81,15 +82,15 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId }) => {
 
             await axios(options)
                 .then(() => {
-                    getStacks();
-                    // updateBoardPage();
+                    if (getDetailedBoard) {
+                        getDetailedBoard();
+                    }
                 })
                 .catch((error) => {
                     console.error(error.message);
                 });
         }
     };
-
 
     const handleButtonClick = (stackId: string, editOrDelete: string) => {
         if (editOrDelete === "edit") { setEditAlert(true) }

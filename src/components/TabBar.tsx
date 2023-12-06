@@ -6,7 +6,7 @@ import {
   IonTabButton,
   IonTabs,
 } from "@ionic/react";
-import { Redirect, Route } from "react-router";
+import { Redirect, Route, RouteComponentProps } from "react-router";
 import { home, layersOutline, personCircleOutline } from "ionicons/icons";
 import Home from "../pages/Home";
 import MyOrgs from "../pages/MyOrgs";
@@ -14,8 +14,9 @@ import Profile from "../pages/Profile";
 import OrgDetail from "../pages/OrgDetail";
 
 import Board from "../pages/Board";
+import { match } from "react-router-dom";
 
-const TabBar: React.FC = () => {
+const TabBar: React.FC<RouteComponentProps> = ({ match }) => {
   return (
       <IonTabs>
 
@@ -32,7 +33,8 @@ const TabBar: React.FC = () => {
           <Route exact path="/app/profile">
             <Profile />
           </Route>
-          <Route exact path ="/app/profile/organizations/:orgId" component={OrgDetail}/>
+          <Route exact path="/app/profile/organizations/:orgId" component={OrgDetail}/>
+          <Route exact path={`/app/profile/organizations/:orgId/boards/:boardId`} component={Board}/>
 
         </IonRouterOutlet>
 

@@ -12,16 +12,19 @@ import { createOutline } from "ionicons/icons";
 import axios from "axios";
 import { serverAdress } from "../auth.config";
 import { useAuth0 } from "@auth0/auth0-react";
+import { Board, Panel } from "../types";
 
 interface NewStackProps {
-    panelId: string;
+    panelId: string | (() => void);
     orgId: string;
     boardId: string
     hasStacks: boolean;
-    getBoard: () => void;
+    getDetailedBoard?: () => void;
+    detailedBoard?: Board;
+    detailedPanels?: Panel[];
 }
 
-const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId, getBoard }) => {
+const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId, getDetailedBoard, detailedBoard, detailedPanels }) => {
 
     const { getAccessTokenSilently } = useAuth0();
 
@@ -39,7 +42,7 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
 
         await axios(options)
             .then(() => {
-                getBoard();
+                getDetailedBoard!();
             })
             .catch((error) => {
                 console.error(error.message);

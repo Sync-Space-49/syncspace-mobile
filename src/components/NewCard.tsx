@@ -7,16 +7,19 @@ import { addOutline } from "ionicons/icons";
 import axios from "axios";
 import { serverAdress } from "../auth.config";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Stack } from "../types";
+import { Board, Panel, Stack } from "../types";
 import { useState } from "react";
 
 interface NewCardProps {
     stack: Stack;
     orgId: string;
     boardId: string;
+    getDetailedBoard?: () => void;
+    detailedBoard?: Board;
+    detailedPanels?: Panel[];
 }
 
-const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId }) => {
+const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId, getDetailedBoard, detailedBoard, detailedPanels }) => {
     const { getAccessTokenSilently } = useAuth0();
 
     const [showAlert, setShowAlert] = useState(false);
@@ -41,7 +44,9 @@ const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId }) => {
 
         await axios(options)
             .then(() => {
-                // getBoard();
+                if(getDetailedBoard) {
+                    getDetailedBoard();
+                }
                 console.log('created card')
             })
             .catch((error) => {

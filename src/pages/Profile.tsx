@@ -78,7 +78,7 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (organizations.length > 0) {
+    if (organizations && organizations.length > 0) {
       const updatedOrgNames = organizations.map((org) => ({
         text: org.name,
         id: org.id,
