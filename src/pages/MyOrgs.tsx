@@ -129,68 +129,67 @@ const MyOrgs: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
+      {/* <IonToolbar>
+        <IonTitle>My Organizations</IonTitle>
+      </IonToolbar> */}
+      {/* </IonHeader> */}
+      {/* <IonHeader collapse="condense"> */}
+      
+      <IonHeader collapse="condense">
+        <IonToolbar></IonToolbar> 
         <IonToolbar>
-          <IonTitle>My Organizations</IonTitle>
+          <IonTitle size="large">My Organizations</IonTitle>
+          <IonButtons slot="end">
+            <IonButton id="click-trigger" onClick={() => setIsPopoverOpen(true)}>
+              <IonIcon slot="icon-only" icon={addOutline} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
+          <IonPopover
+            isOpen={isPopoverOpen}
+            onDidDismiss={() => setIsPopoverOpen(false)}
+            trigger="click-trigger"
+            triggerAction="click"
+          >
+            <IonList>
+              <IonItem
+                button={true}
+                detail={false}
+                onClick={handleCreateOrganization}
+              >
+                Create a new organization
+              </IonItem>
+              <IonAlert
+                isOpen={showAlert}
+                onDidDismiss={() => setShowAlert(false)}
+                header="Please enter your organization details"
+                buttons={[
+                  {
+                    text: "Finish",
+                    handler: (alertData) => {
+                      const title = alertData.title;
+                      const description = alertData.description;
+                      createOrganization(title, description);
+                    },
+                  },
+                ]}
+                inputs={[
+                  {
+                    name: "title",
+                    placeholder: "Title",
+                  },
+                  {
+                    name: "description",
+                    type: "textarea",
+                    placeholder: "Description",
+                  },
+                ]}
+              />
+            </IonList>
+          </IonPopover>
+      <IonSearchbar></IonSearchbar>
       </IonHeader>
       <IonContent>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">My Organizations</IonTitle>
-            <IonButtons slot="end">
-              <IonButton
-                id="click-trigger"
-                onClick={() => setIsPopoverOpen(true)}
-              >
-                <IonIcon slot="icon-only" icon={addOutline} />
-              </IonButton>
-            </IonButtons>
-            <IonPopover
-              isOpen={isPopoverOpen}
-              onDidDismiss={() => setIsPopoverOpen(false)}
-              trigger="click-trigger"
-              triggerAction="click"
-            >
-              <IonList>
-                <IonItem
-                  button={true}
-                  detail={false}
-                  onClick={handleCreateOrganization}
-                >
-                  Create a new organization
-                </IonItem>
-                <IonAlert
-                  isOpen={showAlert}
-                  onDidDismiss={() => setShowAlert(false)}
-                  header="Please enter your organization details"
-                  buttons={[
-                    {
-                      text: "Finish",
-                      handler: (alertData) => {
-                        const title = alertData.title;
-                        const description = alertData.description;
-                        createOrganization(title, description);
-                      },
-                    },
-                  ]}
-                  inputs={[
-                    {
-                      name: "title",
-                      placeholder: "Title",
-                    },
-                    {
-                      name: "description",
-                      type: "textarea",
-                      placeholder: "Description",
-                    },
-                  ]}
-                />
-              </IonList>
-            </IonPopover>
-          </IonToolbar>
-        </IonHeader>
-        <IonSearchbar></IonSearchbar>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>

@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { RouteComponentProps, useHistory } from "react-router";
 import { IonList, IonItem, IonLabel } from "@ionic/react";
 
 interface BoardProps {
@@ -8,7 +8,9 @@ interface BoardProps {
   listImg?: string; //board image src
 }
 
-interface CustomListProps {
+interface CustomListProps 
+  // extends RouteComponentProps<{ }>
+{
   title?: string; //organization title (ignore how its being used in home rn)
   orgId?: string;
   subTitle?: string; //subtitle, if required (for ex. "today", "yesterday" on home page)
@@ -22,6 +24,7 @@ const CustomList: React.FC<CustomListProps> = ({
   subTitle,
   items,
   titleImg,
+  // match
 }) => {
   const history = useHistory();
 

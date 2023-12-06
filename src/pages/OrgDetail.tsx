@@ -35,7 +35,7 @@ import { useRef } from "react";
 interface OrgDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
-  }> {}
+  }> { }
 
 interface ListProps {
   text: string; // the list's content
@@ -295,157 +295,157 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
   return (
     <IonPage>
-      <IonHeader collapse="condense">
-        <div className="toolbar-shrink">
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonBackButton
-                defaultHref="/app"
-                className="ion-margin-vertical"
+    <IonHeader collapse="condense">
+      <div className="toolbar-shrink">
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton
+              defaultHref="/app"
+              className="ion-margin-vertical"
+            />
+          </IonButtons>
+          <IonTitle>{organization?.name}</IonTitle>
+          <IonButtons slot="end">
+            <IonButton
+              id="new-board-btn"
+              onClick={() => setIsPopoverOpen(true)}
+            >
+              <IonIcon slot="icon-only" icon={addOutline} />
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+        <IonPopover
+          isOpen={isPopoverOpen}
+          onDidDismiss={() => setIsPopoverOpen(false)}
+          dismissOnSelect={true}
+          trigger="new-board-btn"
+          triggerAction="click"
+        >
+          <IonList>
+            <IonItem button={true} detail={false} onClick={handleCreateBoard}>
+              New board
+            </IonItem>
+            <IonItem button={true} detail={false} onClick={handleNewAI}>
+              <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
+              New board with AI
+            </IonItem>
+          </IonList>
+        </IonPopover>
+        <IonAlert
+          isOpen={showAlert}
+          onDidDismiss={() => setShowAlert(false)}
+          header="Enter Board Name"
+          buttons={[
+            {
+              text: "Finish",
+              handler: (alertData) => {
+                const title = alertData.title;
+                const isPrivate = alertData.isPrivate;
+                createBoard(title, isPrivate);
+              },
+            },
+          ]}
+          inputs={[
+            {
+              name: "title",
+              placeholder: "Title",
+              type: "text",
+            },
+            {
+              name: "isPrivate",
+              placeholder: "isPrivate",
+              type: "text",
+            },
+          ]}
+        />
+        <IonModal isOpen={showCreateAIModal} onDidDismiss={dismiss}>
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Card Settings</IonTitle>
+              <IonButtons slot="end">
+                <IonButton onClick={() => setShowCreateAIModal(false)}>
+                  Close
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent>
+            <IonItem>
+              <IonLabel position="stacked">Title</IonLabel>
+              <IonInput
+                value={title}
+                onIonChange={(e) => setTitle(e.detail.value || "")}
               />
-            </IonButtons>
-            <IonTitle>{organization?.name}</IonTitle>
-            <IonButtons slot="end">
-              <IonButton
-                id="new-board-btn"
-                onClick={() => setIsPopoverOpen(true)}
+            </IonItem>
+            <IonItem>
+              <IonLabel position="stacked">Description</IonLabel>
+              <IonTextarea
+                value={description}
+                autoGrow={true}
+                onIonChange={(e) => setDescription(e.detail.value || "")}
+              />
+            </IonItem>
+            <IonItem>
+              <IonLabel position="stacked">Is Private?</IonLabel>
+              <IonSelect
+                value={isPrivate}
+                onIonChange={(e) => setIsPrivate(e.detail.value)}
               >
-                <IonIcon slot="icon-only" icon={addOutline} />
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-          <IonPopover
-            isOpen={isPopoverOpen}
-            onDidDismiss={() => setIsPopoverOpen(false)}
-            dismissOnSelect={true}
-            trigger="new-board-btn"
-            triggerAction="click"
-          >
-            <IonList>
-              <IonItem button={true} detail={false} onClick={handleCreateBoard}>
-                New board
-              </IonItem>
-              <IonItem button={true} detail={false} onClick={handleNewAI}>
-                <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
-                New board with AI
-              </IonItem>
-            </IonList>
-          </IonPopover>
-          <IonAlert
-            isOpen={showAlert}
-            onDidDismiss={() => setShowAlert(false)}
-            header="Enter Board Name"
-            buttons={[
-              {
-                text: "Finish",
-                handler: (alertData) => {
-                  const title = alertData.title;
-                  const isPrivate = alertData.isPrivate;
-                  createBoard(title, isPrivate);
-                },
-              },
-            ]}
-            inputs={[
-              {
-                name: "title",
-                placeholder: "Title",
-                type: "text",
-              },
-              {
-                name: "isPrivate",
-                placeholder: "isPrivate",
-                type: "text",
-              },
-            ]}
-          />
-          <IonModal isOpen={showCreateAIModal} onDidDismiss={dismiss}>
-            <IonHeader>
-              <IonToolbar>
-                <IonTitle>Card Settings</IonTitle>
-                <IonButtons slot="end">
-                  <IonButton onClick={() => setShowCreateAIModal(false)}>
-                    Close
-                  </IonButton>
-                </IonButtons>
-              </IonToolbar>
-            </IonHeader>
-            <IonContent>
-              <IonItem>
-                <IonLabel position="stacked">Title</IonLabel>
-                <IonInput
-                  value={title}
-                  onIonChange={(e) => setTitle(e.detail.value || "")}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked">Description</IonLabel>
-                <IonTextarea
-                  value={description}
-                  autoGrow={true}
-                  onIonChange={(e) => setDescription(e.detail.value || "")}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked">Is Private?</IonLabel>
-                <IonSelect
-                  value={isPrivate}
-                  onIonChange={(e) => setIsPrivate(e.detail.value)}
-                >
-                  <IonSelectOption value="true">True</IonSelectOption>
-                  <IonSelectOption value="false">False</IonSelectOption>
-                </IonSelect>
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked">Detail Level</IonLabel>
-                <IonSelect
-                  value={detailLevel}
-                  onIonChange={(e) => setDetailLevel(e.detail.value)}
-                >
-                  <IonSelectOption value="brief">Brief</IonSelectOption>
-                  <IonSelectOption value="detailed">Detailed</IonSelectOption>
-                  <IonSelectOption value="very detailed">
-                    Very Detailed
-                  </IonSelectOption>
-                </IonSelect>
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked">Story Point Type</IonLabel>
-                <IonSelect
-                  value={storyPointType}
-                  onIonChange={(e) => setStoryPointType(e.detail.value)}
-                >
-                  <IonSelectOption value="fibonacci">Fibonacci</IonSelectOption>
-                  <IonSelectOption value="tshirt size">
-                    T-Shirt Size
-                  </IonSelectOption>
-                  <IonSelectOption value="1-5">1-5</IonSelectOption>
-                </IonSelect>
-              </IonItem>
-              <IonButton expand="block" onClick={handleSubmit}>
-                Submit
-              </IonButton>
-            </IonContent>
-          </IonModal>
-        </div>
-      </IonHeader>
-      <IonContent fullscreen>
-        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
-        <CustomList
-          orgId={orgId}
-          title={customListTitle}
-          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
-          items={viewableBoardsProps}
-        />
-        <CustomList
-          orgId={orgId}
-          title="Hidden Boards"
-          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
-          items={hiddenBoardsProps}
-        />
-      </IonContent>
-    </IonPage>
+                <IonSelectOption value="true">True</IonSelectOption>
+                <IonSelectOption value="false">False</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="stacked">Detail Level</IonLabel>
+              <IonSelect
+                value={detailLevel}
+                onIonChange={(e) => setDetailLevel(e.detail.value)}
+              >
+                <IonSelectOption value="brief">Brief</IonSelectOption>
+                <IonSelectOption value="detailed">Detailed</IonSelectOption>
+                <IonSelectOption value="very detailed">
+                  Very Detailed
+                </IonSelectOption>
+              </IonSelect>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="stacked">Story Point Type</IonLabel>
+              <IonSelect
+                value={storyPointType}
+                onIonChange={(e) => setStoryPointType(e.detail.value)}
+              >
+                <IonSelectOption value="fibonacci">Fibonacci</IonSelectOption>
+                <IonSelectOption value="tshirt size">
+                  T-Shirt Size
+                </IonSelectOption>
+                <IonSelectOption value="1-5">1-5</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+            <IonButton expand="block" onClick={handleSubmit}>
+              Submit
+            </IonButton>
+          </IonContent>
+        </IonModal>
+      </div>
+    </IonHeader>
+    <IonContent fullscreen>
+      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+        <IonRefresherContent></IonRefresherContent>
+      </IonRefresher>
+      <CustomList
+        orgId={orgId}
+        title={customListTitle}
+        titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
+        items={viewableBoardsProps}
+      />
+      <CustomList
+        orgId={orgId}
+        title="Hidden Boards"
+        titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
+        items={hiddenBoardsProps}
+      />
+    </IonContent>
+  </IonPage>
   );
 };
 

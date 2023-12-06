@@ -12,9 +12,10 @@ import { useState } from "react";
 interface NewPanelProps {
     orgId: string;
     boardId: string;
+    getDetailedBoard?: () => void;
 }
 
-const NewPanel: React.FC<NewPanelProps> = ({ orgId, boardId }) => {
+const NewPanel: React.FC<NewPanelProps> = ({ orgId, boardId, getDetailedBoard }) => {
     const { getAccessTokenSilently } = useAuth0();
 
     const [showAlert, setShowAlert] = useState(false);
@@ -33,8 +34,7 @@ const NewPanel: React.FC<NewPanelProps> = ({ orgId, boardId }) => {
 
         await axios(options)
             .then(() => {
-                // Not sure if you want to do something on success
-                return
+                getDetailedBoard!();
             })
             .catch((error) => {
                 console.error(error.message);
