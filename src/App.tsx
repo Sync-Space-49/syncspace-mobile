@@ -84,25 +84,26 @@ const App: React.FC = () => {
           url.includes("state=") &&
           (url.includes("code=") || url.includes("error="))
         ) {
-          handleRedirectCallback(url)
-            .then(() => {
-              if(Capacitor.getPlatform() === 'ios') {
-                return Browser.close().catch(() => {
-                  return Promise.resolve();
-                })
-              }
-              return Promise.resolve();
-            })
-        history.push('/app/home') //may need to change
-      } else {
-        if(Capacitor.getPlatform() === 'ios') {
-          Browser.close().catch(() => {
+          handleRedirectCallback(url).then(() => {
+            if (Capacitor.getPlatform() === "ios") {
+              return Browser.close().catch(() => {
+                return Promise.resolve();
+              });
+            }
             return Promise.resolve();
-          })
+          });
+          history.push("/app/home"); //may need to change
+        } else {
+          if (Capacitor.getPlatform() === "ios") {
+            Browser.close().catch(() => {
+              return Promise.resolve();
+            });
+          }
+          history.push("/");
+        }
       }
-      history.push('/');
-      }}
-  })}, [handleRedirectCallback]);
+    });
+  }, [handleRedirectCallback]);
 
   // console.log("app is rendering");
   return (
@@ -112,7 +113,7 @@ const App: React.FC = () => {
           <Route exact path="/" component={LandingPage} />
           <Route path="/app" component={TabBar} />
           <Route path="/callback" component={TabBar}>
-            <Redirect to="/app" /> 
+            <Redirect to="/app" />
           </Route>
           <Redirect from="/callback" to="/app" />
           <Route exact path="/app/home" component={Home} />

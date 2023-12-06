@@ -3,7 +3,7 @@ import { RouteComponentProps, useHistory } from "react-router";
 import { IonList, IonItem, IonLabel } from "@ionic/react";
 
 interface BoardProps {
-  boardId?: string
+  boardId?: string;
   text?: string | null; // board's title
   listImg?: string; //board image src
 }
@@ -48,7 +48,10 @@ const CustomList: React.FC<CustomListProps> = ({
       {items && items.length > 0 && (
         <IonList inset={true}>
           {items.map((item, index) => (
-            <IonItem key={index} routerLink={`/app/myorgs/organizations/${orgId}/boards/${item.boardId}`}>
+            <IonItem
+              key={index}
+              routerLink={`/app/myorgs/organizations/${orgId}/boards/${item.boardId}`}
+            >
               {item.listImg && (
                 <img
                   src={item.listImg}

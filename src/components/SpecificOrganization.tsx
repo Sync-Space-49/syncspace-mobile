@@ -36,11 +36,16 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({
       let data: any;
       await axios(options)
         .then((response) => {
+          console.log("SpecificOrganization, Boards fetched: ", response.data);
           data = response.data;
           setBoards(data);
           updateOrgList();
         })
         .catch((error) => {
+          console.error(
+            "SpecificOrganization, failed to fetch boards: ",
+            error.message
+          );
           console.error(error.message);
         });
     });

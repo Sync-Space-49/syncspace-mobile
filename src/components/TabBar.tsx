@@ -12,6 +12,7 @@ import Home from "../pages/Home";
 import MyOrgs from "../pages/MyOrgs";
 import Profile from "../pages/Profile";
 import OrgDetail from "../pages/OrgDetail";
+import CreateAIBoard from "../pages/CreateAIBoard";
 
 import Board from "../pages/Board";
 import { match } from "react-router-dom";
@@ -38,21 +39,21 @@ const TabBar: React.FC<RouteComponentProps> = ({ match }) => {
 
         </IonRouterOutlet>
 
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="Home" href="/app/home">
-            <IonIcon aria-hidden="true" icon={home} />
-            <IonLabel>Home</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="My Organizations" href="/app/myorgs">
-            <IonIcon aria-hidden="true" icon={layersOutline} />
-            <IonLabel>My Orgs</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="Profile" href="/app/profile">
-            <IonIcon aria-hidden="true" icon={personCircleOutline} />
-            <IonLabel>Profile</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
+      <IonTabBar slot="bottom">
+        <IonTabButton tab="Home" href="/app/home">
+          <IonIcon aria-hidden="true" icon={home} />
+          <IonLabel>Home</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="My Organizations" href="/app/myorgs">
+          <IonIcon aria-hidden="true" icon={layersOutline} />
+          <IonLabel>My Orgs</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="Profile" href="/app/profile">
+          <IonIcon aria-hidden="true" icon={personCircleOutline} />
+          <IonLabel>Profile</IonLabel>
+        </IonTabButton>
+      </IonTabBar>
+    </IonTabs>
   );
 };
 

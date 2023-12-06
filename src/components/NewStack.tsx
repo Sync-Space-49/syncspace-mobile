@@ -29,6 +29,9 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
     const { getAccessTokenSilently } = useAuth0();
 
     const createStack = async (title: string) => {
+        if (!panelId) {
+            console.log("there is no panel");
+        }
         const token = await getAccessTokenSilently();
         const body = new FormData();
         body.append("title", title);
@@ -37,7 +40,7 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
             method: "POST",
             url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks`,
             headers: { authorization: `Bearer ${token}` },
-            data: body
+            data: body,
         };
 
         await axios(options)
@@ -52,10 +55,11 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
     return (
         <IonCard className="ion-padding">
             <IonCardHeader>
-                {!hasStacks ? <IonCardTitle>No stacks were found</IonCardTitle>
-                    :
+                {!hasStacks ? (
+                    <IonCardTitle>No stacks were found</IonCardTitle>
+                ) : (
                     <IonCardTitle>Create new stack</IonCardTitle>
-                }
+                )}
             </IonCardHeader>
             <IonButton id="add-stack" fill="clear">
                 <IonIcon slot="icon-only" icon={createOutline} />
@@ -65,28 +69,28 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
                 header="What are do you want the stack to be called?"
                 buttons={[
                     {
-                        text: 'Cancel',
-                        role: 'cancel',
+                        text: "Cancel",
+                        role: "cancel",
                         handler: () => {
-                            console.log('Alert cancelled')
-                        }
+                            console.log("Alert cancelled");
+                        },
                     },
                     {
-                        text: 'Create new stack',
-                        role: 'confirm',
-                    }
+                        text: "Create new stack",
+                        role: "confirm",
+                    },
                 ]}
                 inputs={[
                     {
-                        placeholder: 'Title',
+                        placeholder: "Title",
                         attributes: {
-                            maxLength: 255
-                        }
-                    }
+                            maxLength: 255,
+                        },
+                    },
                 ]}
                 onDidDismiss={({ detail }) => {
-                    if (detail.role === 'confirm') {
-                        let title = detail.data.values[0]
+                    if (detail.role === "confirm") {
+                        let title = detail.data.values[0];
                         createStack(title);
                     }
                 }}
