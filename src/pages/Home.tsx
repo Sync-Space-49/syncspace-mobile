@@ -1,8 +1,5 @@
 import {
   IonContent,
-  IonItem,
-  IonLabel,
-  IonList,
   IonHeader,
   IonPage,
   IonTitle,
@@ -10,8 +7,11 @@ import {
   IonSearchbar,
   IonToast,
   useIonLoading,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
 } from "@ionic/react";
-import CustomList from "../components/CustomList";
+import HomeCustomList from "../components/HomeCustomList";
 import "./Home.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
@@ -19,25 +19,42 @@ import { serverAdress } from "../auth.config";
 import axios from "axios";
 import { Organization } from "../types";
 
+interface BoardItem {
+  text: string;
+  boardId: string;
+  orgId: string;
+}
+
 const Home: React.FC = () => {
   const { isLoading, user, isAuthenticated, getAccessTokenSilently } =
     useAuth0();
   const [present] = useIonLoading();
-
   const [orgCreated, setOrgCreated] = useState(false);
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
+    let token = await getAccessTokenSilently();
+    getUserOrganizations();
+    event.detail.complete();
+  };
+  const [userBoards, setUserBoards] = useState<any[]>([]);
+  const [userAssignedCards, setUserAssignedCards] = useState<any[]>([]);
+  const [favouritedBoard, setFavouritedBoard] = useState<any[]>([]);
+  const [boardItems, setBoardItems] = useState<BoardItem[]>([]);
+  const [favoritedBoardItems, setFavoritedBoardItems] = useState<BoardItem[]>(
+    []
+  );
 
   const personalOrgSetup = async () => {
     const isFirstLogin = user!.isFirstLogin;
     // if (isLoading) {
-      present({
-        duration: 3000,
-      });
+    present({
+      duration: 3000,
+    });
     // }
     console.log("isFirstLogin: " + isFirstLogin);
     if (isFirstLogin) {
-      const userOrgs: Organization[] | null = await getOrganizations();
+      const userOrgs: Organization[] | null = await getUserOrganizations();
       if (userOrgs) {
-        console.log(userOrgs);
+        console.log("user orgs are: ", userOrgs);
         return console.log("user orgs exist, exited personal org creation");
       }
       const token = await getAccessTokenSilently();
@@ -65,7 +82,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const getOrganizations = async () => {
+  const getUserOrganizations = async () => {
     let token = await getAccessTokenSilently();
     const userId = user!.sub;
     const options = {
@@ -77,10 +94,87 @@ const Home: React.FC = () => {
     await axios(options)
       .then((response) => {
         const userOrganizations = response.data;
+        console.log("user organizations: ", userOrganizations);
         return userOrganizations;
       })
       .catch((error) => {
-        console.log(error.message);
+        console.log("failed to fetch user organizations: ", error.message);
+      });
+    return null;
+  };
+
+  const getUserBoards = async () => {
+    let token = await getAccessTokenSilently();
+    const userId = user!.sub;
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/users/${userId}/boards`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then((response) => {
+        const userBoards = response.data;
+        console.log("user boards: ", userBoards);
+        console.log("user boards, board id", response.data[0].id);
+        console.log("user boards, org id", response.data[0].organization_id);
+        setUserBoards(userBoards);
+        return userBoards;
+      })
+      .catch((error) => {
+        console.log("failed to fetch user boards: ", error.message);
+      });
+    return null;
+  };
+
+  const getUserAssignedCards = async () => {
+    let token = await getAccessTokenSilently();
+    const userId = user!.sub;
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/users/${userId}/assigned`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then((response) => {
+        const userAssignedCards = response.data;
+        console.log("user assigned cards: ", userAssignedCards);
+        setUserAssignedCards(userAssignedCards);
+        return userAssignedCards;
+      })
+      .catch((error) => {
+        console.log("failed to fetch user assigned cards: ", error.message);
+      });
+    return null;
+  };
+
+  const getFavouriteBoards = async () => {
+    let token = await getAccessTokenSilently();
+    const userId = user!.sub;
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/users/${userId}/boards/favourite`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then((response) => {
+        const favouritedBoards = response.data;
+        console.log("user favourited boards: ", favouritedBoards);
+        console.log("user favourited boards, board id", response.data[0].id);
+        console.log(
+          "user favourited boards, org id",
+          response.data[0].organization_id
+        );
+        setFavouritedBoard(favouritedBoards);
+        return favouritedBoards;
+      })
+      .catch((error) => {
+        console.log(
+          "failed to fetch user favourited boards cards: ",
+          error.message
+        );
       });
     return null;
   };
@@ -90,8 +184,39 @@ const Home: React.FC = () => {
       if (user!.isFirstLogin && !orgCreated) {
         personalOrgSetup();
       }
+      getUserBoards();
+      getUserAssignedCards();
+      getFavouriteBoards();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (userBoards) {
+      const newBoardItems = userBoards.map((board) => ({
+        text: board.title,
+        boardId: board.id,
+        orgId: board.organization_id,
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+      }));
+      setBoardItems(newBoardItems);
+    }
+  }, [userBoards]);
+
+  useEffect(() => {
+    if (favouritedBoard) {
+      const newFavouritedBoard = favouritedBoard.map((board) => ({
+        text: board.title,
+        boardId: board.id,
+        orgId: board.organization_id,
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+      }));
+      setFavoritedBoardItems(newFavouritedBoard);
+    }
+  }, [favouritedBoard]);
+
+  //get stack, get panel, get board
 
   return (
     <IonPage>
@@ -108,7 +233,9 @@ const Home: React.FC = () => {
         </IonHeader>
 
         <IonSearchbar></IonSearchbar>
-
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
         <div className="container">
           {isAuthenticated ? (
             <IonToast
@@ -119,68 +246,16 @@ const Home: React.FC = () => {
             <IonToast message="You are not signed in." />
           )}
         </div>
-        <CustomList
-          title="Quick Access"
-          items={[
-            {
-              text: "Mobile",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-            {
-              text: "Axe-Hacks",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-            {
-              text: "Fall'23",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-          ]}
-        />
-
-        <CustomList
-          title="Recent Activity"
-          subTitle="Today"
-          items={[
-            {
-              text: "Dylan created a new ticket: “Modify AI Models”",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-            {
-              text: "Sumi marked “Create flyers for Axe-Hacks” as completed",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-            {
-              text: "Tyler deleted “[SPIKE] Research AI”",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-          ]}
-        />
-
-        <CustomList
-          subTitle="Yesterday"
-          items={[
-            {
-              text: "Nathan edited “Add Account Functionality”",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-            {
-              text: "Kaitlyn commented “Should we use React?”",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-            {
-              text: "MJ marked “Update Github README” as in-progress",
-              listImg:
-                "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-            },
-          ]}
+        {/* only show 3 most recent boards, sort by created by? */}
+        <HomeCustomList title="Recent Boards" items={boardItems} />
+        <HomeCustomList title="Favourited Boards" items={favoritedBoardItems} />
+        <HomeCustomList
+          title="My Cards"
+          items={userAssignedCards.map((card) => ({
+            text: card.title,
+            listImg:
+              "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+          }))}
         />
       </IonContent>
     </IonPage>

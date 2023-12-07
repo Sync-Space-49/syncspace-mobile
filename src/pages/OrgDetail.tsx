@@ -35,7 +35,7 @@ import { useRef } from "react";
 interface OrgDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
-  }> { }
+  }> {}
 
 interface ListProps {
   text: string; // the list's content
@@ -105,8 +105,11 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       .then((response) => {
         console.log("OrgDetail, Boards fetched: ", response.data);
         data = response.data;
-        if (data === null) { setBoards([]) }
-        else {setBoards(data)}
+        if (data === null) {
+          setBoards([]);
+        } else {
+          setBoards(data);
+        }
         // setLoading(false);
       })
       .catch((error) => {
@@ -115,13 +118,20 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       });
   };
 
-  const createBoard = async (title: string, isPrivate: boolean) => {
+  const createBoard = async (
+    title: string,
+    isPrivate: boolean,
+    description: string
+  ) => {
     const token = await getAccessTokenSilently();
     const body = new FormData();
     if (title) {
       body.append("title", title);
     }
     body.append("isPrivate", isPrivate ? "1" : "0");
+    if (description) {
+      body.append("description", description);
+    }
     console.log("Sending data:", body);
 
     const options = {
@@ -275,7 +285,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       }
     }
     if (boards && boards?.length <= 0) {
-      setViewableBoardsProps([])
+      setViewableBoardsProps([]);
     }
   }, [boards]);
 
@@ -345,7 +355,8 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                 handler: (alertData) => {
                   const title = alertData.title;
                   const isPrivate = alertData.isPrivate;
-                  createBoard(title, isPrivate);
+                  const description = alertData.description;
+                  createBoard(title, isPrivate, description);
                 },
               },
             ]}
@@ -359,6 +370,11 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                 name: "isPrivate",
                 placeholder: "isPrivate",
                 type: "text",
+              },
+              {
+                name: "description",
+                placeholder: "description",
+                type: "textarea",
               },
             ]}
           />
