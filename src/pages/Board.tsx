@@ -37,6 +37,7 @@ import {
   IonSelectOption,
   IonTextarea,
   ItemReorderEventDetail,
+  IonToggle,
 } from "@ionic/react";
 import {
   addOutline,
@@ -89,11 +90,6 @@ interface UpdatePanelProps {
   position?: number;
 }
 
-interface UpdateStackProps {
-  title?: string;
-  position?: number;
-}
-
 interface UpdateCardProps {
   title?: string;
   description?: string;
@@ -103,18 +99,18 @@ interface UpdateCardProps {
 
 interface UpdateBoardProps {
   title?: string;
-  isPrivate?: string | number;
+  description?: string;
+  is_private?: string | number;
 }
 
 const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
-
 
   /*  Global Constants  */
 
 
   const orgId: string = match.params.orgId;
   const boardId: string = match.params.boardId;
-  const history = useHistory(); // wasn't used in board.tsx: remove
+  const history = useHistory(); 
   const { getAccessTokenSilently, user } = useAuth0();
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
@@ -129,7 +125,6 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [board, setBoard] = useState<Board>();
   const [boardOwnerId, setBoardOwnerId] = useState<string>();
   const [panels, setPanels] = useState<Panel[]>();
-  const [detailedPanel, setDetailedPanel] = useState<Panel>();
   const [detailedPanels, setDetailedPanels] = useState<Panel[]>();
   const [currentPanelIndex, setCurrentPanelIndex] = useState<number | null>(null);
   const [panelViewButtons, setPanelViewButtons] = useState<ButtonProps[]>([]);
@@ -138,6 +133,7 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [currentStack, setCurrentStack] = useState<Stack>();
   const [panelViewIsOpen, setPanelViewIsOpen] = useState(false);
   const [deletePanelAlert, setDeletePanelAlert] = useState(false);
+  const [deleteBoardAlert, setDeleteBoardAlert] = useState(false);
   const [deleteCardAlert, setDeleteCardAlert] = useState(false);
   const [panelIdToDelete, setPanelIdToDelete] = useState<string | null>(null);
   const [panelModal, setPanelModal] = useState(false);
@@ -147,6 +143,8 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [currentCard, setCurrentCard] = useState<Card>();
   const [selectedMembers, setSelectedMembers] = useState([]); // is this used?
   const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
+
+  const [boardIsPrivate, setBoardIsPrivate] = useState(detailedBoard?.is_private || false);
 
   /* //////////////////////////////
   
@@ -166,6 +164,7 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
         const data = response.data as Board;
         setDetailedBoard(data);
         setBoardOwnerId(data.owner_id);
+        setBoardIsPrivate(data.is_private);
         setDetailedPanels(data.panels);
         if (typeof currentPanelIndex === null) {
           setCurrentPanelIndex(0);
@@ -193,29 +192,28 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   };
 
-  const updateBoard = async (title: string, isPrivate: boolean) => {
+  const updateBoard = async (data: UpdateBoardProps) => {
     const token = await getAccessTokenSilently();
-    const data = {} as any;
-    if (title !== detailedBoard!.title) { data.title = title };
-    if (isPrivate) { data.is_private = isPrivate };
+    const body = new FormData();
+    if (data.title) { body.append('title', data.title) }
+    if (data.description) { body.append('description', data.description) }
+    if (data.is_private == 'true') { body.append('is_private', 'true') };
     const options = {
       method: "PUT",
       url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
       headers: { authorization: `Bearer ${token}` },
-      data: data
+      data: body
     };
     await axios(options)
-      .then(async () => {
-        await getAccessTokenSilently({ cacheMode: 'off' }).then(() => {
-          getBoard();
+      .then(() => {
+          getDetailedBoard();
         })
-      })
       .catch((error) => {
         console.error(error.message);
       });
   };
 
-  const deleteBoard = async (title: string, ownerId: string, isPrivate: boolean) => {
+  const deleteBoard = async () => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "DELETE",
@@ -224,6 +222,7 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
     };
     await axios(options)
       .then(() => {
+        dismiss();
         history.push(`/app/myorgs/organizations/${orgId}`);
       })
       .catch((error) => {
@@ -329,7 +328,7 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
     await axios(options)
       .then((response) => {
         const data: Panel = response.data as Panel;
-        setDetailedPanel(data);
+        // setDetailedPanel(data);
         setDetailedStacks(data.stacks);
         return data;
       })
@@ -425,23 +424,6 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   };
 
-  const getDetailedStack = async (panelId: string, stackId: string) => {
-    const token = await getAccessTokenSilently();
-    const options = {
-      method: "GET",
-      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}/details`,
-      headers: { authorization: `Bearer ${token}` }
-    };
-    await axios(options)
-      .then((response) => {
-        const data = response.data as Stack;
-        setCurrentStack(data);
-      })
-      .catch((error) => {
-        console.error(error.message);
-      });
-  };
-
   const createStack = async (title: string, panelId: string) => {
     const token = await getAccessTokenSilently();
     const body = new FormData();
@@ -458,44 +440,6 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
           getDetailedPanel(panelId);
         })
       })
-      .catch((error) => {
-        console.error(error.message);
-      });
-  };
-
-  const updateStack = async (panelId: string, stackId: string, data: UpdateStackProps) => {
-    const token = await getAccessTokenSilently();
-    const body = new FormData();
-    if (data.title) { body.append('title', data.title) }
-    if (data.position) { body.append('position', data.position.toString()) }
-    const options = {
-      method: "PUT",
-      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}`,
-      headers: { authorization: `Bearer ${token}` },
-      data: body
-    };
-    await axios(options)
-      .then(() => {
-        // setCanDismiss(true); // if we want to try dismiss again
-        getStack(panelId, stackId);
-      })
-      .catch((error) => {
-        console.error(error.message);
-      });
-  };
-
-  const deleteStack = async (panelId: string, stackId: string) => {
-    const token = await getAccessTokenSilently();
-    const options = {
-      method: "DELETE",
-      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}`,
-      headers: { authorization: `Bearer ${token}` }
-    };
-    await axios(options)
-      .then(async () =>
-        await getAccessTokenSilently().then(() => {
-          getStacks(panelId);
-        }))
       .catch((error) => {
         console.error(error.message);
       });
@@ -529,31 +473,6 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
       .then((response) => {
         const data = response.data as Card;
         setCurrentCard(data);
-      })
-      .catch((error) => {
-        console.error(error.message);
-      });
-  };
-
-  const createCard = async (panelId: string, stackId: string, data: UpdateCardProps) => {
-    const token = await getAccessTokenSilently();
-    const body = new FormData();
-    if (data.title) { body.append('title', data.title) }
-    if (data.description) { body.append('description', data.description.toString()) }
-    if (data.points && typeof data.points === "string") {
-      body.append('points', data.points)
-    } else if (data.points) { body.append('points', data.points.toString()) }
-    const options = {
-      method: "POST",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}/cards`,
-      headers: { authorization: `Bearer ${token}` },
-      data: body
-    };
-    await axios(options)
-      .then(async () => {
-        await getAccessTokenSilently().then(() => {
-          getDetailedBoard();
-        })
       })
       .catch((error) => {
         console.error(error.message);
@@ -596,7 +515,6 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
       .then(async () =>
         await getAccessTokenSilently().then(() => {
           getDetailedPanel(panelId);
-          dismiss();
         }))
       .catch((error) => {
         console.error(error.message);
@@ -639,9 +557,32 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
 
   const handleUpdateBoard = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    let possible_new_title = (event.target as any)[`board_title_id_${detailedBoard!.id}`].value;
-    let possible_new_is_private = (event.target as any)[`board_is_private_id_${detailedBoard!.id}`].value;
-    updateBoard(possible_new_title, possible_new_is_private);
+    let possible_new_title;
+    let possible_new_is_private;
+    let possible_new_description;
+    let body: UpdateBoardProps = { 'title': detailedBoard!.title, 'description': detailedBoard!.description, 'is_private': detailedBoard!.is_private.toString() }
+
+    if ((event.target as any)[`board_title_id_${detailedBoard!.id}`].value !== detailedBoard!.title) {
+      possible_new_title = (event.target as any)[`board_title_id_${detailedBoard!.id}`].value;
+      body.title = possible_new_title;
+    };
+    if ((event.target as any)[`board_description_id_${detailedBoard!.id}`].value !== detailedBoard!.description) {
+      possible_new_description = (event.target as any)[`board_description_id_${detailedBoard!.id}`].value;
+      body.description = possible_new_description;
+    };
+    if ((event.target as any)[`board_is_private_id_${detailedBoard!.id}`].value === 'on') {
+      possible_new_is_private = 'true';
+      body.is_private = possible_new_is_private;
+    };
+    console.log('Toggle checked:', (event.target as any)[`board_is_private_id_${detailedBoard!.id}`].checked);
+    console.log('detailedBoard is_private:', detailedBoard!.is_private);
+
+
+    if (body.description !== detailedBoard?.description ||
+      body.title !== detailedBoard?.title ||
+      body.is_private !== detailedBoard?.is_private) {
+      updateBoard(body);
+    };
   };
 
   // TODO: implement server requests and other logic
@@ -653,6 +594,11 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
   const handleDeletePanel = (panelId: string) => {
     setDeletePanelAlert(true)
     setPanelIdToDelete(panelId);
+  };
+
+  const handleDeleteBoard = () => {
+    dismiss();
+    setDeleteBoardAlert(true)
   };
 
   const handleCardClick = (card: Card) => {
@@ -737,8 +683,12 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
   }, [detailedBoard]);
 
   useEffect(() => {
-    if (detailedPanels && detailedPanels[0].id !== undefined && typeof currentPanelIndex === 'number') {
-      getDetailedPanel(detailedPanels[currentPanelIndex!].id).then(() => { });
+    try {
+      if (detailedPanels && typeof currentPanelIndex === 'number' && detailedPanels.length > 0) {
+        getDetailedPanel(detailedPanels[currentPanelIndex].id).then(() => { });
+      }
+    } catch (error) {
+      console.error(error)
     }
   }, [detailedPanels, currentPanelIndex]);
 
@@ -775,43 +725,65 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
                   </IonButtons>
                 </IonToolbar>
               </IonHeader>
-              <IonContent className="ion-padding" scroll-y="false">
+              <IonContent className="ion-padding">
                 <IonGrid>
                   <IonRow>
                     <IonLabel className="ion-padding-vertical">
                       <strong>Actions</strong>
                     </IonLabel>
-                    <form onSubmit={(event) => handleUpdateBoard(event)}>
-                      <IonList inset={true}>
-                        <IonItem>
-                          <IonInput label="Title:" value={detailedBoard?.title} />
-                        </IonItem>
-                      </IonList>
-                    </form>
                   </IonRow>
-                  <IonRow>
-                    <IonCol>
-                      <IonLabel className="ion-padding-vertical">
-                        <strong>Board Members</strong>
-                      </IonLabel>
-                    </IonCol>
-                  </IonRow>
-                  <IonRow>
+                  <form onSubmit={(event) => handleUpdateBoard(event)} className="ion-nowrap">
                     <IonList inset={true}>
-                      <MemberList />
-                      <MemberList />
-                      <MemberList />
+                      <IonItem>
+                        <IonInput label="Title:" value={detailedBoard?.title} name={`board_title_id_${detailedBoard?.id}`} />
+                      </IonItem>
+                      <IonItem>
+                        <IonTextarea rows={3} autoGrow={true} label="Description:" value={detailedBoard?.description} name={`board_description_id_${detailedBoard?.id}`} />
+                      </IonItem>
+                      <IonItem>
+                        <IonToggle checked={boardIsPrivate} name={`board_is_private_id_${detailedBoard?.id}`}>Private:</IonToggle>
+                      </IonItem>
                     </IonList>
+                    <IonRow className="ion-padding-start">
+                      <IonButton color="tertiary" type="submit" size="small">Save</IonButton>
+                    </IonRow>
+                  </form>
+                  <IonRow>
+                    <IonLabel className="ion-padding-vertical">
+                      <strong>Board Members</strong>
+                    </IonLabel>
                   </IonRow>
-                  <IonRow className="edit-buttons">
-                    <IonCol>
-                      <IonButton color="danger">Delete</IonButton>
-                    </IonCol>
-                    <IonCol />
-                    <IonCol>
-                      <IonButton color="tertiary">Save</IonButton>
-                    </IonCol>
+
+                  <IonList inset={true}>
+                    <MemberList />
+                    <MemberList />
+                    <MemberList />
+                  </IonList>
+                  <IonRow className="ion-justify-content-center ion-padding">
+                    <IonButton size="small" color="danger" id="delete-board-alert" onClick={() => { handleDeleteBoard }}>Delete Board</IonButton>
                   </IonRow>
+                  <IonAlert
+                    isOpen={deleteBoardAlert}
+                    trigger="delete-board-alert"
+                    header="Are you sure you want to delete this board?"
+                    subHeader="This action cannot be undone."
+                    buttons={[
+                      {
+                        text: "Cancel",
+                        role: "cancel",
+                      },
+                      {
+                        text: "Delete",
+                        role: 'confirm',
+                      },
+                    ]}
+                    onIonAlertDidDismiss={({ detail }) => {
+                      if (detail.role === 'confirm') {
+                        deleteBoard();
+                      }
+                      setDeletePanelAlert(false);
+                    }}
+                  />
                 </IonGrid>
               </IonContent>
             </IonModal>
@@ -826,7 +798,7 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
               id="open-popover"
               className="ion-justify-content-center" >
               <IonIcon slot="end" icon={chevronDownOutline} />
-              <strong>{panels && typeof currentPanelIndex === 'number' ? panels[currentPanelIndex].title : 'Choose a panel'}</strong>
+              <strong>{detailedPanels && typeof currentPanelIndex === 'number' ? detailedPanels[currentPanelIndex]?.title : 'Choose a panel'}</strong>
             </IonButton>
             <IonPopover trigger="open-popover" triggerAction="click" dismissOnSelect={true}>
               <IonList>
@@ -1119,7 +1091,7 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
                   <SwiperSlide key={index}>
                     <IonCard className="ion-padding">
                       <IonCardHeader>
-                        {!stacks ? <IonCardTitle>No stacks were found</IonCardTitle>
+                        {!detailedStacks || detailedStacks.length <= 0 ? <IonCardTitle>No stacks were found</IonCardTitle>
                           :
                           <IonCardTitle>Create new stack</IonCardTitle>
                         }
@@ -1165,19 +1137,17 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
             ))
           ) : (
             <SwiperSlide>
-              {detailedStacks && (
-                <NewStack
-                  panelId={() => {
-                    if (panels && currentPanelIndex) { panels[currentPanelIndex].id }
-                  }}
-                  orgId={orgId}
-                  boardId={boardId}
-                  hasStacks={false}
-                  getDetailedBoard={getDetailedBoard}
-                  detailedBoard={detailedBoard!}
-                  detailedPanels={detailedPanels!}
-                />
-              )}
+              <NewStack
+                panelId={() => {
+                  if (panels && currentPanelIndex) { panels[currentPanelIndex].id }
+                }}
+                orgId={orgId}
+                boardId={boardId}
+                hasStacks={false}
+                getDetailedBoard={getDetailedBoard}
+                detailedBoard={detailedBoard!}
+                detailedPanels={detailedPanels!}
+              />
             </SwiperSlide>
           )}
         </Swiper>

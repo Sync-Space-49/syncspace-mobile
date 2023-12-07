@@ -1,8 +1,5 @@
 import {
   IonContent,
-  IonItem,
-  IonLabel,
-  IonList,
   IonHeader,
   IonPage,
   IonTitle,
@@ -14,13 +11,19 @@ import {
   IonRefresherContent,
   RefresherEventDetail,
 } from "@ionic/react";
-import CustomList from "../components/CustomList";
+import HomeCustomList from "../components/HomeCustomList";
 import "./Home.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { serverAdress } from "../auth.config";
 import axios from "axios";
 import { Organization } from "../types";
+
+interface BoardItem {
+  text: string;
+  boardId: string;
+  orgId: string;
+}
 
 const Home: React.FC = () => {
   const { isLoading, user, isAuthenticated, getAccessTokenSilently } =
@@ -35,6 +38,10 @@ const Home: React.FC = () => {
   const [userBoards, setUserBoards] = useState<any[]>([]);
   const [userAssignedCards, setUserAssignedCards] = useState<any[]>([]);
   const [favouritedBoard, setFavouritedBoard] = useState<any[]>([]);
+  const [boardItems, setBoardItems] = useState<BoardItem[]>([]);
+  const [favoritedBoardItems, setFavoritedBoardItems] = useState<BoardItem[]>(
+    []
+  );
 
   const personalOrgSetup = async () => {
     const isFirstLogin = user!.isFirstLogin;
@@ -109,6 +116,8 @@ const Home: React.FC = () => {
       .then((response) => {
         const userBoards = response.data;
         console.log("user boards: ", userBoards);
+        console.log("user boards, board id", response.data[0].id);
+        console.log("user boards, org id", response.data[0].organization_id);
         setUserBoards(userBoards);
         return userBoards;
       })
@@ -153,6 +162,11 @@ const Home: React.FC = () => {
       .then((response) => {
         const favouritedBoards = response.data;
         console.log("user favourited boards: ", favouritedBoards);
+        console.log("user favourited boards, board id", response.data[0].id);
+        console.log(
+          "user favourited boards, org id",
+          response.data[0].organization_id
+        );
         setFavouritedBoard(favouritedBoards);
         return favouritedBoards;
       })
@@ -175,6 +189,34 @@ const Home: React.FC = () => {
       getFavouriteBoards();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (userBoards) {
+      const newBoardItems = userBoards.map((board) => ({
+        text: board.title,
+        boardId: board.id,
+        orgId: board.organization_id,
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+      }));
+      setBoardItems(newBoardItems);
+    }
+  }, [userBoards]);
+
+  useEffect(() => {
+    if (favouritedBoard) {
+      const newFavouritedBoard = favouritedBoard.map((board) => ({
+        text: board.title,
+        boardId: board.id,
+        orgId: board.organization_id,
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+      }));
+      setFavoritedBoardItems(newFavouritedBoard);
+    }
+  }, [favouritedBoard]);
+
+  //get stack, get panel, get board
 
   return (
     <IonPage>
@@ -204,23 +246,10 @@ const Home: React.FC = () => {
             <IonToast message="You are not signed in." />
           )}
         </div>
-        <CustomList
-          title="Recent Boards"
-          items={userBoards.map((board) => ({
-            text: board.title,
-            listImg:
-              "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-          }))}
-        />
-        <CustomList
-          title="Favorited Boards"
-          items={favouritedBoard.map((board) => ({
-            text: board.title,
-            listImg:
-              "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-          }))}
-        />
-        <CustomList
+        {/* only show 3 most recent boards, sort by created by? */}
+        <HomeCustomList title="Recent Boards" items={boardItems} />
+        <HomeCustomList title="Favourited Boards" items={favoritedBoardItems} />
+        <HomeCustomList
           title="My Cards"
           items={userAssignedCards.map((card) => ({
             text: card.title,

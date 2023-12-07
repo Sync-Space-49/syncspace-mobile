@@ -74,6 +74,10 @@
   --ion-color-light-contrast-rgb: 14, 21, 27;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  --ion-card-background: #fff;
+  --ion-item-background: #F5F5F5;
+
 }
 
 @media (prefers-color-scheme: dark) {

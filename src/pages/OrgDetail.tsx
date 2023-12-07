@@ -105,7 +105,11 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       .then((response) => {
         console.log("OrgDetail, Boards fetched: ", response.data);
         data = response.data;
-        setBoards(data);
+        if (data === null) {
+          setBoards([]);
+        } else {
+          setBoards(data);
+        }
         // setLoading(false);
       })
       .catch((error) => {
@@ -279,6 +283,9 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
         setHiddenBoardsProps(privateListProp);
         console.log("Hidden Boards Props:", privateListProp);
       }
+    }
+    if (boards && boards?.length <= 0) {
+      setViewableBoardsProps([]);
     }
   }, [boards]);
 
