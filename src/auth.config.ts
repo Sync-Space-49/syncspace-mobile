@@ -15,4 +15,4 @@ const iosOrAndroid = isPlatform('hybrid');
 
 export const callbackUri = iosOrAndroid
   ? `${appId}://${auth0Domain}/capacitor/${appId}/callback`
-  : 'http://localhost:8100/app';
+  : `${window.location.origin}/app`;
