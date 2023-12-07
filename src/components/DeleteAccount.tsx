@@ -5,7 +5,7 @@ import { useState } from "react";
 // This should reflect the URL added earlier to your "Allowed Logout URLs" setting
 // in the Auth0 dashboard.
 
-const logoutUri = "http://localhost:8100"; //hopefully links to landingpage
+const logoutUri = window.location.origin; //hopefully links to landingpage
 
 const DeleteButton: React.FC = () => {
   const { logout } = useAuth0();
