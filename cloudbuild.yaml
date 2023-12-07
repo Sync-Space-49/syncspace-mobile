@@ -1,0 +1,68 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--build-arg'
+      - >-
+        REACT_APP_AUTH0_FRONTEND_CLIENT_ID=${_REACT_APP_AUTH0_FRONTEND_CLIENT_ID}
+      - '--build-arg'
+      - >-
+        REACT_APP_AUTH0_FRONTEND_CLIENT_SECRET=${_REACT_APP_AUTH0_FRONTEND_CLIENT_SECRET}
+      - '--build-arg'
+      - >-
+        REACT_APP_AUTH0_DOMAIN=${_REACT_APP_AUTH0_DOMAIN}
+      - '--build-arg'
+      - >-
+        REACT_APP_REDIRECT_URI=${_REACT_APP_REDIRECT_URI}
+      - '--build-arg'
+      - >-
+        REACT_APP_SERVER_ADDRESS=${_REACT_APP_SERVER_ADDRESS}
+      - '--build-arg'
+      - >-
+        REACT_APP_SERVER_AUDIENCE=${_REACT_APP_SERVER_AUDIENCE}
+      - '--build-arg'
+      - '--no-cache'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - .
+      - '-f'
+      - Dockerfile
+    id: Build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - >-
+        --image=$_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
+images:
+  - >-
+    $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _SERVICE_NAME: syncspace-mobile
+  _TRIGGER_ID: 96654d34-f2c9-4f1b-804a-8e832892e4e0
+  _DEPLOY_REGION: us-central1
+  _AR_HOSTNAME: us-central1-docker.pkg.dev
+  _PLATFORM: managed
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - syncspace-mobile
