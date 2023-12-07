@@ -8,6 +8,7 @@ interface Board {
     id: string,
     owner_id: string,
     title: string,
+    description?: string, 
     created_at: string,
     modified_at: string,
     is_private: boolean,
