@@ -18,7 +18,7 @@ root.render(
     domain={auth0Domain}
     clientId={clientId}
     authorizationParams={{
-      redirect_uri: callbackUri,
+      redirect_uri: window.location.origin,
       audience: serverAudience,
     }}
     useRefreshTokens={true}
