@@ -20,7 +20,6 @@ steps:
       - '--build-arg'
       - >-
         REACT_APP_SERVER_AUDIENCE=${_REACT_APP_SERVER_AUDIENCE}
-      - '--build-arg'
       - '--no-cache'
       - '-t'
       - >-
