@@ -42,6 +42,7 @@ const Home: React.FC = () => {
   const [favoritedBoardItems, setFavoritedBoardItems] = useState<BoardItem[]>(
     []
   );
+  const [cardItems, setCardItems] = useState<BoardItem[]>([]);
 
   const personalOrgSetup = async () => {
     const isFirstLogin = user!.isFirstLogin;
@@ -190,18 +191,52 @@ const Home: React.FC = () => {
     }
   }, [user]);
 
+  // useEffect(() => {
+  //   if (userBoards) {
+  //     const newBoardItems = userBoards.map((board) => ({
+  //       text: board.title,
+  //       boardId: board.id,
+  //       orgId: board.organization_id,
+  //       listImg:
+  //         "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+  //     }));
+  //     setBoardItems(newBoardItems);
+  //   }
+  // }, [userBoards]);
+
   useEffect(() => {
     if (userBoards) {
-      const newBoardItems = userBoards.map((board) => ({
+      const sortedBoards = userBoards.sort((a, b) => {
+        return (
+          new Date(b.modified_at).getTime() - new Date(a.modified_at).getTime()
+        );
+      });
+
+      const recentBoards = sortedBoards.slice(0, 3);
+      const newBoardItems = recentBoards.map((board) => ({
         text: board.title,
         boardId: board.id,
         orgId: board.organization_id,
         listImg:
           "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
       }));
+
       setBoardItems(newBoardItems);
     }
   }, [userBoards]);
+
+  useEffect(() => {
+    if (userAssignedCards) {
+      const newUserAssignedCards = userAssignedCards.map((card) => ({
+        text: card.title,
+        boardId: card.board_id,
+        orgId: card.org_id,
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+      }));
+      setCardItems(newUserAssignedCards);
+    }
+  }, [userAssignedCards]);
 
   useEffect(() => {
     if (favouritedBoard) {
@@ -215,8 +250,6 @@ const Home: React.FC = () => {
       setFavoritedBoardItems(newFavouritedBoard);
     }
   }, [favouritedBoard]);
-
-  //get stack, get panel, get board
 
   return (
     <IonPage>
@@ -249,14 +282,7 @@ const Home: React.FC = () => {
         {/* only show 3 most recent boards, sort by created by? */}
         <HomeCustomList title="Recent Boards" items={boardItems} />
         <HomeCustomList title="Favourited Boards" items={favoritedBoardItems} />
-        <HomeCustomList
-          title="My Cards"
-          items={userAssignedCards.map((card) => ({
-            text: card.title,
-            listImg:
-              "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-          }))}
-        />
+        <HomeCustomList title="My Cards" items={cardItems} />
       </IonContent>
     </IonPage>
   );
