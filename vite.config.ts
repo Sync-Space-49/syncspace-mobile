@@ -14,5 +14,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
   },
-  host: true,
+  server: {
+    watch: {
+      usePolling: true,
+    },
+    host: true, // Here
+  }
 })
