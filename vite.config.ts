@@ -14,12 +14,4 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
   },
-  server: {
-    watch: {
-      usePolling: true,
-    },
-    host: true, // Here
-    strictPort: true,
-    port: 8100, // you can replace this port with any port
-  }
 })
