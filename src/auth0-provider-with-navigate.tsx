@@ -10,9 +10,6 @@ export const Auth0ProviderWithHistory = ({ children }:any) => {
         history.push(appState?.returnTo || window.location.pathname);
     };
 
-    console.log(domain)
-    console.log(clientId)
-
     if (!(domain && clientId)) {
         return null;
     }
