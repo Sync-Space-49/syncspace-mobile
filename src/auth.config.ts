@@ -6,7 +6,7 @@ export const serverAdress = import.meta.env.VITE_REACT_APP_SERVER_ADDRESS;
 export const secret = import.meta.env.VITE_REACT_APP_AUTH0_FRONTEND_CLIENT_SECRET;
 export const serverAudience = import.meta.env.VITE_REACT_APP_SERVER_AUDIENCE;
 
-const appId = "com.syncspace.syncspace";
+const appId = "com.app.syncspace";
 
 // Use `auth0Domain` in string interpolation below so that it doesn't
 // get replaced by the quickstart auto-packager

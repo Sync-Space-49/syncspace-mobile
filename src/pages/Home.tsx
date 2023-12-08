@@ -9,17 +9,89 @@ import {
   IonToolbar,
   IonSearchbar,
   IonToast,
+  useIonLoading,
 } from "@ionic/react";
 import CustomList from "../components/CustomList";
 import "./Home.css";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect, useState } from "react";
+import { serverAdress } from "../auth.config";
+import axios from "axios";
+import { Organization } from "../types";
 
 const Home: React.FC = () => {
-  const { isLoading, isAuthenticated } = useAuth0();
+  const { isLoading, user, isAuthenticated, getAccessTokenSilently } =
+    useAuth0();
+  const [present] = useIonLoading();
 
-  if (isLoading) {
+  const [orgCreated, setOrgCreated] = useState(false);
+
+  const personalOrgSetup = async () => {
+    const isFirstLogin = user!.isFirstLogin;
+    // if (isLoading) {
+      present({
+        duration: 3000,
+      });
+    // }
+    console.log("isFirstLogin: " + isFirstLogin);
+    if (isFirstLogin) {
+      const userOrgs: Organization[] | null = await getOrganizations();
+      if (userOrgs) {
+        console.log(userOrgs);
+        return console.log("user orgs exist, exited personal org creation");
+      }
+      const token = await getAccessTokenSilently();
+      const body = new FormData();
+      if (user?.name) {
+        body.append("title", `${user.name}'s `);
+      } else {
+        body.append("title", `${user?.nickname}'s board`);
+      }
+      body.append("description", "Personal organization");
+      const options = {
+        method: "POST",
+        url: `${serverAdress}api/organizations`,
+        headers: { authorization: `Bearer ${token}` },
+        data: body,
+      };
+      await axios(options)
+        .then((response) => {
+          console.log("personal org created!");
+          setOrgCreated(true);
+        })
+        .catch((error) => {
+          console.error(error.message);
+        });
+    }
+  };
+
+  const getOrganizations = async () => {
+    let token = await getAccessTokenSilently();
+    const userId = user!.sub;
+    const options = {
+      method: "GET",
+      url: `${serverAdress}api/users/${userId}/organizations`,
+      headers: { authorization: `Bearer ${token}` },
+    };
+
+    await axios(options)
+      .then((response) => {
+        const userOrganizations = response.data;
+        return userOrganizations;
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
     return null;
-  }
+  };
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      if (user!.isFirstLogin && !orgCreated) {
+        personalOrgSetup();
+      }
+    }
+  }, [user]);
 
   return (
     <IonPage>

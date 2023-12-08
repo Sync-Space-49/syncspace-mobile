@@ -1,22 +1,41 @@
+/* keeping only because i don't know where else this affects but it makes the edit/del buttons ugly 
 .button {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
+} */
+
+.toolbar-action-sheet-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.1rem;
 }
 
 .ai-toggle {
-    background-color: 80e08b;
+  background-color: 80e8b;
 }
 
 .edit-buttons {
-    padding-top: 10rem;
+  padding-top: 10rem;
 }
 
 .subtitle {
-    padding-top: 0;
+  padding-top: 0;
+  justify-content: center;
 }
 
 .toolbar-shrink {
-    height: 30%;
+  height: 30%;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.close-btn {
+  font-size: small;
+  color: grey;
 }

@@ -9,6 +9,12 @@ import {
   IonButtons,
   IonPopover,
   IonIcon,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+  IonItem,
+  IonList,
+  IonAlert,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { addOutline } from "ionicons/icons";
@@ -19,93 +25,187 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { serverAdress } from "../auth.config";
 import axios from "axios";
 
-import type { Organization } from "../types"
+import type { Organization } from "../types";
 
 const MyOrgs: React.FC = () => {
   const { getAccessTokenSilently, user } = useAuth0();
-  const [isLoading, setIsLoading] = useState(false);
-  const [organizations, setOrganizations] = useState<Organization[]>();
-  const [popoverState, setPopoverState] = useState<{
-    showPopover: boolean;
-    event: Event | undefined;
-  }>({ showPopover: false, event: undefined });
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.persist();
-    setPopoverState({ showPopover: true, event: e.nativeEvent });
-  };
-
   const history = useHistory();
+  const [organizations, setOrganizations] = useState<Organization[]>();
+  const [showAlert, setShowAlert] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleCreateOrganization = () => {
-    console.log("org created");
-    history.push("/app/organization");
-    setPopoverState({ showPopover: false, event: undefined });
+    setShowAlert(true);
   };
 
-  const getOrganizations = async () => {
-    setIsLoading(true);
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     let token = await getAccessTokenSilently();
-    const userId = user!.sub;
+    getOrganizations(token);
+    event.detail.complete();
+  };
+
+  const getOrganizations = async (newToken?: string) => {
+    if (newToken) {
+      const userId = user!.sub;
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/users/${userId}/organizations`,
+        headers: { authorization: `Bearer ${newToken}` },
+      };
+
+      await axios(options)
+        .then((response) => {
+          console.log("newtoken");
+          const userOrganizations = response.data;
+          setOrganizations(userOrganizations);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    } else {
+      let token = await getAccessTokenSilently();
+      console.log("old token");
+      const userId = user!.sub;
+      const options = {
+        method: "GET",
+        url: `${serverAdress}api/users/${userId}/organizations`,
+        headers: { authorization: `Bearer ${token}` },
+      };
+
+      await axios(options)
+        .then((response) => {
+          const userOrganizations = response.data;
+          setOrganizations(userOrganizations);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    }
+  };
+
+  const createOrganization = async (title: string, description: string) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    if (title) {
+      body.append("title", title);
+    }
+    if (description) {
+      body.append("description", description);
+    }
     const options = {
-      method: "GET",
-      url: `${serverAdress}api/users/${userId}/organizations`,
+      method: "POST",
+      url: `${serverAdress}api/organizations`,
       headers: { authorization: `Bearer ${token}` },
+      data: body,
     };
 
-    axios(options)
-      .then((response) => {
-        const userOrganizations = response.data;
-        console.log('userOrgs: ' + userOrganizations);
-        setOrganizations(userOrganizations)
+    await axios(options)
+      .then(async (response) => {
+        console.log("success, org created, response: ", response);
+        const orgId = response.data.id;
+        console.log("orgId: ", orgId);
+
+        await getAccessTokenSilently().then((token) => {
+          getOrganizations(token);
+        });
+        // history.push(`/app/myorgs/organizations/${orgId}`);
+        setIsPopoverOpen(false);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(
+          "ERROR: ",
+          error.response ? error.response.data : error.message
+        );
       });
-    setIsLoading(false);
-  }
+  };
+
+  const updateOrgList = () => {
+    getOrganizations();
+  };
+
   useEffect(() => {
     getOrganizations();
   }, []);
 
   return (
     <IonPage>
-      <IonHeader>
+      {/* <IonToolbar>
+        <IonTitle>My Organizations</IonTitle>
+      </IonToolbar> */}
+      {/* </IonHeader> */}
+      {/* <IonHeader collapse="condense"> */}
+      
+      <IonHeader collapse="condense">
+        <IonToolbar></IonToolbar> 
         <IonToolbar>
-          <IonTitle>My Organizations</IonTitle>
+          <IonTitle size="large">My Organizations</IonTitle>
+          <IonButtons slot="end">
+            <IonButton id="click-trigger" onClick={() => setIsPopoverOpen(true)}>
+              <IonIcon slot="icon-only" icon={addOutline} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
+          <IonPopover
+            isOpen={isPopoverOpen}
+            onDidDismiss={() => setIsPopoverOpen(false)}
+            trigger="click-trigger"
+            triggerAction="click"
+          >
+            <IonList>
+              <IonItem
+                button={true}
+                detail={false}
+                onClick={handleCreateOrganization}
+              >
+                Create a new organization
+              </IonItem>
+              <IonAlert
+                isOpen={showAlert}
+                onDidDismiss={() => setShowAlert(false)}
+                header="Please enter your organization details"
+                buttons={[
+                  {
+                    text: "Finish",
+                    handler: (alertData) => {
+                      const title = alertData.title;
+                      const description = alertData.description;
+                      createOrganization(title, description);
+                    },
+                  },
+                ]}
+                inputs={[
+                  {
+                    name: "title",
+                    placeholder: "Title",
+                  },
+                  {
+                    name: "description",
+                    type: "textarea",
+                    placeholder: "Description",
+                  },
+                ]}
+              />
+            </IonList>
+          </IonPopover>
+      <IonSearchbar></IonSearchbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">My Organizations</IonTitle>
-            <IonButtons slot="end">
-              <IonButton onClick={handleButtonClick} className="add-btn">
-                <IonIcon slot="icon-only" icon={addOutline} />
-              </IonButton>
-            </IonButtons>
-            <IonPopover
-              isOpen={popoverState.showPopover}
-              event={popoverState.event}
-              onDidDismiss={() =>
-                setPopoverState({ showPopover: false, event: undefined })
-              }
-            >
-              <IonContent class="ion-padding">
-                <button
-                  onClick={handleCreateOrganization}
-                  className="create-org-btn"
-                >
-                  Create a New Organization
-                </button>
-              </IonContent>
-            </IonPopover>
-          </IonToolbar>
-        </IonHeader>
-        <IonSearchbar></IonSearchbar>
-        {organizations ? (organizations.map((organization, i) => {
-          return <SpecificOrganization org={organization} key={i} />
-        })) : (<h1 className="ion-padding">No organizations were found</h1>)}
+      <IonContent>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
+        {organizations && organizations.length > 0 ? (
+          organizations.map((organization, i) => {
+            return (
+              <SpecificOrganization
+                org={organization}
+                updateOrgList={updateOrgList}
+                key={i}
+              />
+            );
+          })
+        ) : (
+          <h1 className="ion-padding">No organizations were found</h1>
+        )}
       </IonContent>
     </IonPage>
   );
