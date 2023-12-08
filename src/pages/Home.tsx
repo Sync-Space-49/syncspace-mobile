@@ -31,8 +31,12 @@ const Home: React.FC = () => {
   const [present] = useIonLoading();
   const [orgCreated, setOrgCreated] = useState(false);
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
-    let token = await getAccessTokenSilently();
-    getUserOrganizations();
+    await getAccessTokenSilently().then((token) => {
+      getUserOrganizations();
+      getUserBoards(token);
+      getUserAssignedCards(token);
+      getFavouriteBoards(token);
+    });
     event.detail.complete();
   };
   const [userBoards, setUserBoards] = useState<any[]>([]);
@@ -42,6 +46,7 @@ const Home: React.FC = () => {
   const [favoritedBoardItems, setFavoritedBoardItems] = useState<BoardItem[]>(
     []
   );
+  const [cardItems, setCardItems] = useState<BoardItem[]>([]);
 
   const personalOrgSetup = async () => {
     const isFirstLogin = user!.isFirstLogin;
@@ -103,8 +108,7 @@ const Home: React.FC = () => {
     return null;
   };
 
-  const getUserBoards = async () => {
-    let token = await getAccessTokenSilently();
+  const getUserBoards = async (token: string) => {
     const userId = user!.sub;
     const options = {
       method: "GET",
@@ -127,8 +131,7 @@ const Home: React.FC = () => {
     return null;
   };
 
-  const getUserAssignedCards = async () => {
-    let token = await getAccessTokenSilently();
+  const getUserAssignedCards = async (token: string) => {
     const userId = user!.sub;
     const options = {
       method: "GET",
@@ -149,8 +152,7 @@ const Home: React.FC = () => {
     return null;
   };
 
-  const getFavouriteBoards = async () => {
-    let token = await getAccessTokenSilently();
+  const getFavouriteBoards = async (token: string) => {
     const userId = user!.sub;
     const options = {
       method: "GET",
@@ -184,24 +186,46 @@ const Home: React.FC = () => {
       if (user!.isFirstLogin && !orgCreated) {
         personalOrgSetup();
       }
-      getUserBoards();
-      getUserAssignedCards();
-      getFavouriteBoards();
     }
   }, [user]);
 
   useEffect(() => {
     if (userBoards) {
-      const newBoardItems = userBoards.map((board) => ({
+      const sortedBoards = userBoards.sort((a, b) => {
+        return (
+          new Date(b.modified_at).getTime() - new Date(a.modified_at).getTime()
+        );
+      });
+
+      console.log("Sorted Boards: ", sortedBoards);
+      const recentBoards = sortedBoards.slice(0, 3);
+
+      const newBoardItems = recentBoards.map((board) => ({
         text: board.title,
         boardId: board.id,
         orgId: board.organization_id,
         listImg:
           "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
       }));
+
+      console.log("New Board Items: ", newBoardItems);
+
       setBoardItems(newBoardItems);
     }
   }, [userBoards]);
+
+  useEffect(() => {
+    if (userAssignedCards) {
+      const newUserAssignedCards = userAssignedCards.map((card) => ({
+        text: card.title,
+        boardId: card.board_id,
+        orgId: card.org_id,
+        listImg:
+          "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
+      }));
+      setCardItems(newUserAssignedCards);
+    }
+  }, [userAssignedCards]);
 
   useEffect(() => {
     if (favouritedBoard) {
@@ -215,8 +239,6 @@ const Home: React.FC = () => {
       setFavoritedBoardItems(newFavouritedBoard);
     }
   }, [favouritedBoard]);
-
-  //get stack, get panel, get board
 
   return (
     <IonPage>
@@ -246,17 +268,9 @@ const Home: React.FC = () => {
             <IonToast message="You are not signed in." />
           )}
         </div>
-        {/* only show 3 most recent boards, sort by created by? */}
         <HomeCustomList title="Recent Boards" items={boardItems} />
         <HomeCustomList title="Favourited Boards" items={favoritedBoardItems} />
-        <HomeCustomList
-          title="My Cards"
-          items={userAssignedCards.map((card) => ({
-            text: card.title,
-            listImg:
-              "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-          }))}
-        />
+        <HomeCustomList title="My Cards" items={cardItems} />
       </IonContent>
     </IonPage>
   );
