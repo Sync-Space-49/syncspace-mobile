@@ -30,7 +30,6 @@ interface Stack {
     position: Number,
     panel_id: string,
     cards?: []
-    stack_id?: string
 }
 
 interface Card {

@@ -29,11 +29,12 @@ const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId, getDetailedBoa
 
 
 
-    const createCard = async (title: string, description: string) => {
+    const createCard = async (title: string, description: string, points?: string) => {
         const token = await getAccessTokenSilently();
         const body = new FormData();
         body.append("title", title);
         body.append("description", description)
+        if (points){body.append("points", points)}
 
         const options = {
             method: "POST",
@@ -92,14 +93,22 @@ const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId, getDetailedBoa
                         name:'description',
                         type: 'textarea',
                         placeholder: 'Description'
-                    }
+                    },
+                    {
+                        name:'points',
+                        placeholder: 'Story Points',
+                        attributes: {
+                            maxLength: 255
+                        }
+                    },
                 ]}
                 onDidDismiss={({ detail }) => {
                     console.log(detail);
                     if (detail.role === 'confirm') {
                         let title = detail.data.values.title;
                         let description = detail.data.values.description;
-                        createCard(title, description);
+                        let points = detail.data.values.points;
+                        createCard(title, description, points);
                     }
                     setShowAlert(false);
                 }}
