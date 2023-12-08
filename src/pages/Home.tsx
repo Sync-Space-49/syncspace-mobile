@@ -31,8 +31,12 @@ const Home: React.FC = () => {
   const [present] = useIonLoading();
   const [orgCreated, setOrgCreated] = useState(false);
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
-    let token = await getAccessTokenSilently();
-    getUserOrganizations();
+    await getAccessTokenSilently().then((token) => {
+      getUserOrganizations();
+      getUserBoards(token);
+      getUserAssignedCards(token);
+      getFavouriteBoards(token);
+    });
     event.detail.complete();
   };
   const [userBoards, setUserBoards] = useState<any[]>([]);
@@ -104,8 +108,7 @@ const Home: React.FC = () => {
     return null;
   };
 
-  const getUserBoards = async () => {
-    let token = await getAccessTokenSilently();
+  const getUserBoards = async (token: string) => {
     const userId = user!.sub;
     const options = {
       method: "GET",
@@ -128,8 +131,7 @@ const Home: React.FC = () => {
     return null;
   };
 
-  const getUserAssignedCards = async () => {
-    let token = await getAccessTokenSilently();
+  const getUserAssignedCards = async (token: string) => {
     const userId = user!.sub;
     const options = {
       method: "GET",
@@ -150,8 +152,7 @@ const Home: React.FC = () => {
     return null;
   };
 
-  const getFavouriteBoards = async () => {
-    let token = await getAccessTokenSilently();
+  const getFavouriteBoards = async (token: string) => {
     const userId = user!.sub;
     const options = {
       method: "GET",
@@ -185,24 +186,8 @@ const Home: React.FC = () => {
       if (user!.isFirstLogin && !orgCreated) {
         personalOrgSetup();
       }
-      getUserBoards();
-      getUserAssignedCards();
-      getFavouriteBoards();
     }
   }, [user]);
-
-  // useEffect(() => {
-  //   if (userBoards) {
-  //     const newBoardItems = userBoards.map((board) => ({
-  //       text: board.title,
-  //       boardId: board.id,
-  //       orgId: board.organization_id,
-  //       listImg:
-  //         "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
-  //     }));
-  //     setBoardItems(newBoardItems);
-  //   }
-  // }, [userBoards]);
 
   useEffect(() => {
     if (userBoards) {
@@ -212,7 +197,9 @@ const Home: React.FC = () => {
         );
       });
 
+      console.log("Sorted Boards: ", sortedBoards);
       const recentBoards = sortedBoards.slice(0, 3);
+
       const newBoardItems = recentBoards.map((board) => ({
         text: board.title,
         boardId: board.id,
@@ -220,6 +207,8 @@ const Home: React.FC = () => {
         listImg:
           "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
       }));
+
+      console.log("New Board Items: ", newBoardItems);
 
       setBoardItems(newBoardItems);
     }
@@ -279,7 +268,6 @@ const Home: React.FC = () => {
             <IonToast message="You are not signed in." />
           )}
         </div>
-        {/* only show 3 most recent boards, sort by created by? */}
         <HomeCustomList title="Recent Boards" items={boardItems} />
         <HomeCustomList title="Favourited Boards" items={favoritedBoardItems} />
         <HomeCustomList title="My Cards" items={cardItems} />
