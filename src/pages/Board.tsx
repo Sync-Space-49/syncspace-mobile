@@ -103,14 +103,14 @@ interface UpdateBoardProps {
   is_private?: string | number;
 }
 
-const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
+const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
 
   /*  Global Constants  */
 
 
   const orgId: string = match.params.orgId;
   const boardId: string = match.params.boardId;
-  const history = useHistory(); 
+  const history = useHistory();
   const { getAccessTokenSilently, user } = useAuth0();
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
@@ -127,6 +127,7 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [panels, setPanels] = useState<Panel[]>();
   const [detailedPanels, setDetailedPanels] = useState<Panel[]>();
   const [currentPanelIndex, setCurrentPanelIndex] = useState<number | null>(null);
+  const [currentPanelId, setCurrentPanelId] = useState<string>('');
   const [panelViewButtons, setPanelViewButtons] = useState<ButtonProps[]>([]);
   const [stacks, setStacks] = useState<Stack[]>();
   const [detailedStacks, setDetailedStacks] = useState<Stack[]>();
@@ -206,8 +207,8 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
     };
     await axios(options)
       .then(() => {
-          getDetailedBoard();
-        })
+        getDetailedBoard();
+      })
       .catch((error) => {
         console.error(error.message);
       });
@@ -685,7 +686,9 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
   useEffect(() => {
     try {
       if (detailedPanels && typeof currentPanelIndex === 'number' && detailedPanels.length > 0) {
-        getDetailedPanel(detailedPanels[currentPanelIndex].id).then(() => { });
+        getDetailedPanel(detailedPanels[currentPanelIndex].id).then(() => {
+          setCurrentPanelId(detailedPanels[currentPanelIndex].id);
+        });
       }
     } catch (error) {
       console.error(error)
@@ -1001,30 +1004,39 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
                                 <IonLabel className="ion-padding-vertical">
                                   <strong>Details</strong>
                                 </IonLabel>
-                                {currentCard ?
-                                  <form onSubmit={(event) => handleUpdateCard(event, currentCard!)}>
-                                    <IonList inset={true}>
-                                      <IonItem>
-                                        {/* <IonInput label="Card Title:" value={currentCard?.title} name={`card_title_id_${currentCard?.id}_${index}`} /> */}
-                                        {/* <IonInput label="Panel title:" placeholder='Sprint 1' value={panel.title} name={`panel_name_id_${panel.id}`} /> */}
-                                        <IonInput label="Card Title:" value={currentCard.title} name={`card_title_id_${currentCard.id}`} />
-                                      </IonItem>
-                                      <IonItem>
-                                        <IonTextarea rows={3} autoGrow={true} label="Description:" value={currentCard.description} name={`card_description_id_${currentCard.id}`} />
-                                      </IonItem>
-                                    </IonList>
-                                    <IonButton className="ion-justify-content-center" color="tertiary" size="small" type="submit">Save</IonButton>
-                                  </form>
-                                  :
+                              </IonRow>
+                              {currentCard ?
+                                <form onSubmit={(event) => handleUpdateCard(event, currentCard!)}>
                                   <IonList inset={true}>
                                     <IonItem>
-                                      <IonLabel>
-                                        No card found
-                                      </IonLabel>
+                                      <IonInput label="Card Title:" value={currentCard.title} name={`card_title_id_${currentCard.id}`} />
                                     </IonItem>
+                                    <IonItem>
+                                      <IonTextarea rows={3} autoGrow={true} label="Description:" value={currentCard.description} name={`card_description_id_${currentCard.id}`} />
+                                    </IonItem>
+                                    {/*  {detailedStacks && detailedStacks.length > 0 ? (
+            detailedStacks.map((stack, index: number) => ( */}
+                                    {detailedPanels && currentPanelIndex ?
+                                      
+                                      <IonItem>
+                                        <IonSelect interface="popover" label="Panel" placeholder={detailedPanels[currentPanelIndex].title}>
+                                        </IonSelect>
+                                      </IonItem>
+                                      :
+                                      <></>
+                                    }
                                   </IonList>
-                                }
-                              </IonRow>
+                                  <IonButton className="ion-justify-content-center" color="tertiary" size="small" type="submit">Save</IonButton>
+                                </form>
+                                :
+                                <IonList inset={true}>
+                                  <IonItem>
+                                    <IonLabel>
+                                      No card found
+                                    </IonLabel>
+                                  </IonItem>
+                                </IonList>
+                              }
                               <IonRow>
                                 <IonCol>
                                   <IonLabel className="ion-padding-vertical">
@@ -1135,12 +1147,11 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
                 )}
               </>
             ))
-          ) : (
+          )
+            :
             <SwiperSlide>
               <NewStack
-                panelId={() => {
-                  if (panels && currentPanelIndex) { panels[currentPanelIndex].id }
-                }}
+                panelId={currentPanelId}
                 orgId={orgId}
                 boardId={boardId}
                 hasStacks={false}
@@ -1149,11 +1160,11 @@ const BoardDetail: React.FC<BoardDetailPageProps> = ({ match }) => {
                 detailedPanels={detailedPanels!}
               />
             </SwiperSlide>
-          )}
+          }
         </Swiper>
       </IonContent>
     </IonPage >
   );
 };
 
-export default BoardDetail;
+export default Board;
