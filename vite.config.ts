@@ -14,7 +14,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
   },
-  define: {
-    "process.env": dotenv.config().parsed
+  server: {
+    watch: {
+      usePolling: true,
+    },
+    host: true, 
+    strictPort: true,
+    port: 8100, 
   }
 })
