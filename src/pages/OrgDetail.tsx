@@ -44,7 +44,7 @@ import { OverlayEventDetail } from "@ionic/core";
 interface OrgDetailPageProps
   extends RouteComponentProps<{
     orgId: string;
-  }> {}
+  }> { }
 
 interface ListProps {
   text: string; // the list's content
@@ -494,9 +494,6 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                     </IonLabel>
                   </IonRow>
                   <IonList inset={true}>
-                    {/* <MemberList />
-                    <MemberList />
-                    <MemberList /> */}
                   </IonList>
                   <IonRow className="ion-justify-content-center ion-padding">
                     <IonButton
@@ -542,151 +539,161 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-        {/* Viewable Boards: */}
-        <CustomList
-          orgId={orgId}
-          title={customListTitle}
-          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
-          items={viewableBoardsProps}
-        />
-        {/* Create Board (Viewable): */}
-        <IonButton className="org-detail-btn" onClick={openCreateBoardAlert}>
-          <IonIcon slot="start" icon={addOutline} />
-          New board
-        </IonButton>
-        {/* Hidden Boards: */}
-        <CustomList
-          orgId={orgId}
-          title="Hidden Boards"
-          titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
-          items={hiddenBoardsProps}
-        />
-        {/* Create Board (Hidden): */}
-        <IonButton className="org-detail-btn" onClick={openCreateAIBoardModal}>
-          <IonIcon slot="start" icon={colorWandOutline} />
-          New board with AI
-        </IonButton>
-        {/* Popover with Create options: */}
-        <IonPopover
-          isOpen={isPopoverOpen}
-          onDidDismiss={() => setIsPopoverOpen(false)}
-          dismissOnSelect={true}
-          trigger="new-board-btn"
-          triggerAction="click"
-        >
-          <IonList>
-            <IonItem button={true} detail={false} onClick={handleCreateBoard}>
+        <IonGrid>
+          {/* Viewable Boards: */}
+          <CustomList
+            orgId={orgId}
+            title={customListTitle}
+            titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
+            items={viewableBoardsProps}
+          />
+          {/* Hidden Boards: */}
+          <CustomList
+            orgId={orgId}
+            title="Hidden Boards"
+            titleImg="https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png"
+            items={hiddenBoardsProps}
+          />
+          <IonRow className="ion-padding-top ion-justify-content-center">
+            {/* Board buttons */}
+            <IonButton onClick={openCreateBoardAlert}>
+              <IonIcon slot="start" icon={addOutline} />
               New board
-            </IonItem>
-            <IonItem button={true} detail={false} onClick={handleNewAI}>
-              <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
-              New board with AI
-            </IonItem>
-          </IonList>
-        </IonPopover>
-        {/* Create Board Inputs: */}
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
-          header="Enter Board Name"
-          buttons={[
-            {
-              text: "Finish",
-              handler: (alertData) => {
-                const title = alertData.title;
-                const isPrivate = alertData.isPrivate;
-                const description = alertData.description;
-                createBoard(title, isPrivate, description);
-              },
-            },
-          ]}
-          inputs={[
-            {
-              name: "title",
-              placeholder: "Title",
-              type: "text",
-            },
-            {
-              name: "isPrivate",
-              placeholder: "isPrivate",
-              type: "text",
-            },
-            {
-              name: "description",
-              placeholder: "description",
-              type: "textarea",
-            },
-          ]}
-        />
-        {/* Create Board with AI Inputs: */}
-        <IonModal isOpen={showCreateAIModal} onDidDismiss={dismiss}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Card Settings</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowCreateAIModal(false)}>
-                  Close
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
-            <IonItem>
-              <IonLabel position="stacked">Title</IonLabel>
-              <IonInput
-                value={title}
-                onIonChange={(e) => setTitle(e.detail.value || "")}
-              />
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Description</IonLabel>
-              <IonTextarea
-                value={description}
-                autoGrow={true}
-                onIonChange={(e) => setDescription(e.detail.value || "")}
-              />
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Is Private?</IonLabel>
-              <IonSelect
-                value={isPrivate}
-                onIonChange={(e) => setIsPrivate(e.detail.value)}
-              >
-                <IonSelectOption value="true">True</IonSelectOption>
-                <IonSelectOption value="false">False</IonSelectOption>
-              </IonSelect>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Detail Level</IonLabel>
-              <IonSelect
-                value={detailLevel}
-                onIonChange={(e) => setDetailLevel(e.detail.value)}
-              >
-                <IonSelectOption value="brief">Brief</IonSelectOption>
-                <IonSelectOption value="detailed">Detailed</IonSelectOption>
-                <IonSelectOption value="very detailed">
-                  Very Detailed
-                </IonSelectOption>
-              </IonSelect>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Story Point Type</IonLabel>
-              <IonSelect
-                value={storyPointType}
-                onIonChange={(e) => setStoryPointType(e.detail.value)}
-              >
-                <IonSelectOption value="fibonacci">Fibonacci</IonSelectOption>
-                <IonSelectOption value="tshirt size">
-                  T-Shirt Size
-                </IonSelectOption>
-                <IonSelectOption value="1-5">1-5</IonSelectOption>
-              </IonSelect>
-            </IonItem>
-            <IonButton expand="block" onClick={handleSubmit}>
-              Submit
             </IonButton>
-          </IonContent>
-        </IonModal>
+            <IonButton onClick={openCreateAIBoardModal}>
+              <IonIcon slot="start" icon={colorWandOutline} />
+              New board with AI
+            </IonButton>
+          </IonRow>
+          {/* Popover with Create options: */}
+          <IonPopover
+            isOpen={isPopoverOpen}
+            onDidDismiss={() => setIsPopoverOpen(false)}
+            dismissOnSelect={true}
+            trigger="new-board-btn"
+            triggerAction="click"
+          >
+            <IonList>
+              <IonItem button={true} detail={false} onClick={handleCreateBoard}>
+                New board
+              </IonItem>
+              <IonItem button={true} detail={false} onClick={handleNewAI}>
+                <IonIcon slot="end" icon={colorWandOutline}></IonIcon>
+                New board with AI
+              </IonItem>
+            </IonList>
+          </IonPopover>
+          {/* Create Board Inputs: */}
+          <IonAlert
+            isOpen={showAlert}
+            onDidDismiss={() => setShowAlert(false)}
+            header="Enter Board Name"
+            buttons={[
+              {
+                text: "Finish",
+                handler: (alertData) => {
+                  const title = alertData.title;
+                  const isPrivate = alertData.isPrivate;
+                  const description = alertData.description;
+                  createBoard(title, isPrivate, description);
+                },
+              },
+            ]}
+            inputs={[
+              {
+                name: "title",
+                placeholder: "Title",
+                type: "text",
+              },
+              {
+                name: "isPrivate",
+                placeholder: "isPrivate",
+                type: "text",
+              },
+              {
+                name: "description",
+                placeholder: "description",
+                type: "textarea",
+              },
+            ]}
+          />
+          {/* Create Board with AI Inputs: */}
+          <IonModal ref={modal} isOpen={showCreateAIModal} onDidDismiss={dismiss} presentingElement={presentingElement!}>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>AI Board Details</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setShowCreateAIModal(false)}>
+                    Close
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent>
+              <IonGrid>
+                <IonList inset={true}>
+                  <IonItem>
+                    <IonInput
+                      value={title}
+                      label="Title:"
+                      onIonChange={(e) => setTitle(e.detail.value || "")}
+                    />
+                  </IonItem>
+                  <IonItem>
+                    <IonTextarea
+                      label="Description:"
+                      value={description}
+                      autoGrow={true}
+                      rows={3}
+                      onIonChange={(e) => setDescription(e.detail.value || "")}
+                    />
+                  </IonItem>
+                  <IonItem>
+                    <IonSelect
+                      label="Private board:"
+                      value={isPrivate}
+                      onIonChange={(e) => setIsPrivate(e.detail.value)}
+                    >
+                      <IonSelectOption value="true">True</IonSelectOption>
+                      <IonSelectOption value="false">False</IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                  <IonItem>
+                    <IonSelect
+                      label="Detail Level:"
+                      value={detailLevel}
+                      onIonChange={(e) => setDetailLevel(e.detail.value)}
+                    >
+                      <IonSelectOption value="brief">Brief</IonSelectOption>
+                      <IonSelectOption value="detailed">Detailed</IonSelectOption>
+                      <IonSelectOption value="very detailed">
+                        Very Detailed
+                      </IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                  <IonItem>
+                    <IonSelect
+                      label="Story Point Type"
+                      value={storyPointType}
+                      onIonChange={(e) => setStoryPointType(e.detail.value)}
+                    >
+                      <IonSelectOption value="fibonacci">Fibonacci</IonSelectOption>
+                      <IonSelectOption value="tshirt size">
+                        T-Shirt Size
+                      </IonSelectOption>
+                      <IonSelectOption value="1-5">1-5</IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                </IonList>
+                <IonRow className="ion-justify-content-center">
+                  <IonButton expand="block" onClick={handleSubmit}>
+                    Submit
+                  </IonButton>
+                </IonRow>
+              </IonGrid>
+            </IonContent>
+          </IonModal>
+        </IonGrid>
       </IonContent>
     </IonPage>
   );
