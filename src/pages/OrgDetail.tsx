@@ -483,16 +483,16 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                       </IonItem>
                     </IonList>
                     <IonRow className="ion-padding-start">
-                      <IonButton color="tertiary" type="submit" size="small">
+                      {/* <IonButton disabled={true} color="tertiary" type="submit" size="small">
                         Save
-                      </IonButton>
+                      </IonButton> */}
                     </IonRow>
                   </form>
-                  <IonRow>
+                  {/* <IonRow>
                     <IonLabel className="ion-padding-vertical">
                       <strong>Org Members</strong>
                     </IonLabel>
-                  </IonRow>
+                  </IonRow> */}
                   <IonList inset={true}>
                   </IonList>
                   <IonRow className="ion-justify-content-center ion-padding">
