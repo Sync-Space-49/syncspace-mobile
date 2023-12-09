@@ -29,7 +29,7 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({
     await getAccessTokenSilently({ cacheMode: "off" }).then(async (token) => {
       const options = {
         method: "GET",
-        url: `${serverAdress}api/organizations/${organizationId}/boards`,
+        url: `${serverAdress}/api/organizations/${organizationId}/boards`,
         headers: { authorization: `Bearer ${token}` },
       };
       setIsLoading(true);

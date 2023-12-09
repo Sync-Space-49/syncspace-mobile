@@ -16,7 +16,6 @@ import {
   IonGrid,
   IonRow,
   IonInput,
-  IonCol,
   IonActionSheet,
   IonRefresher,
   IonRefresherContent,
@@ -38,9 +37,11 @@ import {
   IonTextarea,
   ItemReorderEventDetail,
   IonToggle,
+  IonAvatar,
+  IonImg,
+  SelectChangeEventDetail,
 } from "@ionic/react";
 import {
-  addOutline,
   ellipsisHorizontal,
   chevronDownOutline,
   createOutline,
@@ -55,7 +56,6 @@ import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
-import MemberList from "../components/MemberList";
 import { serverAdress } from "../auth.config";
 import "./Board.css";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -138,13 +138,16 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [deletePanelAlert, setDeletePanelAlert] = useState(false);
   const [deleteBoardAlert, setDeleteBoardAlert] = useState(false);
   const [deleteCardAlert, setDeleteCardAlert] = useState(false);
+  const [deleteAssignedMemberAlert, setDeleteAssignedMemberAlert] = useState(false);
   const [panelIdToDelete, setPanelIdToDelete] = useState<string | null>(null);
   const [panelModal, setPanelModal] = useState(false);
   const [boardModal, setBoardModal] = useState(false);
   const [cardModal, setCardModal] = useState(false);
   const [cards, setCards] = useState<Card[]>();
   const [currentCard, setCurrentCard] = useState<Card>();
-  const [selectedMembers, setSelectedMembers] = useState([]); // is this used?
+  const [boardMembers, setBoardMembers] = useState<User[]>();
+  // const [cardAssignees, setCardAssignees] = useState<string[] | null>(null);
+  const [memberIdToRemove, setMemberIdToRemove] = useState<string>();
   const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
 
   const [boardIsPrivate, setBoardIsPrivate] = useState(detailedBoard?.is_private || false);
@@ -159,7 +162,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/details`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/details`,
       headers: { authorization: `Bearer ${token}` },
     };
     await axios(options)
@@ -182,7 +185,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}`,
       headers: { authorization: `Bearer ${token}` },
     };
     await axios(options)
@@ -203,7 +206,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     if (data.is_private == 'true') { body.append('is_private', 'true') };
     const options = {
       method: "PUT",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}`,
       headers: { authorization: `Bearer ${token}` },
       data: body
     };
@@ -220,7 +223,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "DELETE",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}`,
       headers: { authorization: `Bearer ${token}` },
     };
     await axios(options)
@@ -237,12 +240,13 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/members`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/members`,
       headers: { authorization: `Bearer ${token}` },
     };
     await axios(options)
       .then((response) => {
         const data = response.data as User[];
+        setBoardMembers(data);
         return data;
       })
       .catch((error) => {
@@ -254,7 +258,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "POST",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/members`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/members`,
       headers: { authorization: `Bearer ${token}` },
       data: {
         "user_id": userId
@@ -273,7 +277,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "DELETE",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/members`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/members`,
       headers: { authorization: `Bearer ${token}` },
       data: {
         "user_id": userId
@@ -363,7 +367,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     if (data.position) { body.append('position', data.position.toString()) }
     const options = {
       method: "PUT",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}`,
       headers: { authorization: `Bearer ${token}` },
       data: body
     };
@@ -380,7 +384,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "DELETE",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}`,
       headers: { authorization: `Bearer ${token}` },
     };
     await axios(options)
@@ -432,7 +436,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     body.append("title", title);
     const options = {
       method: "POST",
-      url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks`,
       headers: { authorization: `Bearer ${token}` },
       data: body
     };
@@ -468,7 +472,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}/cards/${cardId}`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}/cards/${cardId}/details`,
       headers: { authorization: `Bearer ${token}` }
     };
     await axios(options)
@@ -524,7 +528,62 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   };
 
-  /*  {3 more requests to make in postman for assignments} */
+  const getAssignedMembers = async (panelId: string, card: Card) => {
+    const token = await getAccessTokenSilently();
+    const options = {
+      method: "GET",
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${card.stack_id}/cards/${card.id}/assigned`,
+      headers: { authorization: `Bearer ${token}` }
+    };
+    await axios(options)
+      .then(async (response) => {
+        const data = response.data;
+        // setCardAssignees(data);
+        getDetailedPanel(panelId);
+        // getCard(card.id, panelId, card.stack_id);
+      })
+      .catch((error) => {
+        console.log(error.message)
+      });
+  };
+
+  const createAssignedMember = async (panelId: string, card: Card, newUserId: string) => {
+    const token = await getAccessTokenSilently();
+    const body = new FormData();
+    if(newUserId) {body.append("user_id", newUserId) }
+    const options = {
+      method: "POST",
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${card.stack_id}/cards/${card.id}/assigned`,
+      headers: { authorization: `Bearer ${token}` },
+      data: body
+    };
+    await axios(options)
+      .then(async () => {
+        getDetailedPanel(panelId);
+        getCard(card.id, panelId, card.stack_id);
+      })
+      .catch((error) => {
+        console.log(error.message)
+      });
+  };
+
+  const deleteAssignedMember = async (panelId: string, card: Card, userId: string) => {
+    const token = await getAccessTokenSilently();
+    console.log(userId);
+    console.log(card);
+    const options = {
+      method: "DELETE",
+      url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${card.stack_id}/cards/${card.id}/assigned/${userId}`,
+      headers: { authorization: `Bearer ${token}` }
+    };
+    await axios(options)
+      .then(async () => {
+        getAssignedMembers(panelId, card);
+      })
+      .catch((error) => {
+        console.log(error.message)
+      });
+  };
 
   /* //////////////////////////////
   
@@ -577,9 +636,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       possible_new_is_private = 'true';
       body.is_private = possible_new_is_private;
     };
-    console.log('Toggle checked:', (event.target as any)[`board_is_private_id_${detailedBoard!.id}`].checked);
-    console.log('detailedBoard is_private:', detailedBoard!.is_private);
-
 
     if (body.description !== detailedBoard?.description ||
       body.title !== detailedBoard?.title ||
@@ -590,6 +646,10 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
 
   // TODO: implement server requests and other logic
   const handleReorder = (event: CustomEvent<ItemReorderEventDetail>) => {
+        // if ((event.target as any)[`card_position_id_${card.id}`].value !== card.position) {
+    //     possible_new_position = (event.target as any)[`card_position_id_${card.id}`].value;
+    //     body.description = possible_new_position;
+    // };
     console.log("dragged from index", event.detail.from, "to", event.detail.to);
     event.detail.complete();
   };
@@ -614,13 +674,28 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     setStacks(panel.stacks)
   };
 
+  const handleCardAssignments = async (event: string[]) => {
+    const newAssignedUsers = event;
+    console.log(newAssignedUsers);
+    if(currentCard) {
+      newAssignedUsers.map(async (user) => {
+        console.log(user)
+        await createAssignedMember(detailedPanels![currentPanelIndex!].id, currentCard, user);
+      });
+    }; 
+  };
+
+  const handleDeleteCardAssignments = (memberId: string) => {
+    setDeleteAssignedMemberAlert(true);
+    setMemberIdToRemove(memberId);
+  };
+
   const handleUpdateCard = (event: React.FormEvent<HTMLFormElement>, card: Card) => {
     event.preventDefault();
     let possible_new_title;
     let possible_new_description;
     let possible_new_stack_id = (event.target as any)[`card_stack_id_${card.id}`].value;
     let possible_new_points;
-    let possible_new_position;
     let body: UpdateCardProps = { 'title': undefined, 'description': undefined, 'points': undefined, 'position': undefined, 'stack_id': card.stack_id }
     const cardId = card.id;
     const panelId = panels![currentPanelIndex!].id;
@@ -632,20 +707,12 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       possible_new_description = (event.target as any)[`card_description_id_${card.id}`].value;
       body.description = possible_new_description;
     };
-    if(possible_new_stack_id !== body.stack_id) {
+    if (possible_new_stack_id && possible_new_stack_id !== body.stack_id) {
       body.stack_id = possible_new_stack_id;
     }
-    console.log(body.stack_id)
-
-    // haven't added these into the card settings yet so these will cause it not to work if uncommented
-
     // if ((event.target as any)[`card_points_id_${card.id}`].value !== card.points) {
     //     possible_new_points = (event.target as any)[`card_points_id_${card.id}`].value;
     //     body.title = possible_new_points;
-    // };
-    // if ((event.target as any)[`card_position_id_${card.id}`].value !== card.position) {
-    //     possible_new_position = (event.target as any)[`card_position_id_${card.id}`].value;
-    //     body.description = possible_new_position;
     // };
 
     if (body.description !== '' || body.title !== '') {
@@ -667,6 +734,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   useEffect(() => { // on first load: fix this
     setPresentingElement(page.current);
     setCurrentPanelIndex(0);
+    getBoardMembers();
     getDetailedBoard().then(() => {
     });
   }, []);
@@ -717,6 +785,12 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     }
 
   }, [stacks]);
+
+  useEffect(() => {
+    if (detailedPanels && currentPanelIndex && currentCard) {
+      getAssignedMembers(detailedPanels[currentPanelIndex].id, currentCard);
+    }
+  }, [currentCard]);
 
   return (
     <IonPage ref={page}>
@@ -780,9 +854,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                     </IonLabel>
                   </IonRow>
                   <IonList inset={true}>
-                    <MemberList />
-                    <MemberList />
-                    <MemberList />
                   </IonList>
                   <IonRow className="ion-justify-content-center ion-padding">
                     <IonButton size="small" color="danger" id="delete-board-alert" onClick={() => { handleDeleteBoard }}>Delete Board</IonButton>
@@ -1082,21 +1153,63 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                                 </IonList>
                               }
                               <IonRow>
-                                <IonCol>
-                                  <IonLabel className="ion-padding-vertical">
-                                    <strong>Assigned Members</strong>
-                                  </IonLabel>
-                                </IonCol>
-                                <div className="add-member-button">
-                                  <IonButton size="small" fill="clear">
-                                    <IonIcon slot="icon-only" icon={addOutline} />
-                                  </IonButton>
-                                </div>
+                                <IonLabel className="ion-padding-vertical">
+                                  <strong>Assigned Members</strong>
+                                </IonLabel>
                               </IonRow>
                               <IonList inset={true}>
-                                <MemberList />
-                                <MemberList />
-                                <MemberList />
+                                <IonItem>
+                                  <IonSelect label="Assignees" placeholder={boardMembers![0].name} multiple={true} onIonChange={(event) => handleCardAssignments(event.detail.value)}>
+                                    {boardMembers ? (
+                                      boardMembers.map((user) => (
+                                        <IonSelectOption value={user.user_id}>{user.name}</IonSelectOption>
+                                      ))
+                                    ) : <IonSelectOption disabled={true}>No members found</IonSelectOption>}
+                                  </IonSelect>
+                                </IonItem>
+                              </IonList>
+                              <IonList inset={true}>
+                                {currentCard ? (
+                                  currentCard.assignments?.map((member) => (
+                                    <IonItemSliding>
+                                      <IonItem>
+                                        <IonAvatar aria-hidden="true" slot="start">
+                                          <IonImg src={member?.picture} />
+                                        </IonAvatar>
+                                        <IonLabel>{member?.name}</IonLabel>
+                                      </IonItem>
+                                      <IonItemOptions slot="end">
+                                        <IonItemOption color="danger" id="delete-card-assignee" onClick={() => handleDeleteCardAssignments(member.user_id)}>
+                                          <IonIcon slot="icon-only" icon={closeOutline} />
+                                        </IonItemOption>
+                                      </IonItemOptions >
+                                    </IonItemSliding>
+                                  ))) : (
+                                  <IonItem>
+                                    <IonLabel>No members are assigned</IonLabel>
+                                  </IonItem>
+                                )}
+                                <IonAlert
+                                isOpen={deleteAssignedMemberAlert}
+                                trigger="delete-card-assignee"
+                                header="Are you sure you want to remove this member from this card?"
+                                buttons={[
+                                  {
+                                    text: "Cancel",
+                                    role: "cancel",
+                                  },
+                                  {
+                                    text: "Delete",
+                                    role: 'confirm',
+                                  },
+                                ]}
+                                onIonAlertDidDismiss={({ detail }) => {
+                                  if (detail.role === 'confirm') {
+                                    deleteAssignedMember(detailedPanels![currentPanelIndex!].id, currentCard, memberIdToRemove!);
+                                  }
+                                  setDeleteAssignedMemberAlert(false);
+                                }}
+                              />
                               </IonList>
                               <IonRow className="ion-justify-content-center ion-padding" >
                                 <IonButton size="small" color="danger" id="delete-card-alert" onClick={() => handleDeleteCard(currentCard!.id)}>Delete</IonButton>
@@ -1147,9 +1260,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                           {
                             text: 'Cancel',
                             role: 'cancel',
-                            handler: () => {
-                              console.log('Alert cancelled')
-                            }
+                            handler: () => { }
                           },
                           {
                             text: 'Create new stack',

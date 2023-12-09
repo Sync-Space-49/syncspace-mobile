@@ -29,7 +29,7 @@ const DeleteButton: React.FC = () => {
   const deleteAccount = async (userId: string, token: string) => {
     const options = {
       method: "DELETE",
-      url: `${serverAdress}api/users/${userId}`,
+      url: `${serverAdress}/api/users/${userId}`,
       headers: { authorization: `Bearer ${token}` },
     }
 

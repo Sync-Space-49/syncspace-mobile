@@ -27,7 +27,7 @@ const NewPanel: React.FC<NewPanelProps> = ({ orgId, boardId, getDetailedBoard })
 
         const options = {
             method: "POST",
-            url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels`,
+            url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels`,
             headers: { authorization: `Bearer ${token}` },
             data: body
         };

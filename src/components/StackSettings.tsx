@@ -50,7 +50,7 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId, getDet
         let token = await getAccessTokenSilently();
         const options = {
             method: "DELETE",
-            url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stack.id}`,
+            url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stack.id}`,
             headers: { authorization: `Bearer ${token}` },
         }
 
@@ -75,7 +75,7 @@ const ItemModal: React.FC<StackSettingsProps> = ({ stack, orgId, boardId, getDet
 
             const options = {
                 method: "PUT",
-                url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stack.id}`,
+                url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stack.id}`,
                 headers: { authorization: `Bearer ${token}` },
                 data: body
             };

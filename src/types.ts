@@ -33,7 +33,7 @@ interface Stack {
 }
 
 interface Card {
-    assignments?: [],
+    assignments?: User [],
     id: string,
     title: string,
     description?: string,
