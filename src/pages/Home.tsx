@@ -72,7 +72,7 @@ const Home: React.FC = () => {
       body.append("description", "Personal organization");
       const options = {
         method: "POST",
-        url: `${serverAdress}api/organizations`,
+        url: `${serverAdress}/api/organizations`,
         headers: { authorization: `Bearer ${token}` },
         data: body,
       };
@@ -92,7 +92,7 @@ const Home: React.FC = () => {
     const userId = user!.sub;
     const options = {
       method: "GET",
-      url: `${serverAdress}api/users/${userId}/organizations`,
+      url: `${serverAdress}/api/users/${userId}/organizations`,
       headers: { authorization: `Bearer ${token}` },
     };
 
@@ -112,7 +112,7 @@ const Home: React.FC = () => {
     const userId = user!.sub;
     const options = {
       method: "GET",
-      url: `${serverAdress}api/users/${userId}/boards`,
+      url: `${serverAdress}/api/users/${userId}/boards`,
       headers: { authorization: `Bearer ${token}` },
     };
 
@@ -135,7 +135,7 @@ const Home: React.FC = () => {
     const userId = user!.sub;
     const options = {
       method: "GET",
-      url: `${serverAdress}api/users/${userId}/assigned`,
+      url: `${serverAdress}/api/users/${userId}/assigned`,
       headers: { authorization: `Bearer ${token}` },
     };
 
@@ -156,7 +156,7 @@ const Home: React.FC = () => {
     const userId = user!.sub;
     const options = {
       method: "GET",
-      url: `${serverAdress}api/users/${userId}/boards/favourite`,
+      url: `${serverAdress}/api/users/${userId}/boards/favourite`,
       headers: { authorization: `Bearer ${token}` },
     };
 

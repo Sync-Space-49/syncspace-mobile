@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
     let userId = user!.sub;
     const options = {
       method: "GET",
-      url: `${serverAdress}api/users/${userId}/organizations`,
+      url: `${serverAdress}/api/users/${userId}/organizations`,
       headers: { authorization: `Bearer ${token}` },
     };
 
@@ -119,9 +119,6 @@ const Profile: React.FC = () => {
         <OrgList orgs={orgNames} updateOrgList={updateOrgList} />
         <div className="list-title">Actions</div>
         <IonList inset={true}>
-          <IonItem>
-            <IonLabel>Change Password</IonLabel>
-          </IonItem>
           <LogoutButton />
           <IonGrid>
             <IonRow>
