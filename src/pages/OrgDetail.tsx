@@ -120,7 +120,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
     let token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}api/organizations/${orgId}`,
+      url: `${serverAdress}/api/organizations/${orgId}`,
       headers: { authorization: `Bearer ${token}` },
     };
     await axios(options)
@@ -138,7 +138,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
     let token = await getAccessTokenSilently();
     const options = {
       method: "GET",
-      url: `${serverAdress}api/organizations/${orgId}/boards`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards`,
       headers: { authorization: `Bearer ${token}` },
     };
     let data: any;
@@ -177,7 +177,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
     const options = {
       method: "POST",
-      url: `${serverAdress}api/organizations/${orgId}/boards`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards`,
       headers: { authorization: `Bearer ${token}` },
       data: body,
     };
@@ -234,7 +234,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
     const options = {
       method: "POST",
-      url: `${serverAdress}api/organizations/${orgId}/boards/ai`,
+      url: `${serverAdress}/api/organizations/${orgId}/boards/ai`,
       headers: { authorization: `Bearer ${token}` },
       data: body,
     };

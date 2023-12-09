@@ -38,7 +38,7 @@ const NewStack: React.FC<NewStackProps> = ({ hasStacks, panelId, orgId, boardId,
 
         const options = {
             method: "POST",
-            url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks`,
+            url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks`,
             headers: { authorization: `Bearer ${token}` },
             data: body,
         };

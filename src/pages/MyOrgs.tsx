@@ -49,7 +49,7 @@ const MyOrgs: React.FC = () => {
       const userId = user!.sub;
       const options = {
         method: "GET",
-        url: `${serverAdress}api/users/${userId}/organizations`,
+        url: `${serverAdress}/api/users/${userId}/organizations`,
         headers: { authorization: `Bearer ${newToken}` },
       };
 
@@ -68,7 +68,7 @@ const MyOrgs: React.FC = () => {
       const userId = user!.sub;
       const options = {
         method: "GET",
-        url: `${serverAdress}api/users/${userId}/organizations`,
+        url: `${serverAdress}/api/users/${userId}/organizations`,
         headers: { authorization: `Bearer ${token}` },
       };
 
@@ -94,7 +94,7 @@ const MyOrgs: React.FC = () => {
     }
     const options = {
       method: "POST",
-      url: `${serverAdress}api/organizations`,
+      url: `${serverAdress}/api/organizations`,
       headers: { authorization: `Bearer ${token}` },
       data: body,
     };

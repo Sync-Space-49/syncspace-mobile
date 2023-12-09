@@ -37,7 +37,7 @@ const OrgList: React.FC<OrgProps> = ({ orgs, updateOrgList }) => {
     let token = await getAccessTokenSilently();
     const options = {
       method: "DELETE",
-      url: `${serverAdress}api/organizations/${orgId}`,
+      url: `${serverAdress}/api/organizations/${orgId}`,
       headers: { authorization: `Bearer ${token}` },
     }
 

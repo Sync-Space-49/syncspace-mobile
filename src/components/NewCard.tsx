@@ -38,7 +38,7 @@ const NewCard: React.FC<NewCardProps> = ({ stack, orgId, boardId, getDetailedBoa
 
         const options = {
             method: "POST",
-            url: `${serverAdress}api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}/cards`,
+            url: `${serverAdress}/api/organizations/${orgId}/boards/${boardId}/panels/${panelId}/stacks/${stackId}/cards`,
             headers: { authorization: `Bearer ${token}` },
             data: body
         };
