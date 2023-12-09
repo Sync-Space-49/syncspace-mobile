@@ -38,7 +38,7 @@ import { serverAdress } from "../auth.config";
 import { Board, Organization } from "../types";
 import { useRef } from "react";
 import "./OrgDetails.css";
-import MemberList from "../components/MemberList";
+// import MemberList from "../components/MemberList";
 import { OverlayEventDetail } from "@ionic/core";
 
 interface OrgDetailPageProps
@@ -126,7 +126,9 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
     await axios(options)
       .then((response) => {
         const org = response.data;
+        console.log("ORG", org);
         setOrganization(org);
+        return org;
         // setLoading(false);
       })
       .catch((error) => {
@@ -446,7 +448,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                   <form
                     onSubmit={(event) => {
                       event.preventDefault();
-                      updateOrganization(title, description, aiEnabled);
+                      updateOrganization(orgTitle, orgDescription, aiEnabled);
                     }}
                     className="ion-nowrap"
                   >
@@ -454,7 +456,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                       <IonItem>
                         <IonInput
                           label="Title:"
-                          value={orgTitle}
+                          value={organization?.name}
                           onIonChange={(e) => setOrgTitle(e.detail.value!)}
                         />
                       </IonItem>
@@ -463,7 +465,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                           rows={3}
                           autoGrow={true}
                           label="Description:"
-                          value={orgDescription}
+                          value={organization?.description}
                           onIonChange={(e) =>
                             setOrgDescription(e.detail.value!)
                           }
@@ -492,9 +494,9 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
                     </IonLabel>
                   </IonRow>
                   <IonList inset={true}>
+                    {/* <MemberList />
                     <MemberList />
-                    <MemberList />
-                    <MemberList />
+                    <MemberList /> */}
                   </IonList>
                   <IonRow className="ion-justify-content-center ion-padding">
                     <IonButton
