@@ -55,11 +55,11 @@ const Home: React.FC = () => {
       duration: 3000,
     });
     // }
-    console.log("isFirstLogin: " + isFirstLogin);
+    // console.log("isFirstLogin: " + isFirstLogin);
     if (isFirstLogin) {
       const userOrgs: Organization[] | null = await getUserOrganizations();
       if (userOrgs) {
-        console.log("user orgs are: ", userOrgs);
+        // console.log("user orgs are: ", userOrgs);
         return console.log("user orgs exist, exited personal org creation");
       }
       const token = await getAccessTokenSilently();
@@ -120,8 +120,8 @@ const Home: React.FC = () => {
       .then((response) => {
         const userBoards = response.data;
         console.log("user boards: ", userBoards);
-        console.log("user boards, board id", response.data[0].id);
-        console.log("user boards, org id", response.data[0].organization_id);
+        // console.log("user boards, board id", response.data[0].id);
+        // console.log("user boards, org id", response.data[0].organization_id);
         setUserBoards(userBoards);
         return userBoards;
       })
@@ -164,11 +164,11 @@ const Home: React.FC = () => {
       .then((response) => {
         const favouritedBoards = response.data;
         console.log("user favourited boards: ", favouritedBoards);
-        console.log("user favourited boards, board id", response.data[0].id);
-        console.log(
-          "user favourited boards, org id",
-          response.data[0].organization_id
-        );
+        // console.log("user favourited boards, board id", response.data[0].id);
+        // console.log(
+        //   "user favourited boards, org id",
+        //   response.data[0].organization_id
+        // );
         setFavouritedBoard(favouritedBoards);
         return favouritedBoards;
       })
@@ -205,7 +205,7 @@ const Home: React.FC = () => {
         );
       });
 
-      console.log("Sorted Boards: ", sortedBoards);
+      // console.log("Sorted Boards: ", sortedBoards);
       const recentBoards = sortedBoards.slice(0, 3);
 
       const newBoardItems = recentBoards.map((board) => ({
@@ -216,7 +216,7 @@ const Home: React.FC = () => {
           "https://s3.us-east-1.wasabisys.com/sync-space/logo/SyncSpace-mint.png",
       }));
 
-      console.log("New Board Items: ", newBoardItems);
+      // console.log("New Board Items: ", newBoardItems);
 
       setBoardItems(newBoardItems);
     }

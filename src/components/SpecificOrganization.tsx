@@ -36,7 +36,7 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({
       let data: any;
       await axios(options)
         .then((response) => {
-          console.log("SpecificOrganization, Boards fetched: ", response.data);
+          // console.log("SpecificOrganization, Boards fetched: ", response.data);
           data = response.data;
           setBoards(data);
           updateOrgList();

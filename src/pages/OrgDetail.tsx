@@ -156,7 +156,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
       .then(async (response) => {
         console.log("success, board created, response: ", response);
         const boardId = response.data.id;
-        console.log("boardId: ", boardId);
+        // console.log("boardId: ", boardId);
 
         await getAccessTokenSilently().then(() => {
           getBoards();
@@ -242,7 +242,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
   const handleNewAI = () => {
     setShowCreateAIModal(true);
-    console.log("New board with AI clicked!");
+    // console.log("New board with AI clicked!");
   };
   const handleCreateBoard = () => {
     setShowAlert(true);
@@ -263,7 +263,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
 
   useEffect(() => {
     if (boards) {
-      console.log("boards before processing: ", boards);
+      // console.log("boards before processing: ", boards);
       let hiddenBoards = [];
       let nonHiddenBoards = [];
 
@@ -284,7 +284,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
           boardId: board.id,
         }));
         setViewableBoardsProps(viewableListProp);
-        console.log("Viewable Boards Props:", viewableListProp);
+        // console.log("Viewable Boards Props:", viewableListProp);
       }
       if (hiddenBoards && hiddenBoards.length > 0) {
         const privateListProp = hiddenBoards.map((board) => ({
@@ -292,7 +292,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
           boardId: board.id,
         }));
         setHiddenBoardsProps(privateListProp);
-        console.log("Hidden Boards Props:", privateListProp);
+        // console.log("Hidden Boards Props:", privateListProp);
       }
     }
     if (boards && boards?.length <= 0) {
@@ -425,7 +425,7 @@ const OrgDetail: React.FC<OrgDetailPageProps> = ({ match }) => {
         <IonModal isOpen={showCreateAIModal} onDidDismiss={dismiss}>
           <IonHeader>
             <IonToolbar>
-              <IonTitle>Card Settings</IonTitle>
+              <IonTitle>AI Board Details</IonTitle>
               <IonButtons slot="end">
                 <IonButton onClick={() => setShowCreateAIModal(false)}>
                   Close

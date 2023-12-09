@@ -55,7 +55,7 @@ const MyOrgs: React.FC = () => {
 
       await axios(options)
         .then((response) => {
-          console.log("newtoken");
+          // console.log("newtoken");
           const userOrganizations = response.data;
           setOrganizations(userOrganizations);
         })
@@ -64,7 +64,7 @@ const MyOrgs: React.FC = () => {
         });
     } else {
       let token = await getAccessTokenSilently();
-      console.log("old token");
+      // console.log("old token");
       const userId = user!.sub;
       const options = {
         method: "GET",
@@ -103,7 +103,7 @@ const MyOrgs: React.FC = () => {
       .then(async (response) => {
         console.log("success, org created, response: ", response);
         const orgId = response.data.id;
-        console.log("orgId: ", orgId);
+        // console.log("orgId: ", orgId);
 
         await getAccessTokenSilently().then((token) => {
           getOrganizations(token);
@@ -134,60 +134,63 @@ const MyOrgs: React.FC = () => {
       </IonToolbar> */}
       {/* </IonHeader> */}
       {/* <IonHeader collapse="condense"> */}
-      
+
       <IonHeader collapse="condense">
-        <IonToolbar></IonToolbar> 
+        <IonToolbar></IonToolbar>
         <IonToolbar>
           <IonTitle size="large">My Organizations</IonTitle>
           <IonButtons slot="end">
-            <IonButton id="click-trigger" onClick={() => setIsPopoverOpen(true)}>
+            <IonButton
+              id="click-trigger"
+              onClick={() => setIsPopoverOpen(true)}
+            >
               <IonIcon slot="icon-only" icon={addOutline} />
             </IonButton>
           </IonButtons>
         </IonToolbar>
-          <IonPopover
-            isOpen={isPopoverOpen}
-            onDidDismiss={() => setIsPopoverOpen(false)}
-            trigger="click-trigger"
-            triggerAction="click"
-          >
-            <IonList>
-              <IonItem
-                button={true}
-                detail={false}
-                onClick={handleCreateOrganization}
-              >
-                Create a new organization
-              </IonItem>
-              <IonAlert
-                isOpen={showAlert}
-                onDidDismiss={() => setShowAlert(false)}
-                header="Please enter your organization details"
-                buttons={[
-                  {
-                    text: "Finish",
-                    handler: (alertData) => {
-                      const title = alertData.title;
-                      const description = alertData.description;
-                      createOrganization(title, description);
-                    },
+        <IonPopover
+          isOpen={isPopoverOpen}
+          onDidDismiss={() => setIsPopoverOpen(false)}
+          trigger="click-trigger"
+          triggerAction="click"
+        >
+          <IonList>
+            <IonItem
+              button={true}
+              detail={false}
+              onClick={handleCreateOrganization}
+            >
+              Create a new organization
+            </IonItem>
+            <IonAlert
+              isOpen={showAlert}
+              onDidDismiss={() => setShowAlert(false)}
+              header="Please enter your organization details"
+              buttons={[
+                {
+                  text: "Finish",
+                  handler: (alertData) => {
+                    const title = alertData.title;
+                    const description = alertData.description;
+                    createOrganization(title, description);
                   },
-                ]}
-                inputs={[
-                  {
-                    name: "title",
-                    placeholder: "Title",
-                  },
-                  {
-                    name: "description",
-                    type: "textarea",
-                    placeholder: "Description",
-                  },
-                ]}
-              />
-            </IonList>
-          </IonPopover>
-      <IonSearchbar></IonSearchbar>
+                },
+              ]}
+              inputs={[
+                {
+                  name: "title",
+                  placeholder: "Title",
+                },
+                {
+                  name: "description",
+                  type: "textarea",
+                  placeholder: "Description",
+                },
+              ]}
+            />
+          </IonList>
+        </IonPopover>
+        <IonSearchbar></IonSearchbar>
       </IonHeader>
       <IonContent>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
