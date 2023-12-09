@@ -26,7 +26,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="ion-padding" scroll-y="false">
+      <IonContent className="ion-padding">
         <div className="background-img">
           <IonImg src="https://s3.us-east-1.wasabisys.com/sync-space/rocket-tail.png" />
         </div>
