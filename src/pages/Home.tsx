@@ -186,8 +186,16 @@ const Home: React.FC = () => {
       if (user!.isFirstLogin && !orgCreated) {
         personalOrgSetup();
       }
+      const fetchData = async () => {
+        const token = await getAccessTokenSilently();
+        getUserBoards(token);
+        getUserAssignedCards(token);
+        getFavouriteBoards(token);
+      };
+
+      fetchData().catch(console.error);
     }
-  }, [user]);
+  }, [user, getAccessTokenSilently, isLoading, orgCreated]);
 
   useEffect(() => {
     if (userBoards) {
