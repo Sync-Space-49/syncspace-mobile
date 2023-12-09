@@ -65,7 +65,7 @@ const Home: React.FC = () => {
       const token = await getAccessTokenSilently();
       const body = new FormData();
       if (user?.name) {
-        body.append("title", `${user.name}'s `);
+        body.append("title", `${user.name}'s board`);
       } else {
         body.append("title", `${user?.nickname}'s board`);
       }
@@ -186,8 +186,16 @@ const Home: React.FC = () => {
       if (user!.isFirstLogin && !orgCreated) {
         personalOrgSetup();
       }
+      const fetchData = async () => {
+        const token = await getAccessTokenSilently();
+        getUserBoards(token);
+        getUserAssignedCards(token);
+        getFavouriteBoards(token);
+      };
+
+      fetchData().catch(console.error);
     }
-  }, [user]);
+  }, [user, getAccessTokenSilently, isLoading, orgCreated]);
 
   useEffect(() => {
     if (userBoards) {
@@ -239,6 +247,7 @@ const Home: React.FC = () => {
       setFavoritedBoardItems(newFavouritedBoard);
     }
   }, [favouritedBoard]);
+  
 
   return (
     <IonPage>

@@ -39,7 +39,6 @@ import {
   IonToggle,
   IonAvatar,
   IonImg,
-  SelectChangeEventDetail,
 } from "@ionic/react";
 import {
   ellipsisHorizontal,
@@ -116,7 +115,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const page = useRef(undefined);
   const userId = user?.sub;
-  const members = ["Member 1", "Member 2", "Member 3"];  // temp
 
 
   /*   States   */
@@ -146,7 +144,6 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
   const [cards, setCards] = useState<Card[]>();
   const [currentCard, setCurrentCard] = useState<Card>();
   const [boardMembers, setBoardMembers] = useState<User[]>();
-  // const [cardAssignees, setCardAssignees] = useState<string[] | null>(null);
   const [memberIdToRemove, setMemberIdToRemove] = useState<string>();
   const [presentingElement, setPresentingElement] = useState<HTMLElement | undefined>(undefined);
 
@@ -181,7 +178,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
       });
   };
 
-  const getBoard = async () => { // may not need
+  const getBoard = async () => {
     const token = await getAccessTokenSilently();
     const options = {
       method: "GET",
@@ -598,12 +595,12 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     setCardModal(false);
   };
 
-  const onWillDisimss = (event: CustomEvent<OverlayEventDetail>) => {  // probably not needed
+  const onWillDisimss = (event: CustomEvent<OverlayEventDetail>) => { 
     dismiss();
   };
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    getDetailedBoard(); // may want to be something else but this is fine for now
+    getDetailedBoard(); 
     event.detail.complete();
   };
 
@@ -644,12 +641,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     };
   };
 
-  // TODO: implement server requests and other logic
   const handleReorder = (event: CustomEvent<ItemReorderEventDetail>) => {
-        // if ((event.target as any)[`card_position_id_${card.id}`].value !== card.position) {
-    //     possible_new_position = (event.target as any)[`card_position_id_${card.id}`].value;
-    //     body.description = possible_new_position;
-    // };
     console.log("dragged from index", event.detail.from, "to", event.detail.to);
     event.detail.complete();
   };
@@ -710,12 +702,12 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
     if (possible_new_stack_id && possible_new_stack_id !== body.stack_id) {
       body.stack_id = possible_new_stack_id;
     }
-    // if ((event.target as any)[`card_points_id_${card.id}`].value !== card.points) {
-    //     possible_new_points = (event.target as any)[`card_points_id_${card.id}`].value;
-    //     body.title = possible_new_points;
-    // };
+    if ((event.target as any)[`card_points_id_${card.id}`].value !== card.points) {
+        possible_new_points = (event.target as any)[`card_points_id_${card.id}`].value;
+        body.points = possible_new_points;
+    };
 
-    if (body.description !== '' || body.title !== '') {
+    if (body.description !== '' || body.title !== '' || body.points) {
       updateCard(cardId, panelId, body);
     };
   };
@@ -1108,7 +1100,7 @@ const Board: React.FC<BoardDetailPageProps> = ({ match }) => {
                                       <IonTextarea rows={3} autoGrow={true} label="Description:" value={currentCard.description} name={`card_description_id_${currentCard.id}`} />
                                     </IonItem>
                                     <IonItem>
-                                      <IonLabel>Points:</IonLabel>{currentCard.points}
+                                      <IonInput label="Story Points" value={currentCard.points} name={`card_points_id_${currentCard.id}`} />
                                     </IonItem>
                                     {detailedPanels || currentPanelIndex ?
                                       <>

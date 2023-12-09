@@ -55,8 +55,6 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({
     getBoards();
   }, []);
 
-  // todo: distinguish hidden boards from other boards
-
   useEffect(() => {
     if (boards && boards.length > 0) {
       const updatedBoardNames = boards.map((board) => ({
@@ -68,7 +66,6 @@ const SpecificOrganization: React.FC<SpecificOrganizationProps> = ({
       setBoardNames(updatedBoardNames);
     } else {
       console.log("no boards");
-      //   const noBoards = [{}];
       setBoardNames([]);
     }
     setIsLoading(false);
